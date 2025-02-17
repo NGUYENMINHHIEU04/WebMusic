@@ -1,9 +1,9 @@
 import React from "react";
 import { FaHome, FaSearch, FaBook } from "react-icons/fa";
 
-const Sidebar = () => {
+const LeftSidebar = () => {
   return (
-    <div className="w-64 bg-gray-900 text-white p-5">
+    <div className="w-1/5 bg-gray-900 text-white p-5 rounded-lg">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Spotify</h1>
       </div>
@@ -28,4 +28,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default LeftSidebar;
