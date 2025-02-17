@@ -10,7 +10,7 @@ import { HiMiniQueueList } from "react-icons/hi2";
 import { CgMiniPlayer } from "react-icons/cg";
 import { GoScreenFull } from "react-icons/go";
 
-const MusicPlayer = ({ onToggleSingerInfo }) => {
+const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   const togglePlay = () => {
@@ -70,7 +70,9 @@ const MusicPlayer = ({ onToggleSingerInfo }) => {
             className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
             onClick={onToggleSingerInfo} // Thêm sự kiện onClick để toggle hiển thị thông tin ca sĩ
           />
-          <MdLyrics className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <MdLyrics 
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
+            onClick={onToggleLyrics}/>
           <HiMiniQueueList className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <MdImportantDevices className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <FaVolumeUp className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
