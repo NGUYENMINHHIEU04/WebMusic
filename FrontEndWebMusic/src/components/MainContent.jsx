@@ -6,7 +6,7 @@ import Playlist from "./PlaylistCard";
 const MainContent = () => {
 
   return (
-    <div className="flex-1 bg-zinc-900 p-5 text-white">
+    <div className="w-3/5 bg-gray-800 p-5 text-white rounded-lg">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold">Welcome Back!</h2>
       </div>

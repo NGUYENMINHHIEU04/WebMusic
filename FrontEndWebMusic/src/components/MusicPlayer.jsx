@@ -10,7 +10,7 @@ import { HiMiniQueueList } from "react-icons/hi2";
 import { CgMiniPlayer } from "react-icons/cg";
 import { GoScreenFull } from "react-icons/go";
 
-const MusicPlayer = () => {
+const MusicPlayer = ({ onToggleSingerInfo }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   const togglePlay = () => {
@@ -66,17 +66,20 @@ const MusicPlayer = () => {
 
         {/* Volume Control (30% width) */}
         <div className="flex items-center justify-end space-x-4 w-[30%]">
-          <AiOutlinePlaySquare className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"/>
-          <MdLyrics className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"/>
-          <HiMiniQueueList className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"/>
-          <MdImportantDevices className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"/>
+          <AiOutlinePlaySquare
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
+            onClick={onToggleSingerInfo} // Thêm sự kiện onClick để toggle hiển thị thông tin ca sĩ
+          />
+          <MdLyrics className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <HiMiniQueueList className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <MdImportantDevices className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <FaVolumeUp className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <div className="h-1 w-20 bg-gray-700 rounded-full">
             <div className="h-1 bg-green-500 rounded-full" style={{ width: "70%" }}></div>
           </div>
         </div>
-          <CgMiniPlayer className="m-3 w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-          <GoScreenFull className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"/>
+        <CgMiniPlayer className="m-3 w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+        <GoScreenFull className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
       </div>
     </div>
   );
