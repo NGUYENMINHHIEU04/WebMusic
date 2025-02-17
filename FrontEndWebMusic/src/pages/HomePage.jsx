@@ -26,7 +26,7 @@ const Homepage = () => {
       <Header />
       <div className="flex flex-1 p-1 space-x-1 bg-black">
         <LeftSidebar />
-        <MainContent />
+        <MainContent showSingerInfo={showSingerInfo} /> {/* Truyền trạng thái showSingerInfo vào MainContent */}
         {showSingerInfo && <RightSidebarSingerInformation singer={singer} />} {/* Hiển thị RightSidebarSingerInformation khi showSingerInfo là true */}
       </div>
       <Footer />
