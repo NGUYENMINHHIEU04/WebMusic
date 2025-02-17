@@ -10,7 +10,7 @@ import { HiMiniQueueList } from "react-icons/hi2";
 import { CgMiniPlayer } from "react-icons/cg";
 import { GoScreenFull } from "react-icons/go";
 
-const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics }) => {
+const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics, onToggleQueue }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   const togglePlay = () => {
@@ -31,7 +31,16 @@ const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics }) => {
             <p className="font-semibold">Chay Nagy Di - Sky Tour 2019</p>
             <p className="text-sm text-gray-400">Son Tung M-TP</p>
           </div>
-          <FaHeart className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <div className="relative group">
+            <FaHeart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+            <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+              Favorite
+            </span>
+          </div>
+
+
         </div>
 
         {/* Player Controls (40% width) */}
@@ -68,12 +77,16 @@ const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics }) => {
         <div className="flex items-center justify-end space-x-4 w-[30%]">
           <AiOutlinePlaySquare
             className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
-            onClick={onToggleSingerInfo} // Thêm sự kiện onClick để toggle hiển thị thông tin ca sĩ
+            onClick={onToggleSingerInfo}
           />
-          <MdLyrics 
-            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
-            onClick={onToggleLyrics}/>
-          <HiMiniQueueList className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <MdLyrics
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
+            onClick={onToggleLyrics} // Thêm sự kiện onClick để toggle hiển thị Lyrics
+          />
+          <HiMiniQueueList 
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
+            onClick={onToggleQueue} 
+          />
           <MdImportantDevices className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <FaVolumeUp className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <div className="h-1 w-20 bg-gray-700 rounded-full">

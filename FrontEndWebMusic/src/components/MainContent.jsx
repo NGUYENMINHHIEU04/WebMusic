@@ -5,7 +5,7 @@ const MainContent = ({ showSingerInfo }) => {
   return (
     <div
       className={`bg-gray-800 p-5 text-white rounded-lg ${
-        showSingerInfo ? "w-3/5" : "w-4/5" // Chiều rộng thay đổi dựa trên showSingerInfo
+        showSingerInfo ? "w-4/5" : "w-4/5" // Chiều rộng thay đổi dựa trên showSingerInfo
       }`}
     >
       <div className="flex justify-between items-center mb-6">
