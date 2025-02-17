@@ -28,6 +28,7 @@ const Homepage = () => {
 
   const toggleSingerInfo = () => {
     setShowSingerInfo(!showSingerInfo);
+    setShowQueue(false);
   };
 
   const toggleLyrics = () => {
@@ -36,6 +37,7 @@ const Homepage = () => {
 
   const toggleQueue = () => {
     setShowQueue(!showQueue);
+    setShowSingerInfo(false);
   };
 
   return (
