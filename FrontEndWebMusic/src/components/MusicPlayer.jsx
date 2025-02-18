@@ -219,6 +219,7 @@ const MusicPlayer = ({
   const [showMiniPlayer, setShowMiniPlayer] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const musicPlayerRef = useRef(null);
+  const [showLyrics, setShowLyrics] = useState(false);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
@@ -254,8 +255,8 @@ const MusicPlayer = ({
       <div
         ref={musicPlayerRef}
         className={`fixed ${isFullScreen
-            ? "inset-0 bg-gray-900 flex flex-col items-center justify-center"
-            : "bottom-0 left-0 right-0"
+          ? "inset-0 bg-gray-900 flex flex-col items-center justify-center"
+          : "bottom-0 left-0 right-0"
           } fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4`}
       >
         {isFullScreen ? (
@@ -263,15 +264,29 @@ const MusicPlayer = ({
             <p className="text-gray-400 text-sm mb-2">PLAYING FROM ARTIST</p>
             <h1 className="text-3xl font-bold mb-4">Son Tung M-TP</h1>
 
-            <img
-              src={musicImage}
-              alt="Album Cover"
-              className="w-64 h-64 rounded-lg mx-auto mb-8"
-            />
-
-            <h2 className="text-2xl font-bold mb-2">SKYTOUR</h2>
-            <p className="text-lg">Chay Ngay Di - Sky Tour 2019</p>
-            <p className="text-gray-400 mt-2">Son Tung M-TP</p>
+            {showLyrics ? (
+              <div className="h-96 overflow-y-auto bg-gray-800 p-6 rounded-lg mx-auto mb-8 w-3/4">
+                <h2 className="text-2xl font-bold mb-4">Lời bài hát</h2>
+                <pre className="whitespace-pre-wrap text-left">
+                  {`[Verse 1]
+Chạy ngay đi, chạy ngay đi
+Bao nhiêu thử thách ta cùng đi qua
+Chạy ngay đi, chạy ngay đi
+Sky Tour này là của chúng ta`}
+                </pre>
+              </div>
+            ) : (
+              <>
+                <img
+                  src={musicImage}
+                  alt="Album Cover"
+                  className="w-64 h-64 rounded-lg mx-auto mb-8"
+                />
+                <h2 className="text-2xl font-bold mb-2">SKYTOUR</h2>
+                <p className="text-lg">Chay Ngay Di - Sky Tour 2019</p>
+                <p className="text-gray-400 mt-2">Son Tung M-TP</p>
+              </>
+            )}
 
             <div className="mt-8 w-full max-w-2xl mx-auto">
               <div className="flex justify-between text-sm mb-2">
@@ -305,22 +320,16 @@ const MusicPlayer = ({
               <div className="relative group">
                 <MdLyrics
                   className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer"
-                  onClick={onToggleLyrics} // Kết nối sự kiện
+                  onClick={() => setShowLyrics(!showLyrics)}
                 />
-                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
-           transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
-           whitespace-nowrap">
-                  Lyrics
-                </span>
               </div>
-            </div>
-
-            <button
+              <button
               onClick={toggleFullScreen}
-              className="mt-8 text-gray-400 hover:text-white"
+              className="w-6 h-6 text-gray-400 hover:text-white"
             >
               <GoScreenNormal className="w-6 h-6" />
             </button>
+            </div>
           </div>
         ) : (
           <div className="container mx-auto flex items-center justify-between">
