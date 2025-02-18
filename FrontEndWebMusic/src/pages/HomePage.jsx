@@ -7,11 +7,13 @@ import MusicPlayer from "../components/MusicPlayer";
 import Header from "../components/Header";
 import Lyrics from "../components/Lyrics"; // Import component mới
 import RightSidebarQueue from "../components/RightSidebarQueue";
+import RightSidebarDevice from "../components/RightSidebarDevice";
 
 const Homepage = () => {
   const [showSingerInfo, setShowSingerInfo] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
+  const [showDevice, setShowDevice] = useState(false);
 
   const singer = {
     name: "Son Tung M-TP",
@@ -29,6 +31,7 @@ const Homepage = () => {
   const toggleSingerInfo = () => {
     setShowSingerInfo(!showSingerInfo);
     setShowQueue(false);
+    setShowDevice(false);
   };
 
   const toggleLyrics = () => {
@@ -38,6 +41,13 @@ const Homepage = () => {
   const toggleQueue = () => {
     setShowQueue(!showQueue);
     setShowSingerInfo(false);
+    setShowDevice(false);
+  };
+
+  const toggleDevice = () => {
+    setShowDevice(!showDevice);
+    setShowSingerInfo(false); // Ẩn RightSidebarSingerInformation khi hiển thị RightSidebarDevice
+    setShowQueue(false); // Ẩn RightSidebarQueue khi hiển thị RightSidebarDevice
   };
 
   return (
@@ -52,12 +62,14 @@ const Homepage = () => {
         )}
         {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
         {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
+        {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
       </div>
       <Footer />
       <MusicPlayer 
       onToggleSingerInfo={toggleSingerInfo} 
       onToggleLyrics={toggleLyrics} 
       onToggleQueue={toggleQueue}
+      onToggleDevice={toggleDevice}
       />
     </div>
   );
