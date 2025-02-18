@@ -10,7 +10,12 @@ import { HiMiniQueueList } from "react-icons/hi2";
 import { CgMiniPlayer } from "react-icons/cg";
 import { GoScreenFull } from "react-icons/go";
 
-const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics, onToggleQueue }) => {
+const MusicPlayer = ({ 
+  onToggleSingerInfo, 
+  onToggleLyrics, 
+  onToggleQueue,
+  onToggleDevice, 
+}) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
 
   const togglePlay = () => {
@@ -87,7 +92,10 @@ const MusicPlayer = ({ onToggleSingerInfo, onToggleLyrics, onToggleQueue }) => {
             className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
             onClick={onToggleQueue} 
           />
-          <MdImportantDevices className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <MdImportantDevices 
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
+            onClick={onToggleDevice}
+          />
           <FaVolumeUp className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
           <div className="h-1 w-20 bg-gray-700 rounded-full">
             <div className="h-1 bg-green-500 rounded-full" style={{ width: "70%" }}></div>
