@@ -28,6 +28,19 @@ const MusicPlayer = ({
     setShowMiniPlayer(!showMiniPlayer); // Toggle hiển thị MiniPlayer
   };
 
+    // Hàm kích hoạt chế độ toàn màn hình
+    const toggleFullScreen = () => {
+      if (!document.fullscreenElement) {
+        // Nếu không ở chế độ toàn màn hình, kích hoạt toàn màn hình
+        document.documentElement.requestFullscreen().catch((err) => {
+          console.error("Lỗi khi kích hoạt toàn màn hình:", err);
+        });
+      } else {
+        // Nếu đang ở chế độ toàn màn hình, thoát toàn màn hình
+        document.exitFullscreen();
+      }
+    };
+
   return (
     <>
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4">
@@ -148,7 +161,9 @@ const MusicPlayer = ({
             className="m-3 w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
             onClick={toggleMiniPlayer} 
           />
-        <GoScreenFull className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+        <GoScreenFull 
+        className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
+        onClick={toggleFullScreen}/>
       </div>
     </div>
     
