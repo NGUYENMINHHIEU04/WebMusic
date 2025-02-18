@@ -9,20 +9,27 @@ import { AiOutlinePlaySquare } from "react-icons/ai";
 import { HiMiniQueueList } from "react-icons/hi2";
 import { CgMiniPlayer } from "react-icons/cg";
 import { GoScreenFull } from "react-icons/go";
+import MiniPlayer from "./MiniPlayer";
 
-const MusicPlayer = ({ 
-  onToggleSingerInfo, 
-  onToggleLyrics, 
+const MusicPlayer = ({
+  onToggleSingerInfo,
+  onToggleLyrics,
   onToggleQueue,
-  onToggleDevice, 
+  onToggleDevice,
 }) => {
   const [isPlaying, setIsPlaying] = React.useState(false);
+  const [showMiniPlayer, setShowMiniPlayer] = React.useState(false);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
   };
 
+  const toggleMiniPlayer = () => {
+    setShowMiniPlayer(!showMiniPlayer); // Toggle hiển thị MiniPlayer
+  };
+
   return (
+    <>
     <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4">
       <div className="container mx-auto flex items-center justify-between">
         {/* Song Info (30% width) */}
@@ -51,21 +58,57 @@ const MusicPlayer = ({
         {/* Player Controls (40% width) */}
         <div className="flex flex-col items-center space-y-2 w-[40%]">
           <div className="flex items-center space-x-4">
-            <RxShuffle className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
-            <MdSkipPrevious className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+            <div className="relative group">
+              <RxShuffle className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                Enable shuffle
+              </span>
+            </div>
+            <div className="relative group">
+              <MdSkipPrevious className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                Previous
+              </span>
+            </div>
             {isPlaying ? (
-              <FaCirclePause
-                className="w-8 h-8 text-white cursor-pointer"
-                onClick={togglePlay}
-              />
+              <div className="relative group">
+                <FaCirclePause className="w-8 h-8 text-white cursor-pointer" onClick={togglePlay} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                  Pause
+                </span>
+              </div>
             ) : (
-              <FaCirclePlay
-                className="w-8 h-8 text-white cursor-pointer"
-                onClick={togglePlay}
-              />
+              <div className="relative group">
+                <FaCirclePlay className="w-8 h-8 text-white cursor-pointer" onClick={togglePlay} />
+                <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                  Play
+                </span>
+              </div>
             )}
-            <MdSkipNext className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
-            <CiRepeat className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+            <div className="relative group">
+              <MdSkipNext className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer" />
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                Next
+              </span>
+            </div>
+            <div className="relative group">
+              <CiRepeat className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+              <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100
+                   transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg 
+                   whitespace-nowrap">
+                Enable repeat
+              </span>
+            </div>
           </div>
 
           {/* Seek Bar (90% width of Player Controls) */}
@@ -88,12 +131,12 @@ const MusicPlayer = ({
             className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
             onClick={onToggleLyrics} // Thêm sự kiện onClick để toggle hiển thị Lyrics
           />
-          <HiMiniQueueList 
+          <HiMiniQueueList
             className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
-            onClick={onToggleQueue} 
+            onClick={onToggleQueue}
           />
-          <MdImportantDevices 
-            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
+          <MdImportantDevices
+            className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer"
             onClick={onToggleDevice}
           />
           <FaVolumeUp className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
@@ -101,10 +144,24 @@ const MusicPlayer = ({
             <div className="h-1 bg-green-500 rounded-full" style={{ width: "70%" }}></div>
           </div>
         </div>
-        <CgMiniPlayer className="m-3 w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
+          <CgMiniPlayer 
+            className="m-3 w-5 h-5 text-gray-400 hover:text-white cursor-pointer" 
+            onClick={toggleMiniPlayer} 
+          />
         <GoScreenFull className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer" />
       </div>
     </div>
+    
+
+     {/* Hiển thị MiniPlayer nếu showMiniPlayer là true */}
+      {showMiniPlayer && (
+        <MiniPlayer
+          isPlaying={isPlaying}
+          togglePlay={togglePlay}
+          onClose={toggleMiniPlayer} // Truyền hàm đóng MiniPlayer
+        />
+      )}
+    </>
   );
 };
 
