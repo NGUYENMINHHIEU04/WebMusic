@@ -1,5 +1,6 @@
 import React from "react";
 import Playlist from "./PlaylistCard";
+import Footer from "./Footer";
 
 const MainContent = ({ showSingerInfo }) => {
   return (
@@ -31,6 +32,8 @@ const MainContent = ({ showSingerInfo }) => {
         <Playlist />
         <Playlist />
       </div>
+      <br />
+      <Footer />
     </div>
   );
 };

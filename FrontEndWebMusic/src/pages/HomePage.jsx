@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import MainContent from "../components/MainContent";
 import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
-import Footer from "../components/Footer";
 import MusicPlayer from "../components/MusicPlayer";
 import Header from "../components/Header";
 import Lyrics from "../components/Lyrics"; // Import component mới
@@ -64,7 +63,6 @@ const Homepage = () => {
         {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
         {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
       </div>
-      <Footer />
       <MusicPlayer 
       onToggleSingerInfo={toggleSingerInfo} 
       onToggleLyrics={toggleLyrics} 
