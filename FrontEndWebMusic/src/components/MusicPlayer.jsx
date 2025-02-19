@@ -265,7 +265,7 @@ const MusicPlayer = ({
             <h1 className="text-3xl font-bold mb-4">Son Tung M-TP</h1>
 
             {showLyrics ? (
-              <div className="h-96 overflow-y-auto bg-gray-800 p-6 rounded-lg mx-auto mb-8 w-3/4">
+              <div className="h-96 overflow-y-auto bg-gray-900 p-6 rounded-lg mx-auto mb-8 w-3/4">
                 <h2 className="text-2xl font-bold mb-4">Lời bài hát</h2>
                 <pre className="whitespace-pre-wrap text-left">
                   {`[Verse 1]
