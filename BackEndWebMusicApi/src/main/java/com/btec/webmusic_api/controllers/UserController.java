@@ -1,8 +1,8 @@
-package com.btec.quanlykhohang_api.controllers;
+package com.btec.webmusic_api.controllers;
 
 
-import com.btec.quanlykhohang_api.entities.User;
-import com.btec.quanlykhohang_api.services.UserService;
+import com.btec.webmusic_api.entities.User;
+import com.btec.webmusic_api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

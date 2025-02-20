@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.btec</groupId>
-	<artifactId>quanlykhohang-api</artifactId>
+	<artifactId>webmusic_api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>quanlykhohang-api</name>
 	<description>Demo project for Spring Boot</description>

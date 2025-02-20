@@ -1,6 +1,6 @@
-package com.btec.quanlykhohang_api.repositories;
+package com.btec.webmusic_api.repositories;
 
-import com.btec.quanlykhohang_api.entities.Product;
+import com.btec.webmusic_api.entities.Product;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

@@ -1,9 +1,9 @@
-package com.btec.quanlykhohang_api.services;
+package com.btec.webmusic_api.services;
 
-import com.btec.quanlykhohang_api.entities.Order;
-import com.btec.quanlykhohang_api.entities.Product;
-import com.btec.quanlykhohang_api.repositories.OrderRepository;
-import com.btec.quanlykhohang_api.repositories.ProductRepository;
+import com.btec.webmusic_api.entities.Order;
+import com.btec.webmusic_api.entities.Product;
+import com.btec.webmusic_api.repositories.OrderRepository;
+import com.btec.webmusic_api.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

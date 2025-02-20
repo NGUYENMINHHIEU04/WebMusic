@@ -1,4 +1,4 @@
-package com.btec.quanlykhohang_api.entities;
+package com.btec.webmusic_api.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

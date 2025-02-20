@@ -1,4 +1,4 @@
-package com.btec.quanlykhohang_api.entities;
+package com.btec.webmusic_api.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,9 +12,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
-    private String birthDay;
     private boolean active;
-    private String address;
 
     // Getters and Setters
     public String getId() {
@@ -57,14 +55,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getBirthDay() {
-        return birthDay;
-    }
-
-    public void setBirthDay(String birthDay) {
-        this.birthDay = birthDay;
-    }
-
     public boolean isActive() {
         return active;
     }
@@ -73,11 +63,4 @@ public class User {
         this.active = active;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 }

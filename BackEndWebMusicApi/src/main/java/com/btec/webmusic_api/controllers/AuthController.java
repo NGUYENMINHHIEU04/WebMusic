@@ -1,15 +1,14 @@
-package com.btec.quanlykhohang_api.controllers;
+package com.btec.webmusic_api.controllers;
 
 
-import com.btec.quanlykhohang_api.entities.User;
-import com.btec.quanlykhohang_api.security.JwtUtil;
-import com.btec.quanlykhohang_api.services.UserService;
+import com.btec.webmusic_api.entities.User;
+import com.btec.webmusic_api.security.JwtUtil;
+import com.btec.webmusic_api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 
 
@@ -52,6 +51,8 @@ public class AuthController {
      * @param loginRequest A map containing email and password.
      * @return ResponseEntity with the JWT token or error message.
      */
+
+
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
