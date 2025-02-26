@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import MainContent from "../components/MainContent";
 import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
-import Footer from "../components/Footer";
 import MusicPlayer from "../components/MusicPlayer";
 import Header from "../components/Header";
 import Lyrics from "../components/Lyrics";
@@ -73,27 +72,27 @@ const Homepage = () => {
       <style>
         {`
           /* Custom scrollbar styling, keeping shape but changing color and reducing thickness by 2px */
-          .custom-scrollba::-webkit-scrollbar {
+          .custom-home-scrollbar::-webkit-scrollbar {
             width: 12px; /* Reduced from 6px to 4px (pull up and down 2px) */
           }
 
-          .custom-scrollba::-webkit-scrollbar-track {
+          .custom-home-scrollbar::-webkit-scrollbar-track {
             background: transparent; /* No background for track */
           }
 
-          .custom-scrollba::-webkit-scrollbar-thumb {
+          .custom-home-scrollbar::-webkit-scrollbar-thumb {
             background: #4a5568; /* green-400 for consistency with progress bar */
-            border-radius: 3px; /* Keep the same shape (minimal, rounded) */
+            border-radius: 1px; /* Keep the same shape (minimal, rounded) */
           }
 
-          .custom-scrollba::-webkit-scrollbar-thumb:hover {
+          .custom-home-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #6b7280; /* green-500 for a slightly darker hover */
           }
         `}
       </style>
       <div className="flex flex-col h-screen">
         <Header />
-        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-scrollba">
+        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-home-scrollbar">
           <LeftSidebar />
           {showLyrics ? (
             <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
@@ -111,18 +110,7 @@ const Homepage = () => {
           onToggleDevice={toggleDevice}
         />
       </div>
-<<<<<<< Updated upstream
-      <Footer />
-      <MusicPlayer 
-      onToggleSingerInfo={toggleSingerInfo} 
-      onToggleLyrics={toggleLyrics} 
-      onToggleQueue={toggleQueue}
-      onToggleDevice={toggleDevice}
-      />
-    </div>
-=======
     </>
->>>>>>> Stashed changes
   );
 };
 

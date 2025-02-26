@@ -1,5 +1,6 @@
 import React from "react";
 import Playlist from "./PlaylistCard";
+import Footer from "./Footer";
 
 const MainContent = ({ showSingerInfo }) => {
   return (
@@ -56,31 +57,7 @@ const MainContent = ({ showSingerInfo }) => {
         <br />
         <Footer />
       </div>
-<<<<<<< Updated upstream
-      <div className="grid grid-cols-6 gap-3">
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-      </div>
-      <br />
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Recommended Playlists</h2>
-        <button className="text-sm font-semibold">View All</button>
-      </div>
-      <div className="grid grid-cols-6 gap-3">
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-        <Playlist />
-      </div>
-    </div>
-=======
     </>
->>>>>>> Stashed changes
   );
 };
 
