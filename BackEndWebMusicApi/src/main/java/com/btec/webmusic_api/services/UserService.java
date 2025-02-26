@@ -1,7 +1,7 @@
-package com.btec.quanlykhohang_api.services;
+package com.btec.webmusic_api.services;
 
-import com.btec.quanlykhohang_api.entities.User;
-import com.btec.quanlykhohang_api.repositories.UserRepository;
+import com.btec.webmusic_api.entities.User;
+import com.btec.webmusic_api.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,9 +41,7 @@ public class UserService {
             User user = userOptional.get();
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
-            user.setBirthDay(updatedUser.getBirthDay());
             user.setActive(updatedUser.isActive());
-            user.setAddress(updatedUser.getAddress());
             return userRepository.save(user);
         }
         return null;

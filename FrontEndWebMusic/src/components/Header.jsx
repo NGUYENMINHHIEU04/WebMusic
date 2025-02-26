@@ -38,7 +38,7 @@ export default function Header() {
           <FaDownload />
           <span>Download Application</span>
         </button>
-        <a href="#" className="hover:text-white">Register</a>
+        <a href="/auth" className="hover:text-white">Register</a>
         <button className="px-4 py-2 bg-white text-black font-semibold rounded-full hover:bg-gray-200">
           Login
         </button>

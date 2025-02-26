@@ -1,7 +1,7 @@
-package com.btec.quanlykhohang_api.controllers;
-import com.btec.quanlykhohang_api.entities.Product;
-import com.btec.quanlykhohang_api.security.JwtUtil;
-import com.btec.quanlykhohang_api.services.ProductService;
+package com.btec.webmusic_api.controllers;
+import com.btec.webmusic_api.entities.Product;
+import com.btec.webmusic_api.security.JwtUtil;
+import com.btec.webmusic_api.services.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

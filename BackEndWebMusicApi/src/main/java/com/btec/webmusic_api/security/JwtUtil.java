@@ -1,4 +1,4 @@
-package com.btec.quanlykhohang_api.security;
+package com.btec.webmusic_api.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -6,8 +6,6 @@ import io.jsonwebtoken.security.SignatureException;
 import java.util.Date;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
-import java.util.Date;
 
 public class JwtUtil {
 

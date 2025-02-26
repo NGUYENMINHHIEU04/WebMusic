@@ -24,24 +24,6 @@ const Homepage = () => {
     title: "Chạy Ngay Đi",
     lyrics: `Chạy ngay đi trước khi
     Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
-    Chạy ngay đi trước khi
-    Mọi điều dần tồi tệ hơn
     ...`,
   };
 
@@ -71,22 +53,22 @@ const Homepage = () => {
     <>
       <style>
         {`
-          /* Custom scrollbar styling, keeping shape but changing color and reducing thickness by 2px */
+          /* Custom scrollbar styling */
           .custom-home-scrollbar::-webkit-scrollbar {
-            width: 12px; /* Reduced from 6px to 4px (pull up and down 2px) */
+            width: 12px;
           }
 
           .custom-home-scrollbar::-webkit-scrollbar-track {
-            background: transparent; /* No background for track */
+            background: transparent;
           }
 
           .custom-home-scrollbar::-webkit-scrollbar-thumb {
-            background: #4a5568; /* green-400 for consistency with progress bar */
-            border-radius: 1px; /* Keep the same shape (minimal, rounded) */
+            background: #4a5568;
+            border-radius: 1px;
           }
 
           .custom-home-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; /* green-500 for a slightly darker hover */
+            background: #6b7280;
           }
         `}
       </style>
