@@ -4,7 +4,7 @@ import MainContent from "../components/MainContent";
 import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
 import MusicPlayer from "../components/MusicPlayer";
 import Header from "../components/Header";
-import Lyrics from "../components/Lyrics"; // Import component mới
+import Lyrics from "../components/Lyrics";
 import RightSidebarQueue from "../components/RightSidebarQueue";
 import RightSidebarDevice from "../components/RightSidebarDevice";
 
@@ -45,31 +45,54 @@ const Homepage = () => {
 
   const toggleDevice = () => {
     setShowDevice(!showDevice);
-    setShowSingerInfo(false); // Ẩn RightSidebarSingerInformation khi hiển thị RightSidebarDevice
-    setShowQueue(false); // Ẩn RightSidebarQueue khi hiển thị RightSidebarDevice
+    setShowSingerInfo(false);
+    setShowQueue(false);
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
-      <div className="flex flex-1 p-1 space-x-1 bg-black">
-        <LeftSidebar />
-        {showLyrics ? (
-          <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
-        ) : (
-          <MainContent showSingerInfo={showSingerInfo} />
-        )}
-        {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
-        {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
-        {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+    <>
+      <style>
+        {`
+          /* Custom scrollbar styling */
+          .custom-home-scrollbar::-webkit-scrollbar {
+            width: 12px;
+          }
+
+          .custom-home-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          .custom-home-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 1px;
+          }
+
+          .custom-home-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+          }
+        `}
+      </style>
+      <div className="flex flex-col h-screen">
+        <Header />
+        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-home-scrollbar">
+          <LeftSidebar />
+          {showLyrics ? (
+            <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
+          ) : (
+            <MainContent showSingerInfo={showSingerInfo} />
+          )}
+          {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
+          {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
+          {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+        </div>
+        <MusicPlayer 
+          onToggleSingerInfo={toggleSingerInfo} 
+          onToggleLyrics={toggleLyrics} 
+          onToggleQueue={toggleQueue}
+          onToggleDevice={toggleDevice}
+        />
       </div>
-      <MusicPlayer 
-      onToggleSingerInfo={toggleSingerInfo} 
-      onToggleLyrics={toggleLyrics} 
-      onToggleQueue={toggleQueue}
-      onToggleDevice={toggleDevice}
-      />
-    </div>
+    </>
   );
 };
 

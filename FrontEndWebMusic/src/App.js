@@ -20,13 +20,15 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" element={<Homepage />} />
+        <Route path="/login" element={<AuthPage />} />
         <Route path="/home" element={<Homepage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/dashboard" element={<Dashboard/>} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
   );
 };
+
 
 export default App;
