@@ -24,6 +24,10 @@ const Homepage = () => {
     title: "Chạy Ngay Đi",
     lyrics: `Chạy ngay đi trước khi
     Mọi điều dần tồi tệ hơn
+    Chạy ngay đi trước khi
+    Mọi điều dần tồi tệ hơn
+    Chạy ngay đi trước khi
+    Mọi điều dần tồi tệ hơn
     ...`,
   };
 
@@ -51,30 +55,9 @@ const Homepage = () => {
 
   return (
     <>
-      <style>
-        {`
-          /* Custom scrollbar styling */
-          .custom-home-scrollbar::-webkit-scrollbar {
-            width: 12px;
-          }
-
-          .custom-home-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-          }
-
-          .custom-home-scrollbar::-webkit-scrollbar-thumb {
-            background: #4a5568;
-            border-radius: 1px;
-          }
-
-          .custom-home-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-          }
-        `}
-      </style>
       <div className="flex flex-col h-screen">
         <Header />
-        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-home-scrollbar">
+        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-scrollbar">
           <LeftSidebar />
           {showLyrics ? (
             <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
@@ -85,11 +68,12 @@ const Homepage = () => {
           {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
           {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
         </div>
-        <MusicPlayer 
-          onToggleSingerInfo={toggleSingerInfo} 
-          onToggleLyrics={toggleLyrics} 
+        <MusicPlayer
+          onToggleSingerInfo={toggleSingerInfo}
+          onToggleLyrics={toggleLyrics}
           onToggleQueue={toggleQueue}
           onToggleDevice={toggleDevice}
+          song={song}
         />
       </div>
     </>
