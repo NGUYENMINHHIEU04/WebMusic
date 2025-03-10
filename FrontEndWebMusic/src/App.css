@@ -37,11 +37,3 @@
   }
 }
 
-input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #10B981; /* green-500 */
-  border-radius: 50%;
-  cursor: pointer;
-}

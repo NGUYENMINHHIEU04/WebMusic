@@ -1,6 +1,6 @@
 import React from "react";
 
-const Lyrics = ({ songTitle, lyrics, onClose }) => {
+const Lyrics = ({ songTitle, lyrics }) => {
   return (
     <>
       <style>
@@ -25,14 +25,9 @@ const Lyrics = ({ songTitle, lyrics, onClose }) => {
         `}
       </style>
       <div className="bg-gray-800 p-5 text-white rounded-lg w-4/5 h-screen overflow-y-auto custom-scrollbar relative">
-        <button
-          className="absolute top-3 right-3 text-lg text-gray-400 hover:text-white"
-          onClick={onClose}
-        >
-          ✖
-        </button>
+
         <h2 className="text-3xl font-bold mb-4">{songTitle}</h2>
-        <div className="p-2 bg-gray-700 rounded-lg">
+        <div className="p-2  rounded-lg">
           {lyrics.split("\n").map((line, index) => (
             <p key={index} className="mb-2">{line}</p>
           ))}
