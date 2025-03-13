@@ -39,7 +39,7 @@ function LoginForm({ isActive }) {
   return (
     <div className={`absolute right-0 w-1/2 h-full bg-white flex items-center justify-center text-center p-10 transition-all duration-1000 ease-in-out ${isActive ? 'right-1/2' : ''} z-10`}>
       <form className="w-full" onSubmit={handleLogin}>
-        <h1 className="text-4xl text-purple-500 font-bold mb-4">Login</h1>
+        <h1 className="text-4xl text-green-900 font-bold mb-4">Login</h1>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
@@ -73,7 +73,7 @@ function LoginForm({ isActive }) {
           </Link>
         </div>
 
-        <button type="submit" className="w-full py-3 bg-purple-500 rounded-lg text-white font-semibold text-lg shadow-md hover:bg-purple-600 transition-all">
+        <button type="submit" className="w-full py-3 bg-green-900 rounded-lg text-white font-semibold text-lg shadow-md hover:bg-green-600 transition-all">
           Login
         </button>
 
