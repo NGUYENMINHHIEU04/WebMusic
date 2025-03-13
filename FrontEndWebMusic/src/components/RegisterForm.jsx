@@ -39,7 +39,7 @@ function RegisterForm({ isActive }) {
   return (
     <div className={`absolute right-0 w-1/2 h-full bg-white flex items-center justify-center text-center p-10 transition-all duration-1000 ease-in-out ${isActive ? 'right-1/2' : 'invisible'} z-10`}>
       <form className="w-full" onSubmit={handleRegister}>
-        <h1 className="text-4xl text-purple-500 font-bold mb-4">Registration</h1>
+        <h1 className="text-4xl text-green-900 font-bold mb-4">Registration</h1>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
         {success && <p className="text-green-500 mb-4">{success}</p>}
@@ -92,7 +92,7 @@ function RegisterForm({ isActive }) {
           <FaLock className="absolute right-5 top-1/2 transform -translate-y-1/2 text-xl text-gray-500" />
         </div>
 
-        <button type="submit" className="w-full py-3 bg-purple-500 rounded-lg text-white font-semibold text-lg shadow-md hover:bg-purple-600 transition-all">
+        <button type="submit" className="w-full py-3 bg-green-900 rounded-lg text-white font-semibold text-lg shadow-md hover:bg-green-600 transition-all">
           Register
         </button>
 
