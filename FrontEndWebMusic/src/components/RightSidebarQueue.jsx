@@ -30,7 +30,7 @@ const RightSidebarQueue = ({ onClose }) => {
           }
         `}
       </style>
-      <div className="w-1/5 bg-gray-900 text-white p-5 rounded-lg h-screen overflow-y-auto custom-scrollbar">
+      <div className=" bg-gray-900 text-white p-5 rounded-lg h-screen overflow-y-auto custom-scrollbar">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold">Danh sách phát</h2>
           <button

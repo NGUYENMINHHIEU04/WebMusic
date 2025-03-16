@@ -24,7 +24,7 @@ const Lyrics = ({ songTitle, lyrics }) => {
           }
         `}
       </style>
-      <div className="bg-gray-800 p-5 text-white rounded-lg w-4/5 h-screen overflow-y-auto custom-scrollbar relative">
+      <div className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar relative">
 
         <h2 className="text-3xl font-bold mb-4">{songTitle}</h2>
         <div className="p-2  rounded-lg">

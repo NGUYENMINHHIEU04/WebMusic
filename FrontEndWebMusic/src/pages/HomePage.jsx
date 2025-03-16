@@ -1,18 +1,252 @@
-import React, { useState } from "react";
+// import React, { useState, useRef, useEffect } from "react";
+// import LeftSidebar from "../components/LeftSidebar";
+// import MainContent from "../components/MainContent";
+// import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
+// import MusicPlayer from "../components/MusicPlayer";
+// import Header from "../components/Header";
+// import Lyrics from "../components/Lyrics";
+// import RightSidebarQueue from "../components/RightSidebarQueue";
+// import RightSidebarDevice from "../components/RightSidebarDevice";
+// import closed_hand from "../images/001-hand.png";
+// import open_hand from "../images/002-palm.png";
+
+
+// const Homepage = () => {
+//   const [showSingerInfo, setShowSingerInfo] = useState(false);
+//   const [showLyrics, setShowLyrics] = useState(false);
+//   const [showQueue, setShowQueue] = useState(false);
+//   const [showDevice, setShowDevice] = useState(false);
+//   const [leftSidebarWidth, setLeftSidebarWidth] = useState(20);
+//   const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
+//   const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+//   const [isDraggingRight, setIsDraggingRight] = useState(false);
+//   const containerRef = useRef(null);
+
+//   const singer = {
+//     name: "Son Tung M-TP",
+//     bio: "Ca sĩ, nhạc sĩ người Việt Nam",
+//     image: "https://via.placeholder.com/150",
+//   };
+
+//   const song = {
+//     title: "Chạy Ngay Đi",
+//     lyrics: `Chạy ngay đi trước khi
+//     Mọi điều dần tồi tệ hơn
+//     Chạy ngay đi trước khi
+//     Mọi điều dần tồi tệ hơn
+//     Chạy ngay đi trước khi
+//     Mọi điều dần tồi tệ hơn
+//     ...`,
+//   };
+
+//   const toggleSingerInfo = () => {
+//     setShowSingerInfo(!showSingerInfo);
+//     setShowQueue(false);
+//     setShowDevice(false);
+//   };
+
+//   const toggleLyrics = () => {
+//     setShowLyrics(!showLyrics);
+//   };
+
+//   const toggleQueue = () => {
+//     setShowQueue(!showQueue);
+//     setShowSingerInfo(false);
+//     setShowDevice(false);
+//   };
+
+//   const toggleDevice = () => {
+//     setShowDevice(!showDevice);
+//     setShowSingerInfo(false);
+//     setShowQueue(false);
+//   };
+
+//   const handleMouseDownLeft = () => {
+//     setIsDraggingLeft(true);
+//   };
+
+//   const handleMouseUpLeft = () => {
+//     setIsDraggingLeft(false);
+//   };
+
+//   const handleMouseMoveLeft = (e) => {
+//     if (!isDraggingLeft || !containerRef.current) return;
+
+//     const containerWidth = containerRef.current.offsetWidth;
+//     const newX = e.clientX;
+//     const newWidthPercentage = (newX / containerWidth) * 100;
+
+//     if (newWidthPercentage >= 15 && newWidthPercentage <= 40) {
+//       setLeftSidebarWidth(newWidthPercentage);
+//     }
+//   };
+
+//   const handleMouseDownRight = () => {
+//     setIsDraggingRight(true);
+//   };
+
+//   const handleMouseUpRight = () => {
+//     setIsDraggingRight(false);
+//   };
+
+//   const handleMouseMoveRight = (e) => {
+//     if (!isDraggingRight || !containerRef.current) return;
+
+//     const containerWidth = containerRef.current.offsetWidth;
+//     const newX = e.clientX;
+//     const newRightWidthPercentage = ((containerWidth - newX) / containerWidth) * 100;
+
+//     if (newRightWidthPercentage >= 15 && newRightWidthPercentage <= 40) {
+//       setRightSidebarWidth(newRightWidthPercentage);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (isDraggingLeft) {
+//       window.addEventListener("mousemove", handleMouseMoveLeft);
+//       window.addEventListener("mouseup", handleMouseUpLeft);
+//     } else if (isDraggingRight) {
+//       window.addEventListener("mousemove", handleMouseMoveRight);
+//       window.addEventListener("mouseup", handleMouseUpRight);
+//     } else {
+//       window.removeEventListener("mousemove", handleMouseMoveLeft);
+//       window.removeEventListener("mouseup", handleMouseUpLeft);
+//       window.removeEventListener("mousemove", handleMouseMoveRight);
+//       window.removeEventListener("mouseup", handleMouseUpRight);
+//     }
+
+//     return () => {
+//       window.removeEventListener("mousemove", handleMouseMoveLeft);
+//       window.removeEventListener("mouseup", handleMouseUpLeft);
+//       window.removeEventListener("mousemove", handleMouseMoveRight);
+//       window.removeEventListener("mouseup", handleMouseUpRight);
+//     };
+//   }, [isDraggingLeft, isDraggingRight]);
+
+//   return (
+//     <>
+//       <style>
+//         {`
+//           /* Thanh phân cách giữa các layout */
+//           .divider {
+//             width: 2px;
+//             background: transparent;
+//             transition: background 0.2s;
+//           }
+
+//           .divider:hover {
+//             background: #888; /* Màu xám khi hover */
+//             cursor: url(${open_hand}) 16 16, auto; /* Bàn tay mở khi hover */
+//           }
+
+//           .divider:active {
+//             background: #888; /* Màu xám khi kéo */
+//             cursor: url(${closed_hand})16 16, auto; /* Bàn tay nắm khi nhấn */
+//           }
+//         `}
+//       </style>
+//       <div className="flex flex-col h-screen">
+//         <Header />
+//         <div
+//           className="flex flex-1 p-1 bg-black overflow-y-auto custom-scrollbar"
+//           ref={containerRef}
+//         >
+//           <div style={{ width: `${leftSidebarWidth}%` }}>
+//             <LeftSidebar />
+//           </div>
+
+//           <div
+//             className="divider"
+//             onMouseDown={handleMouseDownLeft}
+//           />
+
+//           <div style={{ width: `calc(${100 - leftSidebarWidth - (showSingerInfo || showQueue || showDevice ? rightSidebarWidth : 0)}%)` }}>
+//             {showLyrics ? (
+//               <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
+//             ) : (
+//               <MainContent showSingerInfo={showSingerInfo} />
+//             )}
+//           </div>
+
+//           {(showSingerInfo || showQueue || showDevice) && (
+//             <div
+//               className="divider"
+//               onMouseDown={handleMouseDownRight}
+//             />
+//           )}
+
+//           {(showSingerInfo || showQueue || showDevice) && (
+//             <div style={{ width: `${rightSidebarWidth}%` }}>
+//               {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
+//               {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
+//               {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+//             </div>
+//           )}
+//         </div>
+//         <MusicPlayer
+//           onToggleSingerInfo={toggleSingerInfo}
+//           onToggleLyrics={toggleLyrics}
+//           onToggleQueue={toggleQueue}
+//           onToggleDevice={toggleDevice}
+//           song={song}
+//         />
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Homepage;
+
+import React, { useState, useRef, useEffect } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import MainContent from "../components/MainContent";
 import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
-import MusicPlayer from "../components/MusicPlayer";
+import LoginBanner from "../components/LoginBanner"; // Import LoginBanner
 import Header from "../components/Header";
 import Lyrics from "../components/Lyrics";
 import RightSidebarQueue from "../components/RightSidebarQueue";
 import RightSidebarDevice from "../components/RightSidebarDevice";
+import closed_hand from "../images/001-hand.png";
+import open_hand from "../images/002-palm.png";
+
+// Component Popup Đăng nhập
+const LoginPopup = ({ onClose }) => {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 p-6 rounded-lg text-white w-96">
+        <h2 className="text-xl mb-4">Start listening with a free Spotify account</h2>
+        <button className="bg-green-500 text-white px-4 py-2 rounded-full w-full mb-2 hover:bg-green-600">
+          Sign up free
+        </button>
+        <button className="bg-gray-700 text-white px-4 py-2 rounded-full w-full hover:bg-gray-600">
+          Download app
+        </button>
+        <p className="text-center mt-4 text-sm">
+          Already have an account? <span className="text-green-500 cursor-pointer">Log in</span>
+        </p>
+        <button
+          className="mt-4 text-gray-400 hover:text-white absolute top-2 right-2"
+          onClick={onClose}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Homepage = () => {
   const [showSingerInfo, setShowSingerInfo] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showDevice, setShowDevice] = useState(false);
+  const [leftSidebarWidth, setLeftSidebarWidth] = useState(20);
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
+  const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+  const [isDraggingRight, setIsDraggingRight] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Giả định trạng thái đăng nhập
+  const containerRef = useRef(null);
 
   const singer = {
     name: "Son Tung M-TP",
@@ -53,28 +287,135 @@ const Homepage = () => {
     setShowQueue(false);
   };
 
+  const handleMouseDownLeft = () => {
+    setIsDraggingLeft(true);
+  };
+
+  const handleMouseUpLeft = () => {
+    setIsDraggingLeft(false);
+  };
+
+  const handleMouseMoveLeft = (e) => {
+    if (!isDraggingLeft || !containerRef.current) return;
+
+    const containerWidth = containerRef.current.offsetWidth;
+    const newX = e.clientX;
+    const newWidthPercentage = (newX / containerWidth) * 100;
+
+    if (newWidthPercentage >= 15 && newWidthPercentage <= 40) {
+      setLeftSidebarWidth(newWidthPercentage);
+    }
+  };
+
+  const handleMouseDownRight = () => {
+    setIsDraggingRight(true);
+  };
+
+  const handleMouseUpRight = () => {
+    setIsDraggingRight(false);
+  };
+
+  const handleMouseMoveRight = (e) => {
+    if (!isDraggingRight || !containerRef.current) return;
+
+    const containerWidth = containerRef.current.offsetWidth;
+    const newX = e.clientX;
+    const newRightWidthPercentage = ((containerWidth - newX) / containerWidth) * 100;
+
+    if (newRightWidthPercentage >= 15 && newRightWidthPercentage <= 40) {
+      setRightSidebarWidth(newRightWidthPercentage);
+    }
+  };
+
+  useEffect(() => {
+    if (isDraggingLeft) {
+      window.addEventListener("mousemove", handleMouseMoveLeft);
+      window.addEventListener("mouseup", handleMouseUpLeft);
+    } else if (isDraggingRight) {
+      window.addEventListener("mousemove", handleMouseMoveRight);
+      window.addEventListener("mouseup", handleMouseUpRight);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMoveLeft);
+      window.removeEventListener("mouseup", handleMouseUpLeft);
+      window.removeEventListener("mousemove", handleMouseMoveRight);
+      window.removeEventListener("mouseup", handleMouseUpRight);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMoveLeft);
+      window.removeEventListener("mouseup", handleMouseUpLeft);
+      window.removeEventListener("mousemove", handleMouseMoveRight);
+      window.removeEventListener("mouseup", handleMouseUpRight);
+    };
+  }, [isDraggingLeft, isDraggingRight]);
+
+  const handleLoginRequired = () => {
+    setShowLoginPopup(true);
+  };
+
   return (
     <>
+      <style>
+        {`
+          /* Thanh phân cách giữa các layout */
+          .divider {
+            width: 2px;
+            background: transparent;
+            transition: background 0.2s;
+          }
+
+          .divider:hover {
+            background: #888;
+            cursor: url(${open_hand}) 16 16, auto;
+          }
+
+          .divider:active {
+            background: #888;
+            cursor: url(${closed_hand}) 16 16, auto;
+          }
+        `}
+      </style>
       <div className="flex flex-col h-screen">
         <Header />
-        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-scrollbar">
-          <LeftSidebar />
-          {showLyrics ? (
-            <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
-          ) : (
-            <MainContent showSingerInfo={showSingerInfo} />
+        <div
+          className="flex flex-1 p-1 bg-black overflow-y-auto custom-scrollbar"
+          ref={containerRef}
+        >
+          <div style={{ width: `${leftSidebarWidth}%` }}>
+            <LeftSidebar />
+          </div>
+
+          <div
+            className="divider"
+            onMouseDown={handleMouseDownLeft}
+          />
+
+          <div style={{ width: `calc(${100 - leftSidebarWidth - (showSingerInfo || showQueue || showDevice ? rightSidebarWidth : 0)}%)` }}>
+            {showLyrics ? (
+              <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
+            ) : (
+              <MainContent showSingerInfo={showSingerInfo} onLoginRequired={handleLoginRequired} />
+            )}
+          </div>
+
+          {(showSingerInfo || showQueue || showDevice) && (
+            <div
+              className="divider"
+              onMouseDown={handleMouseDownRight}
+            />
           )}
-          {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
-          {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
-          {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+
+          {(showSingerInfo || showQueue || showDevice) && (
+            <div style={{ width: `${rightSidebarWidth}%` }}>
+              {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
+              {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
+              {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+            </div>
+          )}
         </div>
-        <MusicPlayer
-          onToggleSingerInfo={toggleSingerInfo}
-          onToggleLyrics={toggleLyrics}
-          onToggleQueue={toggleQueue}
-          onToggleDevice={toggleDevice}
-          song={song}
-        />
+        {/* Hiển thị LoginBanner thay cho MusicPlayer khi chưa đăng nhập */}
+        {!isLoggedIn ? <LoginBanner /> : null}
+        {showLoginPopup && <LoginPopup onClose={() => setShowLoginPopup(false)} />}
       </div>
     </>
   );
