@@ -40,7 +40,7 @@ export default function Header() {
         </button>
         <a href="/auth" className="hover:text-white">Register</a>
         <button className="px-4 py-2 bg-white text-black font-semibold rounded-full hover:bg-gray-200">
-          Login
+          <a href="/auth">Login</a>
         </button>
       </div>
     </header>

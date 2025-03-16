@@ -27,9 +27,7 @@
 //         `}
 //       </style>
 //       <div
-//         className={`bg-gray-800 p-5 text-white rounded-lg ${
-//           showSingerInfo ? "w-4/5" : "w-4/5"
-//         } h-screen overflow-y-auto custom-scrollbar`}
+//         className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar"
 //       >
 //         <div className="flex justify-between items-center mb-6">
 //           <h2 className="text-3xl font-bold">Welcome Back!</h2>
@@ -63,11 +61,23 @@
 
 // export default MainContent;
 
+// MainContent.js
 import React from "react";
 import Playlist from "./PlaylistCard";
 import Footer from "./Footer";
 
-const MainContent = ({ showSingerInfo }) => {
+const MainContent = ({ showSingerInfo, onLoginRequired }) => {
+  const handlePlaylistClick = () => {
+    // Giả định kiểm tra trạng thái đăng nhập (thay bằng logic thực tế)
+    const isLoggedIn = false; // Thay bằng trạng thái thực tế
+    if (!isLoggedIn) {
+      onLoginRequired(); // Gọi hàm từ props để hiển thị popup đăng nhập
+    } else {
+      // Logic khi đã đăng nhập (ví dụ: phát nhạc)
+      console.log("Playing playlist...");
+    }
+  };
+
   return (
     <>
       <style>
@@ -98,12 +108,12 @@ const MainContent = ({ showSingerInfo }) => {
           <h2 className="text-3xl font-bold">Welcome Back!</h2>
         </div>
         <div className="grid grid-cols-6 gap-3">
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
+        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
+        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
+        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
+        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
+        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
+          
         </div>
         <br />
         <div className="flex justify-between items-center mb-6">
@@ -111,11 +121,11 @@ const MainContent = ({ showSingerInfo }) => {
           <button className="text-sm font-semibold">View All</button>
         </div>
         <div className="grid grid-cols-6 gap-3">
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
-          <Playlist />
+          <Playlist onClick={handlePlaylistClick} />
+          <Playlist onClick={handlePlaylistClick} />
+          <Playlist onClick={handlePlaylistClick} />
+          <Playlist onClick={handlePlaylistClick} />
+          <Playlist onClick={handlePlaylistClick} />
         </div>
         <br />
         <Footer />
