@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import LeftSidebar from "../components/LeftSidebar";
 import MainContent from "../components/MainContent";
 import RightSidebarSingerInformation from "../components/RightSidebarSingerInformation";
@@ -7,12 +7,20 @@ import Header from "../components/Header";
 import Lyrics from "../components/Lyrics";
 import RightSidebarQueue from "../components/RightSidebarQueue";
 import RightSidebarDevice from "../components/RightSidebarDevice";
+import closed_hand from "../images/001-hand.png";
+import open_hand from "../images/002-palm.png";
+
 
 const Homepage = () => {
   const [showSingerInfo, setShowSingerInfo] = useState(false);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showDevice, setShowDevice] = useState(false);
+  const [leftSidebarWidth, setLeftSidebarWidth] = useState(20);
+  const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
+  const [isDraggingLeft, setIsDraggingLeft] = useState(false);
+  const [isDraggingRight, setIsDraggingRight] = useState(false);
+  const containerRef = useRef(null);
 
   const singer = {
     name: "Son Tung M-TP",
@@ -53,20 +61,127 @@ const Homepage = () => {
     setShowQueue(false);
   };
 
+  const handleMouseDownLeft = () => {
+    setIsDraggingLeft(true);
+  };
+
+  const handleMouseUpLeft = () => {
+    setIsDraggingLeft(false);
+  };
+
+  const handleMouseMoveLeft = (e) => {
+    if (!isDraggingLeft || !containerRef.current) return;
+
+    const containerWidth = containerRef.current.offsetWidth;
+    const newX = e.clientX;
+    const newWidthPercentage = (newX / containerWidth) * 100;
+
+    if (newWidthPercentage >= 15 && newWidthPercentage <= 40) {
+      setLeftSidebarWidth(newWidthPercentage);
+    }
+  };
+
+  const handleMouseDownRight = () => {
+    setIsDraggingRight(true);
+  };
+
+  const handleMouseUpRight = () => {
+    setIsDraggingRight(false);
+  };
+
+  const handleMouseMoveRight = (e) => {
+    if (!isDraggingRight || !containerRef.current) return;
+
+    const containerWidth = containerRef.current.offsetWidth;
+    const newX = e.clientX;
+    const newRightWidthPercentage = ((containerWidth - newX) / containerWidth) * 100;
+
+    if (newRightWidthPercentage >= 15 && newRightWidthPercentage <= 40) {
+      setRightSidebarWidth(newRightWidthPercentage);
+    }
+  };
+
+  useEffect(() => {
+    if (isDraggingLeft) {
+      window.addEventListener("mousemove", handleMouseMoveLeft);
+      window.addEventListener("mouseup", handleMouseUpLeft);
+    } else if (isDraggingRight) {
+      window.addEventListener("mousemove", handleMouseMoveRight);
+      window.addEventListener("mouseup", handleMouseUpRight);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMoveLeft);
+      window.removeEventListener("mouseup", handleMouseUpLeft);
+      window.removeEventListener("mousemove", handleMouseMoveRight);
+      window.removeEventListener("mouseup", handleMouseUpRight);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMoveLeft);
+      window.removeEventListener("mouseup", handleMouseUpLeft);
+      window.removeEventListener("mousemove", handleMouseMoveRight);
+      window.removeEventListener("mouseup", handleMouseUpRight);
+    };
+  }, [isDraggingLeft, isDraggingRight]);
+
   return (
     <>
+      <style>
+        {`
+          /* Thanh phân cách giữa các layout */
+          .divider {
+            width: 2px;
+            background: transparent;
+            transition: background 0.2s;
+          }
+
+          .divider:hover {
+            background: #888; /* Màu xám khi hover */
+            cursor: url(${open_hand}) 16 16, auto; /* Bàn tay mở khi hover */
+          }
+
+          .divider:active {
+            background: #888; /* Màu xám khi kéo */
+            cursor: url(${closed_hand})16 16, auto; /* Bàn tay nắm khi nhấn */
+          }
+        `}
+      </style>
       <div className="flex flex-col h-screen">
         <Header />
-        <div className="flex flex-1 p-1 space-x-1 bg-black overflow-y-auto custom-scrollbar">
-          <LeftSidebar />
-          {showLyrics ? (
-            <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
-          ) : (
-            <MainContent showSingerInfo={showSingerInfo} />
+        <div
+          className="flex flex-1 p-1 bg-black overflow-y-auto custom-scrollbar"
+          ref={containerRef}
+        >
+          <div style={{ width: `${leftSidebarWidth}%` }}>
+            <LeftSidebar />
+          </div>
+
+          <div
+            className="divider"
+            onMouseDown={handleMouseDownLeft}
+          />
+
+          <div style={{ width: `calc(${100 - leftSidebarWidth - (showSingerInfo || showQueue || showDevice ? rightSidebarWidth : 0)}%)` }}>
+            {showLyrics ? (
+              <Lyrics songTitle={song.title} lyrics={song.lyrics} onClose={toggleLyrics} />
+            ) : (
+              <MainContent showSingerInfo={showSingerInfo} />
+            )}
+          </div>
+
+          {(showSingerInfo || showQueue || showDevice) && (
+            <div
+              className="divider"
+              onMouseDown={handleMouseDownRight}
+            />
           )}
-          {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
-          {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
-          {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+
+          {(showSingerInfo || showQueue || showDevice) && (
+            <div style={{ width: `${rightSidebarWidth}%` }}>
+              {showSingerInfo && <RightSidebarSingerInformation singer={singer} />}
+              {showQueue && <RightSidebarQueue onClose={toggleQueue} />}
+              {showDevice && <RightSidebarDevice onClose={toggleDevice} />}
+            </div>
+          )}
         </div>
         <MusicPlayer
           onToggleSingerInfo={toggleSingerInfo}
@@ -81,3 +196,4 @@ const Homepage = () => {
 };
 
 export default Homepage;
+
