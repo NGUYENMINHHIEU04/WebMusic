@@ -1,83 +1,8 @@
-// import React from "react";
-// import Playlist from "./PlaylistCard";
-// import Footer from "./Footer";
-
-// const MainContent = ({ showSingerInfo }) => {
-//   return (
-//     <>
-//       <style>
-//         {`
-//           /* Custom scrollbar styling inspired by Spotify */
-//           .custom-scrollbar::-webkit-scrollbar {
-//             width: 8px;
-//           }
-
-//           .custom-scrollbar::-webkit-scrollbar-track {
-//             background: transparent;
-//           }
-
-//           .custom-scrollbar::-webkit-scrollbar-thumb {
-//             background: #4a5568;
-//             border-radius: 4px;
-//           }
-
-//           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-//             background: #6b7280;
-//           }
-//         `}
-//       </style>
-//       <div
-//         className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar"
-//       >
-//         <div className="flex justify-between items-center mb-6">
-//           <h2 className="text-3xl font-bold">Welcome Back!</h2>
-//         </div>
-//         <div className="grid grid-cols-6 gap-3">
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//         </div>
-//         <br />
-//         <div className="flex justify-between items-center mb-6">
-//           <h2 className="text-3xl font-bold">Recommended Playlists</h2>
-//           <button className="text-sm font-semibold">View All</button>
-//         </div>
-//         <div className="grid grid-cols-6 gap-3">
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//           <Playlist />
-//         </div>
-//         <br />
-//         <Footer />
-//       </div>
-//     </>
-//   );
-// };
-
-// export default MainContent;
-
-// MainContent.js
 import React from "react";
 import Playlist from "./PlaylistCard";
 import Footer from "./Footer";
 
-const MainContent = ({ showSingerInfo, onLoginRequired }) => {
-  const handlePlaylistClick = () => {
-    // Giả định kiểm tra trạng thái đăng nhập (thay bằng logic thực tế)
-    const isLoggedIn = false; // Thay bằng trạng thái thực tế
-    if (!isLoggedIn) {
-      onLoginRequired(); // Gọi hàm từ props để hiển thị popup đăng nhập
-    } else {
-      // Logic khi đã đăng nhập (ví dụ: phát nhạc)
-      console.log("Playing playlist...");
-    }
-  };
-
+const MainContent = ({ showSingerInfo }) => {
   return (
     <>
       <style>
@@ -108,12 +33,12 @@ const MainContent = ({ showSingerInfo, onLoginRequired }) => {
           <h2 className="text-3xl font-bold">Welcome Back!</h2>
         </div>
         <div className="grid grid-cols-6 gap-3">
-        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
-        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
-        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
-        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
-        <Playlist onClick={() => {}} onLoginRequired={onLoginRequired} />
-          
+          <Playlist />
+          <Playlist />
+          <Playlist />
+          <Playlist />
+          <Playlist />
+          <Playlist />
         </div>
         <br />
         <div className="flex justify-between items-center mb-6">
@@ -121,11 +46,11 @@ const MainContent = ({ showSingerInfo, onLoginRequired }) => {
           <button className="text-sm font-semibold">View All</button>
         </div>
         <div className="grid grid-cols-6 gap-3">
-          <Playlist onClick={handlePlaylistClick} />
-          <Playlist onClick={handlePlaylistClick} />
-          <Playlist onClick={handlePlaylistClick} />
-          <Playlist onClick={handlePlaylistClick} />
-          <Playlist onClick={handlePlaylistClick} />
+          <Playlist />
+          <Playlist />
+          <Playlist />
+          <Playlist />
+          <Playlist />
         </div>
         <br />
         <Footer />
@@ -135,3 +60,4 @@ const MainContent = ({ showSingerInfo, onLoginRequired }) => {
 };
 
 export default MainContent;
+
