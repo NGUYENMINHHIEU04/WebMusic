@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaSearch, FaHome, FaDownload } from "react-icons/fa";
 import { IoIosMore } from "react-icons/io";
-import spotifyLogo from "../images/testLogo.png"; // Ensure this logo is in the correct folder
+import Logo from "../images/logo.png"; // Ensure this logo is in the correct folder
 
 export default function Header() {
   const [search, setSearch] = useState("");
@@ -10,7 +10,7 @@ export default function Header() {
     <header className="flex items-center justify-between px-6 py-2 bg-black text-white">
       {/* Left Section: Logo & Home Button */}
       <div className="flex items-center space-x-4">
-        <img src={spotifyLogo} alt="Spotify" className="h-8" />
+        <img src={Logo} alt="Spotify" className="h-8" />
         <button className="p-2 bg-gray-800 rounded-full">
           <FaHome className="text-white text-lg" />
         </button>
