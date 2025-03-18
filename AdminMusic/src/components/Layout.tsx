@@ -1,114 +1,96 @@
 
-import { Button } from "@/components/ui/button";
-import { MusicIcon, Users, Album, LayoutDashboard, LogOut } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { Music, User, Home, Settings, Album } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-const Layout = ({ children }: LayoutProps) => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const currentPath = location.pathname;
-
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    toast({
-      title: `Đã chuyển đến ${path}`,
-      description: "Chuyển hướng thành công",
-    });
-  };
-
-  const handleLogout = () => {
-    toast({
-      title: "Đăng xuất thành công",
-      description: "Bạn đã đăng xuất khỏi hệ thống",
-    });
-    // Trong tương lai sẽ thêm xử lý đăng xuất thực tế ở đây
-  };
+  
+  const navItems = [
+    { to: "/", label: "Trang chủ", icon: <Home className="w-5 h-5" /> },
+    { to: "/songs", label: "Bài hát", icon: <Music className="w-5 h-5" /> },
+    { to: "/albums", label: "Albums", icon: <Album className="w-5 h-5" /> },
+    { to: "/users", label: "Người dùng", icon: <User className="w-5 h-5" /> },
+    { to: "/settings", label: "Cài đặt", icon: <Settings className="w-5 h-5" /> },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center">
-          <div className="flex items-center gap-2">
-            <MusicIcon className="h-6 w-6" />
-            <h1 className="text-xl font-semibold">LMH Music Admin</h1>
-          </div>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-10 w-64 bg-white shadow-md border-r border-border hidden md:flex md:flex-col">
+        <div className="flex items-center h-16 px-6 border-b">
+          <Link to="/" className="flex items-center space-x-2">
+            <Music className="w-6 h-6" />
+            <span className="text-lg font-semibold"> LMH Music</span>
+          </Link>
         </div>
-      </header>
+        
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                "flex items-center px-4 py-3 text-sm rounded-lg transition-all hover-scale",
+                location.pathname === item.to
+                  ? "bg-secondary text-primary font-medium"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              )}
+            >
+              <span className="mr-3">{item.icon}</span>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </aside>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 border-r min-h-[calc(100vh-4rem)] p-4 bg-sidebar text-sidebar-foreground flex flex-col justify-between">
-          <nav className="space-y-2">
-            <Button
-              variant={currentPath === "/" ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => handleNavigation("/")}
-            >
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button
-              variant={currentPath === "/songs" ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => handleNavigation("/songs")}
-            >
-              <MusicIcon className="mr-2 h-4 w-4" />
-              Quản lý bài hát
-            </Button>
-            <Button
-              variant={currentPath === "/albums" ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => handleNavigation("/albums")}
-            >
-              <Album className="mr-2 h-4 w-4" />
-              Quản lý album
-            </Button>
-            <Button
-              variant={currentPath === "/users" ? "secondary" : "ghost"}
-              className="w-full justify-start"
-              onClick={() => handleNavigation("/users")}
-            >
-              <Users className="mr-2 h-4 w-4" />
-              Quản lý người dùng
-            </Button>
-          </nav>
-          
-          {/* Admin Profile Section */}
-          <div className="mt-auto pt-4 border-t">
-            <div className="flex items-center p-2 rounded-lg">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src="" alt="Admin" />
-                <AvatarFallback>A</AvatarFallback>
-              </Avatar>
-              <div className="ml-3">
-                <p className="text-sm font-medium">Admin</p>
-                <p className="text-xs text-muted-foreground">admin@music.app</p>
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start mt-2"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Đăng xuất
-            </Button>
-          </div>
-        </aside>
-
-        {/* Main content */}
-        <main className="flex-1">
-          {children}
-        </main>
+      {/* Mobile header */}
+      <div className="fixed inset-x-0 top-0 z-10 flex items-center h-16 px-4 bg-white border-b md:hidden">
+        <Link to="/" className="flex items-center space-x-2">
+          <Music className="w-6 h-6" />
+          <span className="text-lg font-semibold">Quản lý Âm nhạc</span>
+        </Link>
       </div>
+
+      {/* Mobile navigation */}
+      <div className="fixed inset-x-0 bottom-0 z-10 flex items-center h-16 bg-white border-t md:hidden">
+        <nav className="flex items-center justify-around w-full">
+          {navItems.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={cn(
+                "flex flex-col items-center justify-center w-full h-full",
+                location.pathname === item.to
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              )}
+            >
+              {item.icon}
+              <span className="text-xs mt-1">{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      {/* Main content */}
+      <main className="flex-1 pb-16 md:pb-0 md:pl-64">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.3 }}
+          className="container max-w-7xl py-6 md:py-8 px-4 md:px-6"
+        >
+          {children}
+        </motion.div>
+      </main>
     </div>
   );
 };

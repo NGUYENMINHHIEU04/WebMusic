@@ -1,167 +1,270 @@
-
+import React, { useState } from "react";
+import { useData } from "@/context/DataContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { Edit, Plus, Trash } from "lucide-react";
-import Layout from "@/components/Layout";
-
-interface Album {
-  id: string;
-  name: string;
-  artist: string;
-  year: string;
-  tracks: number;
-}
+import { Album, PlusCircle } from "lucide-react";
+import { toast } from "react-toastify";
+import AlbumCard from "@/components/album/AlbumCard";
+import AlbumForm from "@/components/album/AlbumForm";
+import ManageSongs from "@/components/album/ManageSongs";
 
 const Albums = () => {
-  const { toast } = useToast();
-  const [albums, setAlbums] = useState<Album[]>([]);
-  const [isAdding, setIsAdding] = useState(false);
-  const [newAlbum, setNewAlbum] = useState({
-    name: "",
-    artist: "",
-    year: "",
-    tracks: 0
-  });
-
+  const { albums, songs, addAlbum, updateAlbum, deleteAlbum, addSongToAlbum, removeSongFromAlbum } = useData();
+  
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isManageSongsDialogOpen, setIsManageSongsDialogOpen] = useState(false);
+  
+  const [title, setTitle] = useState("");
+  const [artist, setArtist] = useState("");
+  const [releaseDate, setReleaseDate] = useState("");
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [selectedAlbum, setSelectedAlbum] = useState<string | null>(null);
+  const [selectedSongId, setSelectedSongId] = useState<string>("");
+  
   const handleAddAlbum = () => {
-    // Tạo ID giả
-    const id = Date.now().toString();
-    const album = {
-      id,
-      ...newAlbum
+    if (!title || !artist || !releaseDate) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+    
+    addAlbum({
+      title,
+      artist,
+      releaseDate,
+      coverImage: coverImage || undefined
+    });
+    
+    resetForm();
+    setIsAddDialogOpen(false);
+  };
+  
+  const handleEditAlbum = () => {
+    if (!selectedAlbum || !title || !artist || !releaseDate) {
+      toast.error("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+    
+    const updates: any = { title, artist, releaseDate };
+    
+    if (coverImage !== null) {
+      updates.coverImage = coverImage || undefined;
+    }
+    
+    updateAlbum(selectedAlbum, updates);
+    
+    resetForm();
+    setIsEditDialogOpen(false);
+  };
+  
+  const handleDeleteAlbum = () => {
+    if (selectedAlbum) {
+      deleteAlbum(selectedAlbum);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+  
+  const handleAddSongToAlbum = () => {
+    if (selectedAlbum && selectedSongId) {
+      addSongToAlbum(selectedAlbum, selectedSongId);
+      setSelectedSongId("");
+      toast.success("Đã thêm bài hát vào album thành công");
+    }
+  };
+  
+  const resetForm = () => {
+    setTitle("");
+    setArtist("");
+    setReleaseDate("");
+    setCoverImage(null);
+    setSelectedAlbum(null);
+  };
+  
+  const prepareAlbumEdit = (album: any) => {
+    setSelectedAlbum(album.id);
+    setTitle(album.title);
+    setArtist(album.artist);
+    setReleaseDate(album.releaseDate);
+    setCoverImage(album.coverImage || null);
+    setIsEditDialogOpen(true);
+  };
+  
+  const prepareAlbumDelete = (albumId: string) => {
+    setSelectedAlbum(albumId);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const prepareManageSongs = (albumId: string) => {
+    setSelectedAlbum(albumId);
+    setIsManageSongsDialogOpen(true);
+  };
+  
+  const handleCoverImageChange = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setCoverImage(e.target?.result as string);
     };
-    
-    setAlbums([...albums, album]);
-    setNewAlbum({
-      name: "",
-      artist: "",
-      year: "",
-      tracks: 0
-    });
-    setIsAdding(false);
-    
-    toast({
-      title: "Thành công",
-      description: "Thêm album mới thành công",
-    });
+    reader.readAsDataURL(file);
   };
-
-  const handleDeleteAlbum = (id: string) => {
-    setAlbums(albums.filter(album => album.id !== id));
-    toast({
-      title: "Thành công",
-      description: "Xóa album thành công",
-    });
-  };
-
+  
+  const availableSongs = songs.filter(song => 
+    !albums.find(album => album.id === selectedAlbum)?.songs.some(s => s.id === song.id)
+  );
+  
+  const albumSongs = selectedAlbum 
+    ? albums.find(album => album.id === selectedAlbum)?.songs || []
+    : [];
+  
+  const sortedAlbums = [...albums].sort((a, b) => 
+    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+  
   return (
-    <Layout>
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Quản lý album</h1>
-          <Button onClick={() => setIsAdding(!isAdding)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Thêm album
-          </Button>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Albums</h1>
+          <p className="text-muted-foreground">
+            Quản lý tất cả albums của bạn
+          </p>
         </div>
-
-        {isAdding && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Thêm album mới</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Tên album</Label>
-                  <Input 
-                    id="name" 
-                    value={newAlbum.name} 
-                    onChange={(e) => setNewAlbum({...newAlbum, name: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="artist">Nghệ sĩ</Label>
-                  <Input 
-                    id="artist" 
-                    value={newAlbum.artist} 
-                    onChange={(e) => setNewAlbum({...newAlbum, artist: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="year">Năm phát hành</Label>
-                  <Input 
-                    id="year" 
-                    value={newAlbum.year} 
-                    onChange={(e) => setNewAlbum({...newAlbum, year: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tracks">Số bài hát</Label>
-                  <Input 
-                    id="tracks" 
-                    type="number"
-                    value={newAlbum.tracks.toString()} 
-                    onChange={(e) => setNewAlbum({...newAlbum, tracks: parseInt(e.target.value) || 0})}
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end mt-4 gap-2">
-                <Button variant="outline" onClick={() => setIsAdding(false)}>Hủy</Button>
-                <Button onClick={handleAddAlbum}>Lưu</Button>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Tên album</TableHead>
-              <TableHead>Nghệ sĩ</TableHead>
-              <TableHead>Năm phát hành</TableHead>
-              <TableHead>Số bài hát</TableHead>
-              <TableHead className="text-right">Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {albums.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center">Chưa có album nào</TableCell>
-              </TableRow>
-            ) : (
-              albums.map((album) => (
-                <TableRow key={album.id}>
-                  <TableCell>{album.name}</TableCell>
-                  <TableCell>{album.artist}</TableCell>
-                  <TableCell>{album.year}</TableCell>
-                  <TableCell>{album.tracks}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => handleDeleteAlbum(album.id)}
-                      >
-                        <Trash className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <Button onClick={() => setIsAddDialogOpen(true)} className="gap-1">
+          <PlusCircle className="w-4 h-4" /> Thêm album
+        </Button>
       </div>
-    </Layout>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {sortedAlbums.length > 0 ? (
+          sortedAlbums.map((album) => (
+            <AlbumCard
+              key={album.id}
+              album={album}
+              onEdit={prepareAlbumEdit}
+              onDelete={prepareAlbumDelete}
+              onManageSongs={prepareManageSongs}
+            />
+          ))
+        ) : (
+          <div className="col-span-full p-8 text-center bg-white rounded-xl shadow-sm border border-border">
+            <Album className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Không có album nào</h3>
+            <p className="text-muted-foreground mb-4">
+              Bạn chưa có album nào. Hãy thêm album đầu tiên của bạn!
+            </p>
+            <Button onClick={() => setIsAddDialogOpen(true)}>Thêm album</Button>
+          </div>
+        )}
+      </div>
+      
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Thêm album mới</DialogTitle>
+            <DialogDescription>
+              Thêm album mới vào thư viện của bạn
+            </DialogDescription>
+          </DialogHeader>
+          
+          <AlbumForm
+            title={title}
+            setTitle={setTitle}
+            artist={artist}
+            setArtist={setArtist}
+            releaseDate={releaseDate}
+            setReleaseDate={setReleaseDate}
+            onCoverImageChange={handleCoverImageChange}
+          />
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              resetForm();
+              setIsAddDialogOpen(false);
+            }}>
+              Hủy
+            </Button>
+            <Button onClick={handleAddAlbum}>Thêm album</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa album</DialogTitle>
+            <DialogDescription>
+              Chỉnh sửa thông tin album
+            </DialogDescription>
+          </DialogHeader>
+          
+          <AlbumForm
+            title={title}
+            setTitle={setTitle}
+            artist={artist}
+            setArtist={setArtist}
+            releaseDate={releaseDate}
+            setReleaseDate={setReleaseDate}
+            onCoverImageChange={handleCoverImageChange}
+          />
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              resetForm();
+              setIsEditDialogOpen(false);
+            }}>
+              Hủy
+            </Button>
+            <Button onClick={handleEditAlbum}>Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa album này không? Thao tác này không thể hoàn tác.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteAlbum}>
+              Xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isManageSongsDialogOpen} onOpenChange={setIsManageSongsDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Quản lý bài hát trong album</DialogTitle>
+            <DialogDescription>
+              Thêm hoặc xóa bài hát trong album
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ManageSongs
+            availableSongs={availableSongs}
+            albumSongs={albumSongs}
+            selectedSongId={selectedSongId}
+            onSongSelect={setSelectedSongId}
+            onAddSong={handleAddSongToAlbum}
+            onRemoveSong={(songId) => selectedAlbum && removeSongFromAlbum(selectedAlbum, songId)}
+          />
+          
+          <DialogFooter>
+            <Button onClick={() => setIsManageSongsDialogOpen(false)}>
+              Xong
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 
