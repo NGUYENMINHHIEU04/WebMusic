@@ -87,7 +87,7 @@ const Index = () => {
       {/* Recent songs */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Bài hát gần đây</h2>
+          <h2 className="text-xl font-semibold">Bài hát đã thêm gần đây</h2>
           <Link to="/songs" className="text-sm text-primary">Xem tất cả</Link>
         </div>
         

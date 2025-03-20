@@ -230,14 +230,14 @@ const Settings = () => {
                 </div>
                 
                 <div className="bg-primary/5 p-4 rounded-lg">
-                  <h3 className="font-medium mb-2">Giấy phép</h3>
-                  <p className="text-sm text-muted-foreground">MIT License</p>
+                  <h3 className="font-medium mb-2">Bản Quyền</h3>
+                  <p className="text-sm text-muted-foreground">LMH Music</p>
                 </div>
                 
                 <div className="bg-primary/5 p-4 rounded-lg">
                   <h3 className="font-medium mb-2">Công nghệ sử dụng</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>React / TypeScript</li>
+                    <li>React / TypeScript / JavaScript</li>
                     <li>Tailwind CSS</li>
                     <li>Vite</li>
                     <li>ShadcnUI</li>
