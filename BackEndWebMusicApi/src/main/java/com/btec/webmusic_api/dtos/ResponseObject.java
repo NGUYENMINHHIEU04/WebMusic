@@ -1,11 +1,11 @@
 package com.btec.webmusic_api.dtos;
 
-public class ResponseObject {
+public class ResponseObject<T> {
     private int status;
-    private String data;
+    private T data; // Sử dụng generic type T
     private String message;
 
-    public ResponseObject(int status, String data, String message) {
+    public ResponseObject(int status, T data, String message) {
         this.status = status;
         this.data = data;
         this.message = message;
@@ -15,7 +15,7 @@ public class ResponseObject {
         return status;
     }
 
-    public String getData() {
+    public T getData() {
         return data;
     }
 
@@ -23,4 +23,3 @@ public class ResponseObject {
         return message;
     }
 }
-

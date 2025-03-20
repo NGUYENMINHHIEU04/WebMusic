@@ -39,6 +39,7 @@ public class ImageService {
         byte[] data = file.getBytes();
         Image image = new Image();
         image.setData(data);
+        image.setFileName(file.getOriginalFilename());
         return imageRepository.save(image);
     }
 
@@ -53,6 +54,7 @@ public class ImageService {
         if (existingImage.isPresent()) {
             Image image = existingImage.get();
             image.setData(file.getBytes());
+            image.setFileName(file.getOriginalFilename());
             return imageRepository.save(image);
         } else {
             throw new IllegalArgumentException("Image with ID " + id + " not found.");

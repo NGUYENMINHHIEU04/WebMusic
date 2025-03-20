@@ -1,129 +1,99 @@
 package com.btec.webmusic_api.services;
 
+import com.btec.webmusic_api.entities.Audio;
+import com.btec.webmusic_api.entities.Image;
 import com.btec.webmusic_api.entities.Song;
+import com.btec.webmusic_api.repositories.AudioRepository;
+import com.btec.webmusic_api.repositories.ImageRepository;
 import com.btec.webmusic_api.repositories.SongRepository;
-import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import com.mongodb.client.gridfs.model.GridFSFile;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class SongService {
-    @Autowired
-    private SongRepository songRepository;
+    private final SongRepository songRepository;
+    private final AudioRepository audioRepository;
+    private final ImageRepository imageRepository;
 
     @Autowired
-    private GridFsTemplate gridFsTemplate;
-
-    /**
-     * Upload bài hát vào MongoDB GridFS và lưu thông tin vào database
-     */
-    public Song uploadSong(MultipartFile file, String title, String artist, String albumId, String genre, String coverImage) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File nhạc không được để trống");
-        }
-
-        // Lưu file nhạc vào GridFS
-        ObjectId fileId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-
-        // Tạo bài hát mới
-        Song song = new Song();
-        song.setTitle(title);
-        song.setArtist(artist);
-        song.setAlbumId(albumId);
-        song.setGenre(genre);
-        song.setCoverImageUrl(coverImage);
-        song.setFileUrl(fileId.toHexString());
-
-        return songRepository.save(song);
-    }
-    public List<Song> getSongsByAlbum(String albumId) {
-        return songRepository.findByAlbumId(albumId);
+    public SongService(SongRepository songRepository, AudioRepository audioRepository, ImageRepository imageRepository) {
+        this.songRepository = songRepository;
+        this.audioRepository = audioRepository;
+        this.imageRepository = imageRepository;
     }
 
     public Song createSong(Song song) {
+        // Kiểm tra audioId và imageId có tồn tại không
+        Optional<Audio> audio = audioRepository.findById(song.getAudioId());
+        if (!audio.isPresent()) {
+            throw new IllegalArgumentException("Audio with ID " + song.getAudioId() + " not found.");
+        }
+
+        Optional<Image> image = imageRepository.findById(song.getImageId());
+        if (!image.isPresent()) {
+            throw new IllegalArgumentException("Image with ID " + song.getImageId() + " not found.");
+        }
+
+        // Kiểm tra title và artist không được rỗng
+        if (song.getTitle() == null || song.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty.");
+        }
+        if (song.getArtist() == null || song.getArtist().trim().isEmpty()) {
+            throw new IllegalArgumentException("Artist cannot be empty.");
+        }
+
         return songRepository.save(song);
     }
 
-    public List<Song> createSongs(List<Song> songs) {
-        return songRepository.saveAll(songs);
+    public Optional<Song> getSong(String id) {
+        return songRepository.findById(id);
     }
 
-    /**
-     * Lấy danh sách tất cả bài hát
-     */
     public List<Song> getAllSongs() {
         return songRepository.findAll();
     }
 
-    /**
-     * Lấy bài hát theo ID
-     */
-    public Optional<Song> getSongById(String id) {
-        return songRepository.findById(id);
+    public Song updateSong(String id, Song song) {
+        Optional<Song> existingSong = songRepository.findById(id);
+        if (!existingSong.isPresent()) {
+            throw new IllegalArgumentException("Song with ID " + id + " not found.");
+        }
+
+        // Kiểm tra audioId và imageId
+        Optional<Audio> audio = audioRepository.findById(song.getAudioId());
+        if (!audio.isPresent()) {
+            throw new IllegalArgumentException("Audio with ID " + song.getAudioId() + " not found.");
+        }
+
+        Optional<Image> image = imageRepository.findById(song.getImageId());
+        if (!image.isPresent()) {
+            throw new IllegalArgumentException("Image with ID " + song.getImageId() + " not found.");
+        }
+
+        // Kiểm tra title và artist
+        if (song.getTitle() == null || song.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be empty.");
+        }
+        if (song.getArtist() == null || song.getArtist().trim().isEmpty()) {
+            throw new IllegalArgumentException("Artist cannot be empty.");
+        }
+
+        Song updatedSong = existingSong.get();
+        updatedSong.setTitle(song.getTitle());
+        updatedSong.setArtist(song.getArtist());
+        updatedSong.setAudioId(song.getAudioId());
+        updatedSong.setImageId(song.getImageId());
+        return songRepository.save(updatedSong);
     }
 
-
-
-    /**
-     * Xóa bài hát theo ID và xóa file trong GridFS
-     */
-//    public void deleteSong(String id) {
-//        Optional<Song> songOptional = songRepository.findById(id);
-//        if (songOptional.isPresent()) {
-//            Song song = songOptional.get();
-//
-//            // Xóa file nhạc khỏi GridFS nếu tồn tại
-//            if (song.getFileUrl() != null) {
-//                Query query = Query.query(Criteria.where("_id").is(song.getFileUrl()));
-//                gridFsTemplate.delete(query);
-//            }
-//
-//            // Xóa bài hát khỏi database
-//            songRepository.deleteById(id);
-//        } else {
-//            throw new RuntimeException("Bài hát không tồn tại!");
-//        }
-//    }
-
-    public boolean deleteSong(String id) {
+    public void deleteSong(String id) {
         Optional<Song> song = songRepository.findById(id);
-        if (song.isPresent()) {
-            songRepository.deleteById(id);
-            return true; // Trả về true nếu xóa thành công
+        if (!song.isPresent()) {
+            throw new IllegalArgumentException("Song with ID " + id + " not found.");
         }
-        return false; // Trả về false nếu không tìm thấy bài hát
-    }
-
-    /**
-     * Lấy dữ liệu file nhạc từ GridFS theo fileId
-     */
-    public byte[] getSongFile(String fileId) throws IOException {
-        Query query = Query.query(Criteria.where("_id").is(fileId));
-        GridFSFile gridFSFile = gridFsTemplate.findOne(query);
-
-        if (gridFSFile != null) {
-            GridFsResource resource = gridFsTemplate.getResource(gridFSFile);
-            return resource.getInputStream().readAllBytes();
-        }
-        return null;
-    }
-
-
-    public String uploadSongFile(MultipartFile file, String title, String artist, String albumId, String genre, String coverImage) throws IOException {
-        // Lưu file vào GridFS
-        ObjectId fileId = gridFsTemplate.store(file.getInputStream(), file.getOriginalFilename(), file.getContentType());
-
-        // Trả về ID của file đã lưu
-        return fileId.toHexString();
+        songRepository.deleteById(id);
     }
 }

@@ -2,63 +2,64 @@ package com.btec.webmusic_api.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.LocalDate;
 
-@Document(collection = "songs")  // Dùng MongoDB thay vì JPA
+@Document(collection = "songs")
 public class Song {
     @Id
     private String id;
     private String title;
     private String artist;
-    private String albumId;
-    private String genre;
-    private int duration;
-    private LocalDate releaseDate;
-    private String fileUrl;  // Lưu GridFS file ID
-    private String coverImageUrl;
+    private String audioId; // Tham chiếu đến ID của file audio trong collection "audios"
+    private String imageId; // Tham chiếu đến ID của file image trong collection "images"
 
     // Constructors
     public Song() {}
 
-    public Song(String title, String artist, String albumId, String genre, int duration,
-                LocalDate releaseDate, String fileUrl, String coverImageUrl) {
+    public Song(String title, String artist, String audioId, String imageId) {
         this.title = title;
         this.artist = artist;
-        this.albumId = albumId;
-        this.genre = genre;
-        this.duration = duration;
-        this.releaseDate = releaseDate;
-        this.fileUrl = fileUrl;
-        this.coverImageUrl = coverImageUrl;
+        this.audioId = audioId;
+        this.imageId = imageId;
     }
 
-    // Getters & Setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    // Getters and Setters
+    public String getId() {
+        return id;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getArtist() { return artist; }
-    public void setArtist(String artist) { this.artist = artist; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getAlbumId() { return albumId; }
-    public void setAlbumId(String albumId) { this.albumId = albumId; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getGenre() { return genre; }
-    public void setGenre(String genre) { this.genre = genre; }
+    public String getArtist() {
+        return artist;
+    }
 
-    public int getDuration() { return duration; }
-    public void setDuration(int duration) { this.duration = duration; }
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
 
-    public LocalDate getReleaseDate() { return releaseDate; }
-    public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+    public String getAudioId() {
+        return audioId;
+    }
 
-    public String getFileUrl() { return fileUrl; }
-    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+    public void setAudioId(String audioId) {
+        this.audioId = audioId;
+    }
 
-    public String getCoverImageUrl() { return coverImageUrl; }
-    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+    public String getImageId() {
+        return imageId;
+    }
 
-
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
+    }
 }

@@ -10,6 +10,7 @@ public class Image {
     @Id
     private String id;
     private byte[] data;
+    private String fileName;
 
     @Transient
     public static final String SEQUENCE_NAME = "image_sequence";
@@ -29,6 +30,14 @@ public class Image {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void getFileName() {
+        this.fileName=fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
     // Constructors, getters, and setters
 }
