@@ -255,7 +255,7 @@ const LeftSidebar = () => {
           }
         `}
       </style>
-      <div className=" bg-black text-white p-5 h-screen">
+      <div className=" bg-gray-900 text-white p-5 h-screen">
         {/* Fixed Header Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
