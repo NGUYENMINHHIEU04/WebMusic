@@ -218,18 +218,12 @@ const Homepage = () => {
   const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
   const [isDraggingLeft, setIsDraggingLeft] = useState(false);
   const [isDraggingRight, setIsDraggingRight] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false); // Trạng thái Play/Pause toàn cục
-  const [currentPlayingCard, setCurrentPlayingCard] = useState(null); // Theo dõi card đang phát
-  const containerRef = useRef(null);
-
-  const singer = {
-    name: 'Son Tung M-TP',
-    bio: 'Ca sĩ, nhạc sĩ người Việt Nam',
-    image: 'https://via.placeholder.com/150',
-  };
-
-  const song = {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentPlayingCard, setCurrentPlayingCard] = useState(null);
+  const [currentSong, setCurrentSong] = useState({
     title: 'Chạy Ngay Đi',
+    artist: 'Son Tung M-TP',
+    url: '/assets/song/ChuVitCon.mp3', // Bài hát mặc định
     lyrics: `Chạy ngay đi trước khi
     Mọi điều dần tồi tệ hơn
     Chạy ngay đi trước khi
@@ -237,6 +231,13 @@ const Homepage = () => {
     Chạy ngay đi trước khi
     Mọi điều dần tồi tệ hơn
     ...`,
+  });
+  const containerRef = useRef(null);
+
+  const singer = {
+    name: 'Son Tung M-TP',
+    bio: 'Ca sĩ, nhạc sĩ người Việt Nam',
+    image: 'https://via.placeholder.com/150',
   };
 
   const toggleSingerInfo = () => {
@@ -301,14 +302,22 @@ const Homepage = () => {
     }
   };
 
-  // Hàm xử lý Play/Pause từ PlaylistCard
   const handlePlayPause = (cardIndex) => {
     if (currentPlayingCard !== cardIndex) {
-      setCurrentPlayingCard(cardIndex); // Cập nhật card đang phát
-      setIsPlaying(true); // Phát nhạc
+      setCurrentPlayingCard(cardIndex);
+      setIsPlaying(true);
     } else {
-      setIsPlaying(!isPlaying); // Chuyển đổi Play/Pause
+      setIsPlaying(!isPlaying);
     }
+  };
+
+  const handleTrackSelect = (track) => {
+    setCurrentSong({
+      title: track.title,
+      artist: track.artist,
+      url: track.url,
+      lyrics: track.lyrics || '', // Nếu bài hát có lời thì truyền vào, nếu không thì để rỗng
+    });
   };
 
   useEffect(() => {
@@ -371,8 +380,8 @@ const Homepage = () => {
           >
             {showLyrics ? (
               <Lyrics
-                songTitle={song.title}
-                lyrics={song.lyrics}
+                songTitle={currentSong.title}
+                lyrics={currentSong.lyrics}
                 onClose={toggleLyrics}
               />
             ) : (
@@ -382,6 +391,7 @@ const Homepage = () => {
                 setIsPlaying={setIsPlaying}
                 currentPlayingCard={currentPlayingCard}
                 handlePlayPause={handlePlayPause}
+                onTrackSelect={handleTrackSelect} // Truyền callback xuống MainContent
               />
             )}
           </div>
@@ -405,7 +415,7 @@ const Homepage = () => {
           onToggleLyrics={toggleLyrics}
           onToggleQueue={toggleQueue}
           onToggleDevice={toggleDevice}
-          song={song}
+          song={currentSong} // Truyền currentSong xuống MusicPlayer
           isPlaying={isPlaying}
           setIsPlaying={setIsPlaying}
         />

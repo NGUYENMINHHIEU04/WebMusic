@@ -2,10 +2,14 @@
 // import PlaylistCard from './PlaylistCard';
 // import PlaylistDetail from './PlaylistDetail';
 
-// const MainContent = ({ showSingerInfo }) => {
-//   const [selectedPlaylist, setSelectedPlaylist] = useState(null); // Trạng thái để theo dõi playlist được chọn
-//   const [isPlaying, setIsPlaying] = useState(false); // Trạng thái Play/Pause toàn cục
-//   const [currentPlayingCard, setCurrentPlayingCard] = useState(null); // Theo dõi card đang phát
+// const MainContent = ({
+//   showSingerInfo,
+//   isPlaying,
+//   setIsPlaying,
+//   currentPlayingCard,
+//   handlePlayPause,
+// }) => {
+//   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
 //   const playlists = [
 //     {
@@ -36,62 +40,43 @@
 //     },
 //   ];
 
-//   // Hàm xử lý khi nhấn vào card
 //   const handleCardClick = (playlist) => {
 //     setSelectedPlaylist(playlist);
 //   };
 
-//   // Hàm xử lý khi quay lại từ trang chi tiết
 //   const handleBack = () => {
 //     setSelectedPlaylist(null);
-//   };
-
-//   // Hàm xử lý Play/Pause từ PlaylistCard
-//   const handlePlayPause = (cardIndex) => {
-//     if (currentPlayingCard !== cardIndex) {
-//       setCurrentPlayingCard(cardIndex); // Cập nhật card đang phát
-//       setIsPlaying(true); // Phát nhạc
-//     } else {
-//       setIsPlaying(!isPlaying); // Chuyển đổi Play/Pause
-//     }
 //   };
 
 //   return (
 //     <>
 //       <style>
 //         {`
-//           /* Custom scrollbar styling inspired by Spotify */
 //           .custom-scrollbar::-webkit-scrollbar {
 //             width: 8px;
 //           }
-
 //           .custom-scrollbar::-webkit-scrollbar-track {
 //             background: transparent;
 //           }
-
 //           .custom-scrollbar::-webkit-scrollbar-thumb {
 //             background: #4a5568;
 //             border-radius: 4px;
 //           }
-
 //           .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 //             background: #6b7280;
 //           }
 //         `}
 //       </style>
 
-//       <div className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar">
+//       <div className="bg-gray-800 p-5 text-white rounded-lg h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
 //         {selectedPlaylist ? (
-//           // Hiển thị trang chi tiết playlist
-//           <PlaylistDetail 
-//             playlist={selectedPlaylist} 
-//             onBack={handleBack} 
+//           <PlaylistDetail
+//             playlist={selectedPlaylist}
+//             onBack={handleBack}
 //             isPlaying={isPlaying}
 //             setIsPlaying={setIsPlaying}
 //           />
-          
 //         ) : (
-//           // Hiển thị danh sách playlist
 //           <>
 //             <div className="p-5 text-white font-sans">
 //               <div className="flex justify-between items-center mb-5">
@@ -109,6 +94,7 @@
 //                 {playlists.map((playlist, index) => (
 //                   <PlaylistCard
 //                     key={index}
+//                     index={index}
 //                     image={playlist.image}
 //                     title={playlist.title}
 //                     artists={playlist.artists}
@@ -136,6 +122,7 @@
 //                 {playlists.map((playlist, index) => (
 //                   <PlaylistCard
 //                     key={index}
+//                     index={index}
 //                     image={playlist.image}
 //                     title={playlist.title}
 //                     artists={playlist.artists}
@@ -163,6 +150,7 @@
 //                 {playlists.map((playlist, index) => (
 //                   <PlaylistCard
 //                     key={index}
+//                     index={index}
 //                     image={playlist.image}
 //                     title={playlist.title}
 //                     artists={playlist.artists}
@@ -190,6 +178,7 @@
 //                 {playlists.map((playlist, index) => (
 //                   <PlaylistCard
 //                     key={index}
+//                     index={index}
 //                     image={playlist.image}
 //                     title={playlist.title}
 //                     artists={playlist.artists}
@@ -219,6 +208,7 @@ const MainContent = ({
   setIsPlaying,
   currentPlayingCard,
   handlePlayPause,
+  onTrackSelect, // Nhận callback từ Homepage
 }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
@@ -286,6 +276,7 @@ const MainContent = ({
             onBack={handleBack}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
+            onTrackSelect={onTrackSelect} // Truyền callback xuống PlaylistDetail
           />
         ) : (
           <>

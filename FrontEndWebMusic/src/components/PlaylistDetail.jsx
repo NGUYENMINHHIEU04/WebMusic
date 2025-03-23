@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying }) => {
+const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying, onTrackSelect }) => {
   const tracks = [
     {
       id: 1,
@@ -8,6 +8,7 @@ const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying }) => {
       artist: 'Braaheim, Braaten & Chrit Leaf',
       album: 'Call Me Up (Braaten & Chrit Leaf Remix)',
       duration: '2:48',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // Thêm URL bài hát
     },
     {
       id: 2,
@@ -15,6 +16,7 @@ const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying }) => {
       artist: 'YES YES, Tesbter, H.I.S.E.',
       album: 'This is What You Came For',
       duration: '2:41',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', // Thêm URL bài hát
     },
     {
       id: 3,
@@ -22,11 +24,17 @@ const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying }) => {
       artist: 'BRAN',
       album: 'We Are The People',
       duration: '2:42',
+      url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', // Thêm URL bài hát
     },
   ];
 
   const handlePlayPauseClick = () => {
     setIsPlaying(!isPlaying);
+  };
+
+  const handleTrackClick = (track) => {
+    onTrackSelect(track); // Gọi callback để truyền thông tin bài hát lên Homepage
+    setIsPlaying(true); // Tự động phát bài hát khi chọn
   };
 
   return (
@@ -130,7 +138,8 @@ const PlaylistDetail = ({ playlist, onBack, isPlaying, setIsPlaying }) => {
         {tracks.map((track) => (
           <div
             key={track.id}
-            className="grid grid-cols-12 gap-4 py-2 hover:bg-[#282828] rounded-md"
+            className="grid grid-cols-12 gap-4 py-2 hover:bg-[#282828] rounded-md cursor-pointer"
+            onClick={() => handleTrackClick(track)} // Thêm sự kiện onClick
           >
             <div className="col-span-1">{track.id}</div>
             <div className="col-span-5">
