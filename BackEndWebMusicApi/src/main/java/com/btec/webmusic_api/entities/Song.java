@@ -8,21 +8,24 @@ public class Song {
     @Id
     private String id;
     private String title;
-    private String artist;
-    private String audioId; // Tham chiếu đến ID của file audio trong collection "audios"
-    private String imageId; // Tham chiếu đến ID của file image trong collection "images"
+    private String idArtist;  // ID từ API Artist
+    private String artistName; // Tên artist từ API Artist
+    private String audioId; // ID file audio từ API Audio
+    private String imageId; // ID file image từ API Image
+    private String audioUrl; // URL của audio
+    private String imageUrl; // URL của image
 
     // Constructors
     public Song() {}
 
-    public Song(String title, String artist, String audioId, String imageId) {
+    public Song(String title, String idArtist, String audioId, String imageId) {
         this.title = title;
-        this.artist = artist;
+        this.idArtist = idArtist;
         this.audioId = audioId;
         this.imageId = imageId;
     }
 
-    // Getters and Setters
+    // Getters và Setters
     public String getId() {
         return id;
     }
@@ -39,12 +42,20 @@ public class Song {
         this.title = title;
     }
 
-    public String getArtist() {
-        return artist;
+    public String getIdArtist() {
+        return idArtist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setIdArtist(String idArtist) {
+        this.idArtist = idArtist;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
     }
 
     public String getAudioId() {
@@ -61,5 +72,21 @@ public class Song {
 
     public void setImageId(String imageId) {
         this.imageId = imageId;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

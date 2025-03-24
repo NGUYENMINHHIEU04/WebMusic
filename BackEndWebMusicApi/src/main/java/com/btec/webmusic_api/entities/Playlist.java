@@ -1,65 +1,67 @@
 package com.btec.webmusic_api.entities;
 
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Document(collection = "playlists")
 public class Playlist {
     @Id
     private String id;
     private String name;
-    private String genre;
-    private String ImageUrl;
-    private String artists;
     private String description;
+    private List<String> songIds; // Danh sách ID bài hát từ API Song
+    private String coverImageId;  // ID ảnh từ API Image
 
-    // Getter methods
-    public  String getImageUrl(){
-        return ImageUrl;
+    // Constructors
+    public Playlist() {}
+
+    public Playlist(String name, String description, List<String> songIds, String coverImageId) {
+        this.name = name;
+        this.description = description;
+        this.songIds = songIds;
+        this.coverImageId = coverImageId;
     }
 
+    // Getters & Setters
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public String getArtists() {
-        return artists;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
         return description;
     }
 
-    // Setter methods
-    public void setId(String id) {
-        this.id = id;
-    }
-    public void setImageUrl (String imageUrl){
-        this.ImageUrl = imageUrl ;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public void setArtists(String artists) {
-        this.artists = artists;
-    }
-
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getSongIds() {
+        return songIds;
+    }
+
+    public void setSongIds(List<String> songIds) {
+        this.songIds = songIds;
+    }
+
+    public String getCoverImageId() {
+        return coverImageId;
+    }
+
+    public void setCoverImageId(String coverImageId) {
+        this.coverImageId = coverImageId;
     }
 }
