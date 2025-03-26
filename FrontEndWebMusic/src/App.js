@@ -14,9 +14,11 @@ import AuthPage from './pages/AuthPage';
 import ForgotPassword from './pages/ForgotPassword';
 import Homepage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Homepage />} />
@@ -27,6 +29,7 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 };
 
