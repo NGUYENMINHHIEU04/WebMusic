@@ -228,7 +228,7 @@ const MainContent = ({
         // Adjust the mapping based on your actual API response structure
         const formattedPlaylists = data.map((playlist, index) => ({
           id: playlist.id || index,
-          image: playlist.image || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-HDimUUOguRmwDoYVQpoNwHOP8X8Pjpzu7g&s', // Use a default image if none provided
+          image: playlist.image || 'https://via.placeholder.com/150', // Use a default image if none provided
           title: playlist.name || `Playlist ${index + 1}`,
           artists: playlist.artists || 'Various Artists',
         }));

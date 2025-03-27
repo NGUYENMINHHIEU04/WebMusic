@@ -8,24 +8,21 @@ public class Song {
     @Id
     private String id;
     private String title;
-    private String idArtist;  // ID từ API Artist
-    private String artistName; // Tên artist từ API Artist
-    private String audioId; // ID file audio từ API Audio
-    private String imageId; // ID file image từ API Image
-    private String audioUrl; // URL của audio
-    private String imageUrl; // URL của image
+    private String artistId; // ID trỏ tới API Artist
+    private String idAudio;  // ID trỏ tới API Audio
+    private String idImage;  // ID trỏ tới API Image
 
     // Constructors
     public Song() {}
 
-    public Song(String title, String idArtist, String audioId, String imageId) {
+    public Song(String title, String artistId, String idAudio, String idImage) {
         this.title = title;
-        this.idArtist = idArtist;
-        this.audioId = audioId;
-        this.imageId = imageId;
+        this.artistId = artistId;
+        this.idAudio = idAudio;
+        this.idImage = idImage;
     }
 
-    // Getters và Setters
+    // Getters & Setters
     public String getId() {
         return id;
     }
@@ -42,51 +39,27 @@ public class Song {
         this.title = title;
     }
 
-    public String getIdArtist() {
-        return idArtist;
+    public String getArtistId() {
+        return artistId;
     }
 
-    public void setIdArtist(String idArtist) {
-        this.idArtist = idArtist;
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
     }
 
-    public String getArtistName() {
-        return artistName;
+    public String getIdAudio() {
+        return idAudio;
     }
 
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
+    public void setIdAudio(String idAudio) {
+        this.idAudio = idAudio;
     }
 
-    public String getAudioId() {
-        return audioId;
+    public String getIdImage() {
+        return idImage;
     }
 
-    public void setAudioId(String audioId) {
-        this.audioId = audioId;
-    }
-
-    public String getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(String imageId) {
-        this.imageId = imageId;
-    }
-
-    public String getAudioUrl() {
-        return audioUrl;
-    }
-
-    public void setAudioUrl(String audioUrl) {
-        this.audioUrl = audioUrl;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setIdImage(String idImage) {
+        this.idImage = idImage;
     }
 }

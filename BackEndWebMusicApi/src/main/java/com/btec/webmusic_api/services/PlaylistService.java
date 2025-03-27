@@ -31,7 +31,6 @@ public class PlaylistService {
             playlistData.put("name", playlist.getName());
             playlistData.put("description", playlist.getDescription());
             playlistData.put("songs", getSongs(playlist.getSongIds())); // Lấy dữ liệu từ API Song
-            playlistData.put("coverImageUrl", getImageUrl(playlist.getCoverImageId())); // Lấy URL từ API Image
             response.add(playlistData);
         }
 
@@ -49,7 +48,6 @@ public class PlaylistService {
         playlistData.put("name", playlist.getName());
         playlistData.put("description", playlist.getDescription());
         playlistData.put("songs", getSongs(playlist.getSongIds()));
-        playlistData.put("coverImageUrl", getImageUrl(playlist.getCoverImageId()));
 
         return Optional.of(playlistData);
     }
@@ -76,14 +74,4 @@ public class PlaylistService {
         return songs;
     }
 
-    // Lấy URL ảnh từ API Image
-    private String getImageUrl(String imageId) {
-        String imageApiUrl = "http://localhost:8080/api/images/" + imageId;
-        try {
-            restTemplate.getForObject(imageApiUrl, byte[].class); // Kiểm tra xem ảnh có tồn tại không
-            return imageApiUrl;
-        } catch (Exception e) {
-            return null; // Trả về null nếu ảnh không tồn tại
-        }
-    }
 }

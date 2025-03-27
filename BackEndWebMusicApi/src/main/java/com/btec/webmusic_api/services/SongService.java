@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SongService {
+
     private final SongRepository songRepository;
     private final RestTemplate restTemplate;
 
@@ -20,77 +20,73 @@ public class SongService {
         this.restTemplate = new RestTemplate();
     }
 
+    // Lấy tất cả bài hát
+    public List<Map<String, Object>> getAllSongs() {
+        List<Song> songs = songRepository.findAll();
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (Song song : songs) {
+            Map<String, Object> songData = new HashMap<>();
+            songData.put("id", song.getId());
+            songData.put("title", song.getTitle());
+            songData.put("artist", getArtistName(song.getArtistId())); // Lấy tên từ API Artist
+            songData.put("audioData", getAudioData(song.getIdAudio())); // Lấy data từ API Audio
+            songData.put("imageData", getImageData(song.getIdImage())); // Lấy data từ API Image
+            response.add(songData);
+        }
+
+        return response;
+    }
+
+    // Lấy bài hát theo ID
+    public Optional<Map<String, Object>> getSongById(String id) {
+        Optional<Song> songOptional = songRepository.findById(id);
+        if (songOptional.isEmpty()) return Optional.empty();
+
+        Song song = songOptional.get();
+        Map<String, Object> songData = new HashMap<>();
+        songData.put("id", song.getId());
+        songData.put("title", song.getTitle());
+        songData.put("artist", getArtistName(song.getArtistId()));
+        songData.put("audioData", getAudioData(song.getIdAudio()));
+        songData.put("imageData", getImageData(song.getIdImage()));
+
+        return Optional.of(songData);
+    }
+
+    // Tạo bài hát mới
     public Song createSong(Song song) {
-        song.setArtistName(getArtistName(song.getIdArtist()));
-        song.setAudioUrl(getAudioUrl(song.getAudioId()));
-        song.setImageUrl(getImageUrl(song.getImageId()));
         return songRepository.save(song);
     }
 
-    public Optional<Song> getSong(String id) {
-        Optional<Song> song = songRepository.findById(id);
-        song.ifPresent(s -> {
-            s.setArtistName(getArtistName(s.getIdArtist()));
-            s.setAudioUrl(getAudioUrl(s.getAudioId()));
-            s.setImageUrl(getImageUrl(s.getImageId()));
-        });
-        return song;
-    }
-
-    public List<Song> getAllSongs() {
-        List<Song> songs = songRepository.findAll();
-        songs.forEach(song -> {
-            song.setArtistName(getArtistName(song.getIdArtist()));
-            song.setAudioUrl(getAudioUrl(song.getAudioId()));
-            song.setImageUrl(getImageUrl(song.getImageId()));
-        });
-        return songs;
-    }
-
-    public Song updateSong(String id, Song song) {
-        Optional<Song> existingSong = songRepository.findById(id);
-        if (!existingSong.isPresent()) {
-            throw new IllegalArgumentException("Song with ID " + id + " not found.");
-        }
-
-        Song updatedSong = existingSong.get();
-        updatedSong.setTitle(song.getTitle());
-        updatedSong.setIdArtist(song.getIdArtist());
-        updatedSong.setArtistName(getArtistName(song.getIdArtist())); // Lấy tên artist từ API Artist
-        updatedSong.setAudioId(song.getAudioId());
-        updatedSong.setImageId(song.getImageId());
-        updatedSong.setAudioUrl(getAudioUrl(song.getAudioId()));
-        updatedSong.setImageUrl(getImageUrl(song.getImageId()));
-
-        return songRepository.save(updatedSong);
-    }
-
-    public void deleteSong(String id) {
-        if (!songRepository.existsById(id)) {
-            throw new IllegalArgumentException("Song with ID " + id + " not found.");
-        }
-        songRepository.deleteById(id);
-    }
-
-    // Lấy tên artist từ API Artist
-    private String getArtistName(String idArtist) {
-        String artistApiUrl = "http://localhost:8080/api/artists/" + idArtist; // Thay URL thật của API Artist
+    // Lấy tên nghệ sĩ từ API Artist
+    private String getArtistName(String artistId) {
+        String artistApiUrl = "http://localhost:8080/api/artists/" + artistId;
         try {
-            return restTemplate.getForObject(artistApiUrl, String.class);
+            Map<String, Object> artist = restTemplate.getForObject(artistApiUrl, Map.class);
+            return artist != null ? artist.get("name").toString() : null;
         } catch (Exception e) {
-            return "Unknown Artist"; // Trả về mặc định nếu không tìm thấy artist
+            return "Unknown Artist";
         }
     }
 
-    // Lấy URL từ API Audio
-    private String getAudioUrl(String audioId) {
-        String audioApiUrl = "http://localhost:8080/api/audios/" + audioId; // Thay URL thật của API Audio
-        return audioApiUrl;
+    // Lấy dữ liệu audio từ API Audio
+    private Map<String, Object> getAudioData(String audioId) {
+        String audioApiUrl = "http://localhost:8080/api/audio/" + audioId;
+        try {
+            return restTemplate.getForObject(audioApiUrl, Map.class);
+        } catch (Exception e) {
+            return Map.of("error", "Audio not found");
+        }
     }
 
-    // Lấy URL từ API Image
-    private String getImageUrl(String imageId) {
-        String imageApiUrl = "http://localhost:8080/api/images/" + imageId; // Thay URL thật của API Image
-        return imageApiUrl;
+    // Lấy dữ liệu image từ API Image
+    private Map<String, Object> getImageData(String imageId) {
+        String imageApiUrl = "http://localhost:8080/api/images/" + imageId;
+        try {
+            return restTemplate.getForObject(imageApiUrl, Map.class);
+        } catch (Exception e) {
+            return Map.of("error", "Image not found");
+        }
     }
 }
