@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -20,33 +21,19 @@ public class SongController {
         this.songService = songService;
     }
 
-    @PostMapping
-    public ResponseEntity<Song> createSong(@RequestBody Song song) {
-        Song createdSong = songService.createSong(song);
-        return ResponseEntity.ok(createdSong);
+    @GetMapping
+    public ResponseEntity<List<Map<String, Object>>> getAllSongs() {
+        return ResponseEntity.ok(songService.getAllSongs());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Song> getSong(@PathVariable("id") String id) {
-        Optional<Song> song = songService.getSong(id);
+    public ResponseEntity<?> getSongById(@PathVariable String id) {
+        Optional<Map<String, Object>> song = songService.getSongById(id);
         return song.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping
-    public ResponseEntity<List<Song>> getAllSongs() {
-        List<Song> songs = songService.getAllSongs();
-        return ResponseEntity.ok(songs);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Song> updateSong(@PathVariable("id") String id, @RequestBody Song song) {
-        Song updatedSong = songService.updateSong(id, song);
-        return ResponseEntity.ok(updatedSong);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSong(@PathVariable("id") String id) {
-        songService.deleteSong(id);
-        return ResponseEntity.noContent().build();
+    @PostMapping
+    public ResponseEntity<Song> createSong(@RequestBody Song song) {
+        return ResponseEntity.ok(songService.createSong(song));
     }
 }
