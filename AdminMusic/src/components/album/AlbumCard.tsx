@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Album as AlbumIcon, Edit, Trash, MoreVertical, Music } from "lucide-react";
 import { motion } from "framer-motion";
@@ -43,18 +42,18 @@ const AlbumCard = ({ album, onEdit, onDelete, onManageSongs }: AlbumCardProps) =
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onEdit(album)}>
                 <Edit className="mr-2 h-4 w-4" />
-                <span>Chỉnh sửa</span>
+                <span>Edit</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onManageSongs(album.id)}>
                 <Music className="mr-2 h-4 w-4" />
-                <span>Quản lý bài hát</span>
+                <span>Manage Songs</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => onDelete(album.id)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash className="mr-2 h-4 w-4" />
-                <span>Xóa</span>
+                <span>Delete</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -72,7 +71,7 @@ const AlbumCard = ({ album, onEdit, onDelete, onManageSongs }: AlbumCardProps) =
             onClick={() => onManageSongs(album.id)}
           >
             <Music className="w-4 h-4 mr-1" />
-            {album.songs.length} bài hát
+            {album.songs.length} songs
           </Button>
           <span className="text-xs text-muted-foreground">
             {new Date(album.releaseDate).toLocaleDateString()}

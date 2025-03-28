@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useData } from "@/context/DataContext";
 import { Link } from "react-router-dom";
@@ -21,9 +20,9 @@ const Index = () => {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Bảng điều khiển</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Quản lý bài hát, albums và người dùng của bạn
+          Manage your songs, albums, and users
         </p>
       </div>
       
@@ -39,11 +38,11 @@ const Index = () => {
             <div className="p-2 rounded-full bg-blue-100">
               <Music className="w-5 h-5 text-blue-600" />
             </div>
-            <h3 className="text-lg font-medium">Bài hát</h3>
+            <h3 className="text-lg font-medium">Songs</h3>
           </div>
           <p className="mt-3 text-3xl font-bold">{songs.length}</p>
           <Link to="/songs" className="mt-4 text-sm text-blue-600 flex items-center">
-            Xem tất cả <ChevronRight className="w-4 h-4 ml-1" />
+            View all <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </motion.div>
         
@@ -61,7 +60,7 @@ const Index = () => {
           </div>
           <p className="mt-3 text-3xl font-bold">{albums.length}</p>
           <Link to="/albums" className="mt-4 text-sm text-purple-600 flex items-center">
-            Xem tất cả <ChevronRight className="w-4 h-4 ml-1" />
+            View all <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </motion.div>
         
@@ -75,11 +74,11 @@ const Index = () => {
             <div className="p-2 rounded-full bg-green-100">
               <Users className="w-5 h-5 text-green-600" />
             </div>
-            <h3 className="text-lg font-medium">Người dùng</h3>
+            <h3 className="text-lg font-medium">Users</h3>
           </div>
           <p className="mt-3 text-3xl font-bold">{users.length}</p>
           <Link to="/users" className="mt-4 text-sm text-green-600 flex items-center">
-            Xem tất cả <ChevronRight className="w-4 h-4 ml-1" />
+            View all <ChevronRight className="w-4 h-4 ml-1" />
           </Link>
         </motion.div>
       </div>
@@ -87,8 +86,8 @@ const Index = () => {
       {/* Recent songs */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Bài hát đã thêm gần đây</h2>
-          <Link to="/songs" className="text-sm text-primary">Xem tất cả</Link>
+          <h2 className="text-xl font-semibold">Recently Added Songs</h2>
+          <Link to="/songs" className="text-sm text-primary">View all</Link>
         </div>
         
         <div className="bg-white rounded-xl shadow-sm border border-border overflow-hidden">
@@ -126,9 +125,9 @@ const Index = () => {
             </ul>
           ) : (
             <div className="p-8 text-center">
-              <p className="text-muted-foreground">Không có bài hát nào</p>
+              <p className="text-muted-foreground">No songs available</p>
               <Link to="/songs" className="mt-2 text-sm text-primary inline-block">
-                Thêm bài hát
+                Add songs
               </Link>
             </div>
           )}
@@ -138,8 +137,8 @@ const Index = () => {
       {/* Recent albums */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Albums gần đây</h2>
-          <Link to="/albums" className="text-sm text-primary">Xem tất cả</Link>
+          <h2 className="text-xl font-semibold">Recently Added Albums</h2>
+          <Link to="/albums" className="text-sm text-primary">View all</Link>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -169,16 +168,16 @@ const Index = () => {
                   <h3 className="text-sm font-medium truncate">{album.title}</h3>
                   <p className="text-xs text-muted-foreground">{album.artist}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {album.songs.length} bài hát
+                    {album.songs.length} songs
                   </p>
                 </div>
               </motion.div>
             ))
           ) : (
             <div className="col-span-full p-8 text-center bg-white rounded-xl shadow-sm border border-border">
-              <p className="text-muted-foreground">Không có album nào</p>
+              <p className="text-muted-foreground">No albums available</p>
               <Link to="/albums" className="mt-2 text-sm text-primary inline-block">
-                Thêm album
+                Add albums
               </Link>
             </div>
           )}

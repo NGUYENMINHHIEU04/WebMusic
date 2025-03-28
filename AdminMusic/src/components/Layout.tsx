@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Music, User, Home, Settings, Album } from "lucide-react";
 import { motion } from "framer-motion";
 
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -13,11 +14,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   
   const navItems = [
-    { to: "/", label: "Trang chủ", icon: <Home className="w-5 h-5" /> },
-    { to: "/songs", label: "Bài hát", icon: <Music className="w-5 h-5" /> },
+    { to: "/", label: "Home", icon: <Home className="w-5 h-5" /> },
+    { to: "/songs", label: "Songs", icon: <Music className="w-5 h-5" /> },
     { to: "/albums", label: "Albums", icon: <Album className="w-5 h-5" /> },
-    { to: "/users", label: "Người dùng", icon: <User className="w-5 h-5" /> },
-    { to: "/settings", label: "Cài đặt", icon: <Settings className="w-5 h-5" /> },
+    { to: "/users", label: "Users", icon: <User className="w-5 h-5" /> },
+    { to: "/settings", label: "Settings", icon: <Settings className="w-5 h-5" /> },
   ];
 
   return (
@@ -54,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="fixed inset-x-0 top-0 z-10 flex items-center h-16 px-4 bg-white border-b md:hidden">
         <Link to="/" className="flex items-center space-x-2">
           <Music className="w-6 h-6" />
-          <span className="text-lg font-semibold">Quản lý Âm nhạc</span>
+          <span className="text-lg font-semibold">Music Management</span>
         </Link>
       </div>
 
@@ -70,8 +71,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 location.pathname === item.to
                   ? "text-primary"
                   : "text-muted-foreground"
-              )}
-            >
+              )}>
               {item.icon}
               <span className="text-xs mt-1">{item.label}</span>
             </Link>

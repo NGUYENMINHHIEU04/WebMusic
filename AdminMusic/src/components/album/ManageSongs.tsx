@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -25,12 +24,12 @@ const ManageSongs = ({
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
-        <h4 className="text-sm font-medium">Thêm bài hát</h4>
+        <h4 className="text-sm font-medium">Add Song</h4>
         
         <div className="flex items-center space-x-2">
           <Select value={selectedSongId} onValueChange={onSongSelect}>
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Chọn bài hát" />
+              <SelectValue placeholder="Select a song" />
             </SelectTrigger>
             <SelectContent>
               {availableSongs.length > 0 ? (
@@ -41,7 +40,7 @@ const ManageSongs = ({
                 ))
               ) : (
                 <SelectItem value="" disabled>
-                  Không có bài hát khả dụng
+                  No available songs
                 </SelectItem>
               )}
             </SelectContent>
@@ -58,7 +57,7 @@ const ManageSongs = ({
       </div>
       
       <div className="space-y-2">
-        <h4 className="text-sm font-medium">Bài hát trong album</h4>
+        <h4 className="text-sm font-medium">Songs in Album</h4>
         
         <div className="bg-secondary/50 rounded-lg overflow-hidden">
           {albumSongs.length > 0 ? (
@@ -83,7 +82,7 @@ const ManageSongs = ({
             </ul>
           ) : (
             <div className="p-4 text-center text-muted-foreground">
-              Chưa có bài hát nào trong album này
+              No songs in this album
             </div>
           )}
         </div>

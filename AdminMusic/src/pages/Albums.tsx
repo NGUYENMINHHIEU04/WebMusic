@@ -25,7 +25,7 @@ const Albums = () => {
   
   const handleAddAlbum = () => {
     if (!title || !artist || !releaseDate) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
+      toast.error("Please fill in all the information");
       return;
     }
     
@@ -42,7 +42,7 @@ const Albums = () => {
   
   const handleEditAlbum = () => {
     if (!selectedAlbum || !title || !artist || !releaseDate) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
+      toast.error("Please fill in all the information");
       return;
     }
     
@@ -69,7 +69,7 @@ const Albums = () => {
     if (selectedAlbum && selectedSongId) {
       addSongToAlbum(selectedAlbum, selectedSongId);
       setSelectedSongId("");
-      toast.success("Đã thêm bài hát vào album thành công");
+      toast.success("Successfully added song to album");
     }
   };
   
@@ -126,11 +126,11 @@ const Albums = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Albums</h1>
           <p className="text-muted-foreground">
-            Quản lý tất cả albums của bạn
+            Manage all your albums
           </p>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)} className="gap-1">
-          <PlusCircle className="w-4 h-4" /> Thêm album
+          <PlusCircle className="w-4 h-4" /> Add album
         </Button>
       </div>
       
@@ -148,11 +148,11 @@ const Albums = () => {
         ) : (
           <div className="col-span-full p-8 text-center bg-white rounded-xl shadow-sm border border-border">
             <Album className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Không có album nào</h3>
+            <h3 className="text-lg font-medium mb-2">No albums available</h3>
             <p className="text-muted-foreground mb-4">
-              Bạn chưa có album nào. Hãy thêm album đầu tiên của bạn!
+              You don't have any albums yet. Add your first album!
             </p>
-            <Button onClick={() => setIsAddDialogOpen(true)}>Thêm album</Button>
+            <Button onClick={() => setIsAddDialogOpen(true)}>Add album</Button>
           </div>
         )}
       </div>
@@ -160,9 +160,9 @@ const Albums = () => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Thêm album mới</DialogTitle>
+            <DialogTitle>Add new album</DialogTitle>
             <DialogDescription>
-              Thêm album mới vào thư viện của bạn
+              Add a new album to your library
             </DialogDescription>
           </DialogHeader>
           
@@ -181,9 +181,9 @@ const Albums = () => {
               resetForm();
               setIsAddDialogOpen(false);
             }}>
-              Hủy
+              Cancel
             </Button>
-            <Button onClick={handleAddAlbum}>Thêm album</Button>
+            <Button onClick={handleAddAlbum}>Add album</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -191,9 +191,9 @@ const Albums = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa album</DialogTitle>
+            <DialogTitle>Edit album</DialogTitle>
             <DialogDescription>
-              Chỉnh sửa thông tin album
+              Edit album information
             </DialogDescription>
           </DialogHeader>
           
@@ -212,9 +212,9 @@ const Albums = () => {
               resetForm();
               setIsEditDialogOpen(false);
             }}>
-              Hủy
+              Cancel
             </Button>
-            <Button onClick={handleEditAlbum}>Lưu thay đổi</Button>
+            <Button onClick={handleEditAlbum}>Save changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -222,18 +222,18 @@ const Albums = () => {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogTitle>Confirm deletion</DialogTitle>
             <DialogDescription>
-              Bạn có chắc chắn muốn xóa album này không? Thao tác này không thể hoàn tác.
+              Are you sure you want to delete this album? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Hủy
+              Cancel
             </Button>
             <Button variant="destructive" onClick={handleDeleteAlbum}>
-              Xóa
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -242,9 +242,9 @@ const Albums = () => {
       <Dialog open={isManageSongsDialogOpen} onOpenChange={setIsManageSongsDialogOpen}>
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
-            <DialogTitle>Quản lý bài hát trong album</DialogTitle>
+            <DialogTitle>Manage songs in album</DialogTitle>
             <DialogDescription>
-              Thêm hoặc xóa bài hát trong album
+              Add or remove songs in the album
             </DialogDescription>
           </DialogHeader>
           
@@ -259,7 +259,7 @@ const Albums = () => {
           
           <DialogFooter>
             <Button onClick={() => setIsManageSongsDialogOpen(false)}>
-              Xong
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
