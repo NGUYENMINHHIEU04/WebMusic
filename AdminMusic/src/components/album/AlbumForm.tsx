@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,27 +25,27 @@ const AlbumForm = ({
   return (
     <div className="grid gap-4 py-4">
       <div className="grid gap-2">
-        <Label htmlFor="title">Tên album</Label>
+        <Label htmlFor="title">Album Title</Label>
         <Input
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Nhập tên album"
+          placeholder="Enter album title"
         />
       </div>
       
       <div className="grid gap-2">
-        <Label htmlFor="artist">Nghệ sĩ</Label>
+        <Label htmlFor="artist">Artist</Label>
         <Input
           id="artist"
           value={artist}
           onChange={(e) => setArtist(e.target.value)}
-          placeholder="Nhập tên nghệ sĩ"
+          placeholder="Enter artist name"
         />
       </div>
       
       <div className="grid gap-2">
-        <Label htmlFor="releaseDate">Ngày phát hành</Label>
+        <Label htmlFor="releaseDate">Release Date</Label>
         <Input
           id="releaseDate"
           type="date"
@@ -56,11 +55,11 @@ const AlbumForm = ({
       </div>
       
       <div className="grid gap-2">
-        <Label>Ảnh bìa (không bắt buộc)</Label>
+        <Label>Cover Image (optional)</Label>
         <FileUpload
           accept="image/*"
           onChange={onCoverImageChange}
-          label="Tải lên ảnh bìa"
+          label="Upload cover image"
         />
       </div>
     </div>

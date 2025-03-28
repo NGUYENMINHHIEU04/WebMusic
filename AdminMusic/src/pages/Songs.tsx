@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useData } from "@/context/DataContext";
 import { useAudio } from "@/context/AudioContext";
@@ -29,7 +28,7 @@ const Songs = () => {
   
   const handleAddSong = () => {
     if (!title || !artist || !audioFile) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
+      toast.error("Please fill in all the information");
       return;
     }
     
@@ -51,7 +50,7 @@ const Songs = () => {
   
   const handleEditSong = () => {
     if (!selectedSong || !title || !artist) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
+      toast.error("Please fill in all the information");
       return;
     }
     
@@ -136,13 +135,13 @@ const Songs = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Bài hát</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Songs</h1>
           <p className="text-muted-foreground">
-            Quản lý tất cả bài hát của bạn
+            Manage all your songs
           </p>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)} className="gap-1">
-          <PlusCircle className="w-4 h-4" /> Thêm bài hát
+          <PlusCircle className="w-4 h-4" /> Add Song
         </Button>
       </div>
       
@@ -186,14 +185,14 @@ const Songs = () => {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => prepareSongEdit(song)}>
                       <Edit className="mr-2 h-4 w-4" />
-                      <span>Chỉnh sửa</span>
+                      <span>Edit</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={() => prepareSongDelete(song.id)}
                       className="text-destructive focus:text-destructive"
                     >
                       <Trash className="mr-2 h-4 w-4" />
-                      <span>Xóa</span>
+                      <span>Delete</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -203,11 +202,11 @@ const Songs = () => {
         ) : (
           <div className="p-8 text-center">
             <Music className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">Không có bài hát nào</h3>
+            <h3 className="text-lg font-medium mb-2">No songs available</h3>
             <p className="text-muted-foreground mb-4">
-              Bạn chưa có bài hát nào. Hãy thêm bài hát đầu tiên của bạn!
+              You don't have any songs yet. Add your first song!
             </p>
-            <Button onClick={() => setIsAddDialogOpen(true)}>Thêm bài hát</Button>
+            <Button onClick={() => setIsAddDialogOpen(true)}>Add Song</Button>
           </div>
         )}
       </div>
@@ -216,48 +215,48 @@ const Songs = () => {
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Thêm bài hát mới</DialogTitle>
+            <DialogTitle>Add New Song</DialogTitle>
             <DialogDescription>
-              Thêm bài hát mới vào thư viện của bạn
+              Add a new song to your library
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Tên bài hát</Label>
+              <Label htmlFor="title">Song Title</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Nhập tên bài hát"
+                placeholder="Enter song title"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="artist">Nghệ sĩ</Label>
+              <Label htmlFor="artist">Artist</Label>
               <Input
                 id="artist"
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
-                placeholder="Nhập tên nghệ sĩ"
+                placeholder="Enter artist name"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Tập tin âm thanh</Label>
+              <Label>Audio File</Label>
               <FileUpload
                 accept="audio/mpeg"
                 onChange={handleAudioFileChange}
-                label="Tải lên tập tin MP3"
+                label="Upload MP3 file"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Ảnh bìa (không bắt buộc)</Label>
+              <Label>Cover Image (optional)</Label>
               <FileUpload
                 accept="image/*"
                 onChange={handleCoverImageChange}
-                label="Tải lên ảnh bìa"
+                label="Upload cover image"
               />
             </div>
           </div>
@@ -267,9 +266,9 @@ const Songs = () => {
               resetForm();
               setIsAddDialogOpen(false);
             }}>
-              Hủy
+              Cancel
             </Button>
-            <Button onClick={handleAddSong}>Thêm bài hát</Button>
+            <Button onClick={handleAddSong}>Add Song</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -278,48 +277,48 @@ const Songs = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa bài hát</DialogTitle>
+            <DialogTitle>Edit Song</DialogTitle>
             <DialogDescription>
-              Chỉnh sửa thông tin bài hát
+              Edit song information
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="title">Tên bài hát</Label>
+              <Label htmlFor="title">Song Title</Label>
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Nhập tên bài hát"
+                placeholder="Enter song title"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="artist">Nghệ sĩ</Label>
+              <Label htmlFor="artist">Artist</Label>
               <Input
                 id="artist"
                 value={artist}
                 onChange={(e) => setArtist(e.target.value)}
-                placeholder="Nhập tên nghệ sĩ"
+                placeholder="Enter artist name"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Tập tin âm thanh (không bắt buộc)</Label>
+              <Label>Audio File (optional)</Label>
               <FileUpload
                 accept="audio/mpeg"
                 onChange={handleAudioFileChange}
-                label="Tải lên tập tin MP3 mới"
+                label="Upload new MP3 file"
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Ảnh bìa (không bắt buộc)</Label>
+              <Label>Cover Image (optional)</Label>
               <FileUpload
                 accept="image/*"
                 onChange={handleCoverImageChange}
-                label="Tải lên ảnh bìa mới"
+                label="Upload new cover image"
               />
             </div>
           </div>
@@ -329,9 +328,9 @@ const Songs = () => {
               resetForm();
               setIsEditDialogOpen(false);
             }}>
-              Hủy
+              Cancel
             </Button>
-            <Button onClick={handleEditSong}>Lưu thay đổi</Button>
+            <Button onClick={handleEditSong}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -340,18 +339,18 @@ const Songs = () => {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Xác nhận xóa</DialogTitle>
+            <DialogTitle>Confirm Deletion</DialogTitle>
             <DialogDescription>
-              Bạn có chắc chắn muốn xóa bài hát này không? Thao tác này không thể hoàn tác.
+              Are you sure you want to delete this song? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Hủy
+              Cancel
             </Button>
             <Button variant="destructive" onClick={handleDeleteSong}>
-              Xóa
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

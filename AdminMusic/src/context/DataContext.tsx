@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, Song, Album } from "@/types";
 import { v4 as uuidv4 } from "uuid";
@@ -66,19 +65,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
     setUsers((prev) => [...prev, newUser]);
-    toast.success("Người dùng đã được thêm thành công");
+    toast.success("User added successfully");
   };
 
   const updateUser = (id: string, user: Partial<User>) => {
     setUsers((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...user } : item))
     );
-    toast.success("Người dùng đã được cập nhật thành công");
+    toast.success("User updated successfully");
   };
 
   const deleteUser = (id: string) => {
     setUsers((prev) => prev.filter((user) => user.id !== id));
-    toast.success("Người dùng đã được xóa thành công");
+    toast.success("User deleted successfully");
   };
 
   const addSong = (song: Omit<Song, "id" | "createdAt">) => {
@@ -88,7 +87,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
     setSongs((prev) => [...prev, newSong]);
-    toast.success("Bài hát đã được thêm thành công");
+    toast.success("Song added successfully");
   };
 
   const updateSong = (id: string, song: Partial<Song>) => {
@@ -96,7 +95,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       prev.map((item) => (item.id === id ? { ...item, ...song } : item))
     );
     
-    // Cập nhật trong albums nếu cần
+    // Update in albums if needed
     if (song.title || song.artist || song.coverImage) {
       setAlbums((prevAlbums) =>
         prevAlbums.map((album) => ({
@@ -108,13 +107,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
     }
     
-    toast.success("Bài hát đã được cập nhật thành công");
+    toast.success("Song updated successfully");
   };
 
   const deleteSong = (id: string) => {
     setSongs((prev) => prev.filter((song) => song.id !== id));
     
-    // Xóa bài hát khỏi albums
+    // Remove song from albums
     setAlbums((prevAlbums) =>
       prevAlbums.map((album) => ({
         ...album,
@@ -122,7 +121,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }))
     );
     
-    toast.success("Bài hát đã được xóa thành công");
+    toast.success("Song deleted successfully");
   };
 
   const addAlbum = (album: Omit<Album, "id" | "createdAt" | "songs">) => {
@@ -133,19 +132,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       createdAt: new Date().toISOString(),
     };
     setAlbums((prev) => [...prev, newAlbum]);
-    toast.success("Album đã được thêm thành công");
+    toast.success("Album added successfully");
   };
 
   const updateAlbum = (id: string, album: Partial<Album>) => {
     setAlbums((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...album } : item))
     );
-    toast.success("Album đã được cập nhật thành công");
+    toast.success("Album updated successfully");
   };
 
   const deleteAlbum = (id: string) => {
     setAlbums((prev) => prev.filter((album) => album.id !== id));
-    toast.success("Album đã được xóa thành công");
+    toast.success("Album deleted successfully");
   };
 
   const addSongToAlbum = (albumId: string, songId: string) => {
@@ -163,14 +162,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
     );
     
-    // Cập nhật albumId cho bài hát
+    // Update albumId for the song
     setSongs((prev) =>
       prev.map((song) =>
         song.id === songId ? { ...song, albumId } : song
       )
     );
     
-    toast.success("Bài hát đã được thêm vào album");
+    toast.success("Song added to album");
   };
 
   const removeSongFromAlbum = (albumId: string, songId: string) => {
@@ -185,14 +184,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
     );
     
-    // Xóa albumId từ bài hát
+    // Remove albumId from the song
     setSongs((prev) =>
       prev.map((song) =>
         song.id === songId ? { ...song, albumId: undefined } : song
       )
     );
     
-    toast.success("Bài hát đã được xóa khỏi album");
+    toast.success("Song removed from album");
   };
 
   return (

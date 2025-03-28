@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
@@ -26,16 +25,16 @@ const NotFound = () => {
       >
         <h1 className="text-9xl font-bold text-primary">404</h1>
         
-        <h2 className="text-2xl font-medium mt-6 mb-2">Trang không tồn tại</h2>
+        <h2 className="text-2xl font-medium mt-6 mb-2">Page Not Found</h2>
         
         <p className="text-muted-foreground mb-8">
-          Rất tiếc, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển.
+          Sorry, the page you are looking for does not exist or has been moved.
         </p>
         
         <Link to="/">
           <Button className="gap-2">
             <Home className="w-4 h-4" />
-            Trở về trang chủ
+            Back to Home
           </Button>
         </Link>
       </motion.div>

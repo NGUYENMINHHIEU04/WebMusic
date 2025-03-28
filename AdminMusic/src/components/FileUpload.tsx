@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { Upload, X, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   onChange,
   accept = "audio/mpeg",
   maxSize = 10 * 1024 * 1024, // 10MB
-  label = "Tải lên tập tin",
+  label = "Upload File",
   className,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
@@ -37,12 +36,12 @@ const FileUpload: React.FC<FileUploadProps> = ({
   
   const validateFile = (file: File): boolean => {
     if (accept && !file.type.match(accept.replace("*", ""))) {
-      setError(`Chỉ chấp nhận tập tin ${accept}`);
+      setError(`Only accept ${accept} files`);
       return false;
     }
     
     if (maxSize && file.size > maxSize) {
-      setError(`Tập tin phải nhỏ hơn ${maxSize / (1024 * 1024)}MB`);
+      setError(`File must be smaller than ${maxSize / (1024 * 1024)}MB`);
       return false;
     }
     
@@ -147,7 +146,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           <div className="text-sm font-medium">{label}</div>
           
           <p className="text-xs text-muted-foreground">
-            Kéo và thả hoặc click để tải lên
+            Drag and drop or click to upload
           </p>
           
           {file && (
