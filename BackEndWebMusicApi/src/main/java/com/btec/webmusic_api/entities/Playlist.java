@@ -11,8 +11,8 @@ public class Playlist {
     private String id;
     private String name;
     private String description;
-    private List<String> songIds; // Danh sách ID bài hát từ API Song
-    private String coverImageId;  // ID ảnh từ API Image
+    private List<String> songIds; // Danh sách ID của các bài hát
+    private String coverImageId;  // ID của hình ảnh bìa
 
     // Constructors
     public Playlist() {}
@@ -24,7 +24,7 @@ public class Playlist {
         this.coverImageId = coverImageId;
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public String getId() {
         return id;
     }

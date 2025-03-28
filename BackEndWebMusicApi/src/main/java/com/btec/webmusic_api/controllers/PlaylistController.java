@@ -1,19 +1,24 @@
 package com.btec.webmusic_api.controllers;
 
+import com.btec.webmusic_api.configs.StaticDomain;
+import com.btec.webmusic_api.dtos.ResponseObject;
 import com.btec.webmusic_api.entities.Playlist;
 import com.btec.webmusic_api.services.PlaylistService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+@CrossOrigin(origins = {StaticDomain.IP + ":3000",
+        StaticDomain.IP + ":3001",
+        "http://localhost:3000",
+        "http://localhost:3001"})
 @RestController
 @RequestMapping("/api/playlists")
 public class PlaylistController {
-
     private final PlaylistService playlistService;
 
     @Autowired
@@ -21,19 +26,58 @@ public class PlaylistController {
         this.playlistService = playlistService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> getAllPlaylists() {
-        return ResponseEntity.ok(playlistService.getAllPlaylists());
+    @PostMapping
+    public ResponseEntity<ResponseObject<String>> createPlaylist(@RequestBody Playlist playlist) {
+        try {
+            Playlist createdPlaylist = playlistService.createPlaylist(playlist);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject<>(200, createdPlaylist.getId(), "Playlist created successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject<>(400, null, e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPlaylistById(@PathVariable String id) {
-        Optional<Map<String, Object>> playlist = playlistService.getPlaylistById(id);
-        return playlist.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ResponseObject<Playlist>> getPlaylist(@PathVariable("id") String id) {
+        Optional<Playlist> playlist = playlistService.getPlaylist(id);
+        if (playlist.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject<>(200, playlist.get(), "Playlist retrieved successfully"));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObject<>(404, null, "Playlist not found"));
+        }
     }
 
-    @PostMapping
-    public ResponseEntity<Playlist> createPlaylist(@RequestBody Playlist playlist) {
-        return ResponseEntity.ok(playlistService.createPlaylist(playlist));
+    @GetMapping
+    public ResponseEntity<ResponseObject<List<Playlist>>> getAllPlaylists() {
+        List<Playlist> playlists = playlistService.getAllPlaylists();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject<>(200, playlists, "Playlists retrieved successfully"));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseObject<String>> updatePlaylist(@PathVariable("id") String id, @RequestBody Playlist playlist) {
+        try {
+            Playlist updatedPlaylist = playlistService.updatePlaylist(id, playlist);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject<>(200, updatedPlaylist.getId(), "Playlist updated successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject<>(400, null, e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseObject<Object>> deletePlaylist(@PathVariable("id") String id) {
+        try {
+            playlistService.deletePlaylist(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject<>(200, null, "Playlist deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObject<>(404, null, e.getMessage()));
+        }
     }
 }
