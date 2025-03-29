@@ -203,7 +203,7 @@
 import React, { useState, useEffect } from 'react';
 import PlaylistCard from './PlaylistCard';
 import PlaylistDetail from './PlaylistDetail';
-import { getAllPlaylists } from '../apis/api_playlist'; // Import the API function
+import { getAllPlaylistsWithImages } from '../apis/api_playlist'; // Update this path if needed
 
 const MainContent = ({
   showSingerInfo,
@@ -215,11 +215,11 @@ const MainContent = ({
 }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch playlists when component mounts
   useEffect(() => {
+<<<<<<< Updated upstream
     const fetchPlaylists = async () => {
       try {
         setLoading(true);
@@ -241,8 +241,23 @@ const MainContent = ({
       }
     };
 
+=======
+>>>>>>> Stashed changes
     fetchPlaylists();
   }, []);
+
+  const fetchPlaylists = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllPlaylistsWithImages();
+      setPlaylists(response.data);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load playlists: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCardClick = (playlist) => {
     setSelectedPlaylist(playlist);
@@ -273,11 +288,7 @@ const MainContent = ({
       </style>
 
       <div className="bg-gray-800 p-5 text-white rounded-lg h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
-        {loading ? (
-          <div className="text-center p-5">Loading playlists...</div>
-        ) : error ? (
-          <div className="text-center p-5 text-red-500">{error}</div>
-        ) : selectedPlaylist ? (
+        {selectedPlaylist ? (
           <PlaylistDetail
             playlist={selectedPlaylist}
             onBack={handleBack}
@@ -287,6 +298,9 @@ const MainContent = ({
           />
         ) : (
           <>
+            {loading && <div className="p-5 text-center">Loading playlists...</div>}
+            {error && <div className="p-5 text-red-500">{error}</div>}
+            
             <div className="p-5 text-white font-sans">
               <div className="flex justify-between items-center mb-5">
                 <h2 className="text-2xl font-bold uppercase">
@@ -299,24 +313,24 @@ const MainContent = ({
                   SHOW ALL
                 </a>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                {playlists.map((playlist) => (
-                  <PlaylistCard
-                    key={playlist.id}
-                    index={playlist.id}
-                    image={playlist.image}
-                    title={playlist.title}
-                    artists={playlist.artists}
-                    onCardClick={() => handleCardClick(playlist)}
-                    isPlaying={isPlaying && currentPlayingCard === playlist.id}
-                    onPlayPause={() => handlePlayPause(playlist.id)}
-                  />
-                ))}
-              </div>
+              
+              {!loading && playlists.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                  {playlists.map((playlist, index) => (
+                    <PlaylistCard
+                      key={playlist.id || index}
+                      index={index}
+                      image={playlist.imageUrl}
+                      title={playlist.name}
+                      artists={playlist.description}
+                      onCardClick={() => handleCardClick(playlist)}
+                      isPlaying={isPlaying && currentPlayingCard === index}
+                      onPlayPause={() => handlePlayPause(index)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-
-            {/* You can repeat the section below with different playlist filters if needed */}
-            {/* For now, I'll keep just one section since we're using API data */}
           </>
         )}
       </div>

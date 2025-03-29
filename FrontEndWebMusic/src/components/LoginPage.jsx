@@ -11,7 +11,7 @@ const LoginPage = ({ onLogin }) => {
         onClick={onLogin}
         className="bg-[#1DB954] text-black px-6 py-3 rounded-full font-semibold hover:bg-[#1ED760] transition-colors duration-200"
       >
-        Đăng nhập ngay
+        Login now
       </button>
     </div>
   );

@@ -133,3 +133,4 @@ const MusicPlayerFullScreen = ({
 };
 
 export default MusicPlayerFullScreen;
+

@@ -72,3 +72,4 @@ const MiniPlayer = ({ isPlaying, togglePlay, onClose }) => {
 };
 
 export default MiniPlayer;
+
