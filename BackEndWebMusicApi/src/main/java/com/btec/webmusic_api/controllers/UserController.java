@@ -1,6 +1,5 @@
 package com.btec.webmusic_api.controllers;
 
-
 import com.btec.webmusic_api.entities.User;
 import com.btec.webmusic_api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -12,7 +12,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
-    private boolean active;
+    private String role = "USER"; // Thêm role với giá trị mặc định là "USER"
 
     // Getters and Setters
     public String getId() {
@@ -55,12 +55,11 @@ public class User {
         this.lastName = lastName;
     }
 
-    public boolean isActive() {
-        return active;
+    public String getRole() {
+        return role;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setRole(String role) {
+        this.role = role;
     }
-
 }

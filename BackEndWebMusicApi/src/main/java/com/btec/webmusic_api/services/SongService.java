@@ -97,17 +97,6 @@ public class SongService {
         return Optional.of(audioData);
     }
 
-    // Xây dựng response cho bài hát
-    private Map<String, Object> buildSongResponse(Song song) {
-        Map<String, Object> songData = new HashMap<>();
-        songData.put("id", song.getId());
-        songData.put("title", song.getTitle());
-        songData.put("artists", getArtistNames(song.getArtistIds()));
-        songData.put("category", song.getCategory());
-        songData.put("lyrics", song.getLyrics()); // Thêm lyrics vào response
-        return songData;
-    }
-
     // Validate dữ liệu bài hát
     private void validateSong(Song song) {
         if (song.getTitle() == null || song.getTitle().trim().isEmpty()) {
@@ -149,5 +138,35 @@ public class SongService {
             }
         }
         return artistNames;
+    }
+
+    // Xây dựng response cho bài hát, bao gồm thông tin từ API images
+    private Map<String, Object> buildSongResponse(Song song) {
+        Map<String, Object> songData = new HashMap<>();
+        songData.put("id", song.getId());
+        songData.put("title", song.getTitle());
+        songData.put("artists", getArtistNames(song.getArtistIds()));
+        songData.put("category", song.getCategory());
+        songData.put("lyrics", song.getLyrics());
+
+        // Thêm thông tin idImage từ API images
+        songData.put("image", getImageData(song.getIdImage()));
+
+        return songData;
+    }
+
+    // Lấy thông tin hình ảnh từ API images
+    private Map<String, Object> getImageData(String imageId) {
+        String imageApiUrl = "http://localhost:8080/api/images/" + imageId; // Điều chỉnh URL theo API thực tế
+        try {
+            Map<String, Object> imageData = restTemplate.getForObject(imageApiUrl, Map.class);
+            if (imageData != null) {
+                return imageData; // Trả về toàn bộ dữ liệu hình ảnh (hoặc chỉ lấy các trường cần thiết)
+            } else {
+                return Map.of("id", imageId, "url", "Unknown Image");
+            }
+        } catch (Exception e) {
+            return Map.of("id", imageId, "url", "Error fetching image");
+        }
     }
 }

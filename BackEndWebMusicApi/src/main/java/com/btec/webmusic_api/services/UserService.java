@@ -19,10 +19,13 @@ public class UserService {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User createUser(User user) {
-        // Hash the password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null || (!user.getRole().equals("USER") && !user.getRole().equals("ADMIN"))) {
+            user.setRole("USER"); // Đảm bảo role hợp lệ
+        }
         return userRepository.save(user);
     }
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
@@ -41,7 +44,7 @@ public class UserService {
             User user = userOptional.get();
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
-            user.setActive(updatedUser.isActive());
+            user.setRole(updatedUser.getRole()); // Cập nhật role từ dữ liệu đầu vào
             return userRepository.save(user);
         }
         return null;
