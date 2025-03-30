@@ -200,10 +200,11 @@
 
 // export default MainContent;
 
+
 import React, { useState, useEffect } from 'react';
 import PlaylistCard from './PlaylistCard';
 import PlaylistDetail from './PlaylistDetail';
-import { getAllPlaylistsWithImages } from '../apis/api_playlist'; // Update this path if needed
+import { getAllPlaylistsWithImages } from '../apis/api_playlist';
 
 const MainContent = ({
   showSingerInfo,
@@ -219,30 +220,6 @@ const MainContent = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-<<<<<<< Updated upstream
-    const fetchPlaylists = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllPlaylists();
-        // Assuming your API returns an array of objects with id, name, and artists
-        // Adjust the mapping based on your actual API response structure
-        const formattedPlaylists = data.map((playlist, index) => ({
-          id: playlist.id || index,
-          image: playlist.image || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-HDimUUOguRmwDoYVQpoNwHOP8X8Pjpzu7g&s', // Use a default image if none provided
-          title: playlist.name || `Playlist ${index + 1}`,
-          artists: playlist.artists || 'Various Artists',
-        }));
-        setPlaylists(formattedPlaylists);
-      } catch (err) {
-        setError('Failed to load playlists');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-=======
->>>>>>> Stashed changes
     fetchPlaylists();
   }, []);
 
@@ -250,7 +227,7 @@ const MainContent = ({
     try {
       setLoading(true);
       const response = await getAllPlaylistsWithImages();
-      setPlaylists(response.data);
+      setPlaylists(response.data); // Contains playlists with image URLs
       setError(null);
     } catch (err) {
       setError('Failed to load playlists: ' + err.message);
@@ -320,9 +297,9 @@ const MainContent = ({
                     <PlaylistCard
                       key={playlist.id || index}
                       index={index}
-                      image={playlist.imageUrl}
-                      title={playlist.name}
-                      artists={playlist.description}
+                      image={playlist.imageUrl} // From getImageById using coverImageId
+                      title={playlist.name} // Matches JSON 'name'
+                      artists={playlist.description} // Matches JSON 'description'
                       onCardClick={() => handleCardClick(playlist)}
                       isPlaying={isPlaying && currentPlayingCard === index}
                       onPlayPause={() => handlePlayPause(index)}

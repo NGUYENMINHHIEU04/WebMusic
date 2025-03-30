@@ -5,6 +5,7 @@
   "dependencies": {
     "boxicons": "^2.1.4",
     "cra-template": "1.2.0",
+    "date-fns": "^4.1.0",
     "file-loader": "^6.2.0",
     "framer-motion": "^12.5.0",
     "lucide-react": "^0.475.0",
