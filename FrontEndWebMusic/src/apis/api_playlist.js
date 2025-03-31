@@ -1,70 +1,95 @@
 // api_playlist.js
 
-const BASE_URL = 'http://localhost:8080/api/playlists'; // Adjust the base URL as per your Spring Boot server
+const BASE_URL = 'http://localhost:8080/api/playlists';
+const IMAGE_BASE_URL = 'http://localhost:8080/api/images'; // Adjust if different
 
-// Get all playlists
+const handleResponse = async (response) => {
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Something went wrong');
+  }
+  return data;
+};
+
+// Existing playlist functions remain unchanged
 export const getAllPlaylists = async () => {
-    try {
-        const response = await fetch(BASE_URL, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch playlists');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Error fetching playlists:', error);
-        throw error;
-    }
+  try {
+    const response = await fetch(BASE_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error('Error fetching all playlists:', error);
+    throw error;
+  }
 };
 
-// Get playlist by ID
 export const getPlaylistById = async (id) => {
-    try {
-        const response = await fetch(`${BASE_URL}/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                throw new Error('Playlist not found');
-            }
-            throw new Error('Failed to fetch playlist');
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.error('Error fetching playlist:', error);
-        throw error;
-    }
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error('Error fetching playlist:', error);
+    throw error;
+  }
 };
 
-// Create new playlist
 export const createPlaylist = async (playlistData) => {
-    try {
-        const response = await fetch(BASE_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(playlistData),
-        });
+  try {
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(playlistData),
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error('Error creating playlist:', error);
+    throw error;
+  }
+};
 
-        if (!response.ok) {
-            throw new Error('Failed to create playlist');
-        }
+export const updatePlaylist = async (id, playlistData) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(playlistData),
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error('Error updating playlist:', error);
+    throw error;
+  }
+};
 
-        return await response.json();
-    } catch (error) {
-        console.error('Error creating playlist:', error);
-        throw error;
-    }
+export const deletePlaylist = async (id) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    console.error('Error deleting playlist:', error);
+    throw error;
+  }
+};
+
+// New function to fetch image by ID
+export const getImageUrl = (imageId) => {
+  return `${IMAGE_BASE_URL}/${imageId}`;
 };

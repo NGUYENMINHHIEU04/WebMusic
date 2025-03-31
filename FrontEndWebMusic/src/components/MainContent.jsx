@@ -203,7 +203,7 @@
 import React, { useState, useEffect } from 'react';
 import PlaylistCard from './PlaylistCard';
 import PlaylistDetail from './PlaylistDetail';
-import { getAllPlaylists } from '../apis/api_playlist'; // Import the API function
+import { getAllPlaylists, getImageUrl } from '../apis/api_playlist';
 
 const MainContent = ({
   showSingerInfo,
@@ -218,29 +218,18 @@ const MainContent = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch playlists when component mounts
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
         setLoading(true);
-        const data = await getAllPlaylists();
-        // Assuming your API returns an array of objects with id, name, and artists
-        // Adjust the mapping based on your actual API response structure
-        const formattedPlaylists = data.map((playlist, index) => ({
-          id: playlist.id || index,
-          image: playlist.image || 'https://via.placeholder.com/150', // Use a default image if none provided
-          title: playlist.name || `Playlist ${index + 1}`,
-          artists: playlist.artists || 'Various Artists',
-        }));
-        setPlaylists(formattedPlaylists);
+        const response = await getAllPlaylists();
+        setPlaylists(response.data); // Assumes 'data' contains the playlist array
+        setLoading(false);
       } catch (err) {
-        setError('Failed to load playlists');
-        console.error(err);
-      } finally {
+        setError(err.message);
         setLoading(false);
       }
     };
-
     fetchPlaylists();
   }, []);
 
@@ -251,6 +240,22 @@ const MainContent = ({
   const handleBack = () => {
     setSelectedPlaylist(null);
   };
+
+  if (loading) {
+    return (
+      <div className="bg-gray-800 p-5 text-white rounded-lg h-[calc(100vh-96px)] flex items-center justify-center">
+        Loading playlists...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-800 p-5 text-white rounded-lg h-[calc(100vh-96px)] flex items-center justify-center">
+        Error: {error}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -273,11 +278,7 @@ const MainContent = ({
       </style>
 
       <div className="bg-gray-800 p-5 text-white rounded-lg h-[calc(100vh-96px)] overflow-y-auto custom-scrollbar">
-        {loading ? (
-          <div className="text-center p-5">Loading playlists...</div>
-        ) : error ? (
-          <div className="text-center p-5 text-red-500">{error}</div>
-        ) : selectedPlaylist ? (
+        {selectedPlaylist ? (
           <PlaylistDetail
             playlist={selectedPlaylist}
             onBack={handleBack}
@@ -300,23 +301,24 @@ const MainContent = ({
                 </a>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                {playlists.map((playlist) => (
+                {playlists.map((playlist, index) => (
                   <PlaylistCard
                     key={playlist.id}
-                    index={playlist.id}
-                    image={playlist.image}
-                    title={playlist.title}
-                    artists={playlist.artists}
+                    index={index}
+                    image={
+                      playlist.coverImageId
+                        ? getImageUrl(playlist.coverImageId)
+                        : 'https://via.placeholder.com/150' // Fallback image
+                    }
+                    title={playlist.name}
+                    artists={playlist.description || 'No description available'}
                     onCardClick={() => handleCardClick(playlist)}
-                    isPlaying={isPlaying && currentPlayingCard === playlist.id}
-                    onPlayPause={() => handlePlayPause(playlist.id)}
+                    isPlaying={isPlaying && currentPlayingCard === index}
+                    onPlayPause={() => handlePlayPause(index)}
                   />
                 ))}
               </div>
             </div>
-
-            {/* You can repeat the section below with different playlist filters if needed */}
-            {/* For now, I'll keep just one section since we're using API data */}
           </>
         )}
       </div>
