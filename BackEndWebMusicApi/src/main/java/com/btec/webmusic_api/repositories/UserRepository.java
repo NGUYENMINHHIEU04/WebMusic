@@ -1,5 +1,21 @@
-package com.btec.webmusic_api.repositories;
+//package com.btec.webmusic_api.repositories;
+//
+//
+//import com.btec.webmusic_api.entities.User;
+//import org.springframework.data.mongodb.repository.MongoRepository;
+//import org.springframework.stereotype.Repository;
+//
+//import java.util.Optional;
+//
+//@Repository
+//public interface UserRepository extends MongoRepository<User, String> {
+//    Optional<User> findByEmail(String email);
+//
+//}
+//
 
+
+package com.btec.webmusic_api.repositories;
 
 import com.btec.webmusic_api.entities.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -10,6 +26,4 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmail(String email);
-
 }
-

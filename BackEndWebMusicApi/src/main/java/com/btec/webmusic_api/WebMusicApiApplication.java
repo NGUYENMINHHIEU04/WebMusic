@@ -10,5 +10,4 @@ public class WebMusicApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WebMusicApiApplication.class, args);
 	}
-
 }
