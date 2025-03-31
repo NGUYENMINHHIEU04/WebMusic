@@ -1,3 +1,60 @@
+//package com.btec.webmusic_api.services;
+//
+//import com.btec.webmusic_api.entities.User;
+//import com.btec.webmusic_api.repositories.UserRepository;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.stereotype.Service;
+//
+//import java.util.List;
+//import java.util.Optional;
+//
+//@Service
+//public class UserService {
+//
+//    @Autowired
+//    private UserRepository userRepository;
+//
+//    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//
+//    public User createUser(User user) {
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        if (user.getRole() == null || (!user.getRole().equals("USER") && !user.getRole().equals("ADMIN"))) {
+//            user.setRole("USER"); // Đảm bảo role hợp lệ
+//        }
+//        return userRepository.save(user);
+//    }
+//
+//    public User getUserByEmail(String email) {
+//        return userRepository.findByEmail(email).orElse(null);
+//    }
+//
+//    public List<User> getAllUsers() {
+//        return userRepository.findAll();
+//    }
+//
+//    public Optional<User> getUserById(String id) {
+//        return userRepository.findById(id);
+//    }
+//
+//    public User updateUser(String id, User updatedUser) {
+//        Optional<User> userOptional = userRepository.findById(id);
+//        if (userOptional.isPresent()) {
+//            User user = userOptional.get();
+//            user.setFirstName(updatedUser.getFirstName());
+//            user.setLastName(updatedUser.getLastName());
+//            user.setRole(updatedUser.getRole()); // Cập nhật role từ dữ liệu đầu vào
+//            return userRepository.save(user);
+//        }
+//        return null;
+//    }
+//
+//    public void deleteUser(String id) {
+//        userRepository.deleteById(id);
+//    }
+//}
+
 package com.btec.webmusic_api.services;
 
 import com.btec.webmusic_api.entities.User;
@@ -19,10 +76,13 @@ public class UserService {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User createUser(User user) {
+        // Hash the password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // Ensure role is valid (USER or ADMIN, default to USER)
         if (user.getRole() == null || (!user.getRole().equals("USER") && !user.getRole().equals("ADMIN"))) {
-            user.setRole("USER"); // Đảm bảo role hợp lệ
+            user.setRole("USER");
         }
+        // firstName and lastName are already set in the User object from the request
         return userRepository.save(user);
     }
 
@@ -42,9 +102,11 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            user.setEmail(updatedUser.getEmail());
+            user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
-            user.setRole(updatedUser.getRole()); // Cập nhật role từ dữ liệu đầu vào
+            user.setRole(updatedUser.getRole());
             return userRepository.save(user);
         }
         return null;

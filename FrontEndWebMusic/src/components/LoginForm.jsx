@@ -1,19 +1,22 @@
-// import React, { useState } from 'react';
+// // LoginForm.js
+// import React, { useState, useContext } from 'react';
 // import { FaUser, FaLock } from 'react-icons/fa';
 // import SocialLogin from './SocialLogin';
 // import { Link, useNavigate } from 'react-router-dom';
+// import { AuthContext } from '../context/AuthContext';
 
-// const API_URL = "http://localhost:8080/api/auth/sign-in"; // Thay thế bằng API của bạn
+// const API_URL = "http://localhost:8080/api/auth/sign-in";
 
 // function LoginForm({ isActive }) {
+//   const { login } = useContext(AuthContext); // Sử dụng AuthContext
 //   const [email, setEmail] = useState('');
 //   const [password, setPassword] = useState('');
 //   const [error, setError] = useState('');
-//   const navigate = useNavigate(); // Điều hướng sau khi đăng nhập thành công
+//   const navigate = useNavigate();
 
 //   const handleLogin = async (e) => {
 //     e.preventDefault();
-//     setError(''); // Xóa lỗi trước đó
+//     setError('');
 
 //     try {
 //       const response = await fetch(API_URL, {
@@ -26,8 +29,8 @@
 
 //       if (response.ok) {
 //         console.log("Login successful:", data);
-//         localStorage.setItem("token", data.token); // Lưu token vào localStorage
-//         navigate("/home"); // Chuyển hướng đến trang chính
+//         login(data.token); // Gọi hàm login từ AuthContext để cập nhật trạng thái
+//         navigate("/home");
 //       } else {
 //         setError(data.message || "Invalid credentials!");
 //       }
@@ -86,6 +89,7 @@
 
 // export default LoginForm;
 
+
 // LoginForm.js
 import React, { useState, useContext } from 'react';
 import { FaUser, FaLock } from 'react-icons/fa';
@@ -117,13 +121,17 @@ function LoginForm({ isActive }) {
 
       if (response.ok) {
         console.log("Login successful:", data);
-        login(data.token); // Gọi hàm login từ AuthContext để cập nhật trạng thái
+        const { token, userId } = data; // Extract token and userId from API response
+        if (!token || !userId) {
+          throw new Error("Token or userId missing in response");
+        }
+        login(token, userId); // Gọi hàm login từ AuthContext với token và userId
         navigate("/home");
       } else {
         setError(data.message || "Invalid credentials!");
       }
     } catch (error) {
-      setError("Network error, please try again.");
+      setError(error.message || "Network error, please try again.");
     }
   };
 
