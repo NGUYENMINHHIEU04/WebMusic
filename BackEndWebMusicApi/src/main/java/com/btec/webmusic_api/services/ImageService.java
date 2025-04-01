@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ImageService {
@@ -60,6 +62,14 @@ public class ImageService {
             throw new IllegalArgumentException("Image with ID " + id + " not found.");
         }
     }
+
+    public List<String> getAllImageIds() {
+        List<Image> images = imageRepository.findAll();
+        return images.stream()
+                .map(Image::getId)
+                .collect(Collectors.toList());
+    }
+
 
 
     public Optional<Image> getImage(String id) {

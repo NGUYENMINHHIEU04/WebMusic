@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin(origins = {StaticDomain.IP + ":3000",
@@ -67,5 +68,10 @@ public class ImageController {
                     .body(new ResponseObject(500, null, "Error updating image"));
         }
     }
-
+    @GetMapping
+    public ResponseEntity<ResponseObject> getAllImages() {
+        List<String> imageIds = imageService.getAllImageIds();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ResponseObject(200, imageIds, "Images retrieved successfully"));
+    }
 }
