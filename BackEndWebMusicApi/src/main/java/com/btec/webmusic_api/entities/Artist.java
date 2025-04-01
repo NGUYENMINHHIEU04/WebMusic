@@ -48,3 +48,4 @@ public class Artist {
         this.imageId = imageId;
     }
 }
+
