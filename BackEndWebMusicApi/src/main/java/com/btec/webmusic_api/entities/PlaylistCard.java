@@ -5,8 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "playlists")
-public class Playlist {
+@Document(collection = "playlistCards")
+public class PlaylistCard {
     @Id
     private String id;
     private String name;
@@ -15,9 +15,9 @@ public class Playlist {
     private String coverImageId;  // ID của hình ảnh bìa
 
     // Constructors
-    public Playlist() {}
+    public PlaylistCard() {}
 
-    public Playlist(String name, String description, List<String> songIds, String coverImageId) {
+    public PlaylistCard(String name, String description, List<String> songIds, String coverImageId) {
         this.name = name;
         this.description = description;
         this.songIds = songIds;
