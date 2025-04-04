@@ -23,7 +23,7 @@ public class ArtistService {
     }
 
     public Optional<Artist> getArtistById(Long id) {
-        return artistRepository.findById(String.valueOf(id));
+        return artistRepository.findById(String.valueOf(id)); // Sử dụng Long trực tiếp
     }
 
     public Artist saveArtist(Artist artist) {
@@ -31,7 +31,7 @@ public class ArtistService {
     }
 
     public void deleteArtist(Long id) {
-        artistRepository.deleteById(String.valueOf(id));
+        artistRepository.deleteById(String.valueOf(id)); // Sử dụng Long trực tiếp
     }
 }
 

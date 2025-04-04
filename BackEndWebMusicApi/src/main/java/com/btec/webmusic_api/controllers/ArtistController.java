@@ -72,15 +72,13 @@ public class ArtistController {
 
     // Hàm lấy URL ảnh từ API Image
     private String getImageUrl(String imageId) {
-        String imageApiUrl = "http://localhost:8080/api/images/" + imageId; // API Image
-
+        String imageApiUrl = "http://localhost:8080/api/images/" + imageId;
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<byte[]> response = restTemplate.getForEntity(imageApiUrl, byte[].class);
-
         if (response.getStatusCode().is2xxSuccessful()) {
-            return imageApiUrl; // Trả về URL ảnh
+            return imageApiUrl;
         } else {
-            return null; // Không tìm thấy ảnh
+            return null;
         }
     }
 }
