@@ -620,7 +620,7 @@ const MusicPlayer = ({
                 </div>
               </>
             ) : (
-              <div className="text-gray-400">No song selected</div>
+              <div className="text-gray-400"></div>
             )}
           </div>
 
