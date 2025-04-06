@@ -1,7 +1,9 @@
 // api_image.js
 
+import { API_BASE_URL } from "./api";
+
 // Base URL for your Spring Boot API
-const BASE_URL = 'http://localhost:8080/api/images'; // Adjust this URL based on your Spring Boot server
+const BASE_URL = `${API_BASE_URL}/images`; // Adjust this URL based on your Spring Boot server
 
 // Helper function to handle fetch responses
 const handleResponse = async (response) => {
