@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Music, Album, Users, Settings, Image, Headphones } from 'lucide-react';
+import { Home, Music, Album, Users, Settings, Image, Headphones, Mic } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Sidebar = () => {
@@ -12,6 +11,7 @@ const Sidebar = () => {
     { icon: Home, label: 'Home', path: '/' },
     { icon: Music, label: 'Songs', path: '/songs' },
     { icon: Album, label: 'Albums', path: '/albums' },
+    { icon: Mic, label: 'Artists', path: '/artists' },
     { icon: Users, label: 'Users', path: '/users' },
     { icon: Headphones, label: 'Audio', path: '/audio' },
     { icon: Image, label: 'Images', path: '/images' },

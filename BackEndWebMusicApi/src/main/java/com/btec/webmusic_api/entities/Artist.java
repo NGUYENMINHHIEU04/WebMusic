@@ -1,18 +1,17 @@
 package com.btec.webmusic_api.entities;
 
-import jakarta.persistence.*;
-import java.util.List;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "artists") // Xác định collection trong MongoDB
 public class Artist {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private String id; // id sẽ được tự động tạo bởi MongoDB nếu không cung cấp
+
     private String name;
     private String description;
-    @ElementCollection
-    private String imageId; // ID của ảnh từ API Image
-
+    private String imageId; // Loại bỏ @ElementCollection, chỉ cần là String bình thường
 
     // Getters và Setters
     public String getId() {
@@ -39,7 +38,6 @@ public class Artist {
         this.description = description;
     }
 
-
     public String getImageId() {
         return imageId;
     }
@@ -48,4 +46,3 @@ public class Artist {
         this.imageId = imageId;
     }
 }
-

@@ -70,6 +70,16 @@ public class ImageService {
                 .collect(Collectors.toList());
     }
 
+    // Thêm vào class ImageService
+    public void deleteImage(String id) {
+        Optional<Image> imageOptional = imageRepository.findById(id);
+        if (imageOptional.isPresent()) {
+            imageRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Image with ID " + id + " not found.");
+        }
+    }
+
 
 
     public Optional<Image> getImage(String id) {

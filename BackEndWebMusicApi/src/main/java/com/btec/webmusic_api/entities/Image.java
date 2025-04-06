@@ -7,14 +7,21 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "images")
 public class Image {
+
     @Id
     private String id;
+
     private byte[] data;
     private String fileName;
 
-    @Transient
-    public static final String SEQUENCE_NAME = "image_sequence";
+    // Getters và Setters
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public byte[] getData() {
         return data;
@@ -24,20 +31,11 @@ public class Image {
         this.data = data;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void getFileName() {
-        this.fileName=fileName;
+    public String getFileName() {
+        return fileName;
     }
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
-    // Constructors, getters, and setters
 }

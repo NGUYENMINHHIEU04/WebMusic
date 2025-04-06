@@ -9,6 +9,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Songs from "./pages/Songs";
 import Albums from "./pages/Albums";
+import Artists from "./pages/Artist";
 import Users from "./pages/Users";
 import Audio from "./pages/Audio";
 import Images from "./pages/Images";
@@ -31,6 +32,7 @@ const App = () => {
                 <Route index element={<Dashboard />} />
                 <Route path="songs" element={<Songs />} />
                 <Route path="albums" element={<Albums />} />
+                <Route path="artists" element={<Artists />} />
                 <Route path="users" element={<Users />} />
                 <Route path="audio" element={<Audio />} />
                 <Route path="images" element={<Images />} />

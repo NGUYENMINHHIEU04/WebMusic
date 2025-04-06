@@ -74,4 +74,22 @@ public class ImageController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseObject(200, imageIds, "Images retrieved successfully"));
     }
+
+    // Thêm vào class ImageController
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseObject> deleteImage(@PathVariable("id") String id) {
+        try {
+            imageService.deleteImage(id);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject(200, null, "Image deleted successfully"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ResponseObject(404, null, e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseObject(500, null, "Error deleting image"));
+        }
+    }
+
+
 }

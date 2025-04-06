@@ -22,17 +22,17 @@ public class ArtistService {
         return artistRepository.findAll();
     }
 
-    public Optional<Artist> getArtistById(Long id) {
-        return artistRepository.findById(String.valueOf(id));
+    // Thay Long thành String
+    public Optional<Artist> getArtistById(String id) {
+        return artistRepository.findById(id);
     }
 
     public Artist saveArtist(Artist artist) {
         return artistRepository.save(artist);
     }
 
-    public void deleteArtist(Long id) {
-        artistRepository.deleteById(String.valueOf(id));
+    // Thay Long thành String
+    public void deleteArtist(String id) {
+        artistRepository.deleteById(id);
     }
 }
-
-
