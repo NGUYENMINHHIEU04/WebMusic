@@ -4,14 +4,13 @@ import com.btec.webmusic_api.dtos.ResponseObject;
 import com.btec.webmusic_api.entities.Song;
 import com.btec.webmusic_api.services.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,34 +86,46 @@ public class SongController {
         }
     }
 
-    // Stream file MP3 của bài hát
+    // Lấy file MP3 và thông tin bài hát
     @GetMapping("/{id}/audios")
-    public ResponseEntity<Resource> streamSongAudio(@PathVariable String id) {
+    public ResponseEntity<?> getSongAudio(@PathVariable String id) {
         Optional<Map<String, Object>> audioDataOptional = songService.getSongAudio(id);
         if (audioDataOptional.isPresent()) {
             Map<String, Object> audioData = audioDataOptional.get();
             byte[] mp3Data = (byte[]) audioData.get("mp3Data");
-            String fileName = (String) audioData.get("fileName");
             String duration = (String) audioData.get("duration");
+            String fileName = (String) audioData.get("fileName");
 
-            // Tạo Resource từ dữ liệu MP3
-            ByteArrayResource resource = new ByteArrayResource(mp3Data);
+            // Lấy thông tin bài hát từ SongService
+            Optional<Map<String, Object>> songOptional = songService.getSongById(id);
+            if (!songOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject<>(404, null, "Song not found"));
+            }
 
-            // Thiết lập headers cho streaming
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType("audio/mpeg"));
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + (fileName != null ? fileName : "song.mp3"));
-            headers.set("X-Duration", duration != null ? duration : "0:00");
-            headers.set(HttpHeaders.ACCEPT_RANGES, "bytes"); // Hỗ trợ range requests cho streaming
+            Map<String, Object> songData = songOptional.get();
+            String title = (String) songData.getOrDefault("title", "Unknown Title");
+            String category = (String) songData.getOrDefault("category", "Unknown Category");
+            String artist = (String) songData.getOrDefault("artist", "Unknown Artist");
 
-            // Trả về luồng dữ liệu
+            // Chuyển dữ liệu âm thanh thành base64
+            String audioBase64 = Base64.getEncoder().encodeToString(mp3Data);
+
+            // Tạo response JSON
+            Map<String, Object> response = new HashMap<>();
+            response.put("audioBase64", audioBase64);
+            response.put("duration", duration != null ? duration : "0:00");
+            response.put("filename", fileName != null ? fileName : "song.mp3");
+            response.put("title", title);
+            response.put("category", category);
+            response.put("artist", artist);
+
             return ResponseEntity.status(HttpStatus.OK)
-                    .headers(headers)
-                    .contentLength(mp3Data.length)
-                    .body(resource);
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(null);
+                    .body(new ResponseObject<>(404, null, "Audio for song not found"));
         }
     }
 }
