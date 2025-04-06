@@ -1,5 +1,7 @@
 // // api_song.js
 
+import { API_BASE_URL } from "./api";
+
 // const BASE_URL = 'http://localhost:8080/api/songs'; // Adjust the base URL as per your Spring Boot server
 
 // // Helper function to handle fetch responses
@@ -111,7 +113,7 @@
 
 // api_song.js
 
-const BASE_URL = 'http://localhost:8080/api/songs'; // Adjust the base URL as per your Spring Boot server
+const BASE_URL = `${API_BASE_URL}/songs`; // Adjust the base URL as per your Spring Boot server
 
 // Helper function to handle fetch responses
 const handleResponse = async (response) => {

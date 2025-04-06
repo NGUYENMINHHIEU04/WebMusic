@@ -1,5 +1,7 @@
 // // api_playlist.js
 
+import { API_BASE_URL } from "./api";
+
 // const BASE_URL = 'http://localhost:8080/api/playlistCards';
 // const IMAGE_BASE_URL = 'http://localhost:8080/api/images'; // Adjust if different
 
@@ -94,8 +96,8 @@
 //   return `${IMAGE_BASE_URL}/${imageId}`;
 // };
 
-const BASE_URL = 'http://localhost:8080/api/playlistCards';
-const IMAGE_BASE_URL = 'http://localhost:8080/api/images'; // Adjust if different
+const BASE_URL = `${API_BASE_URL}/playlistCards`;
+const IMAGE_BASE_URL = `${API_BASE_URL}/images`; // Adjust if different
 
 const handleResponse = async (response) => {
   const data = await response.json();

@@ -1,6 +1,8 @@
 // api_library.js
 
-const BASE_URL = 'http://localhost:8080/api/library'; // Adjust the base URL as per your Spring Boot server
+import { API_BASE_URL } from "./api";
+
+const BASE_URL = `${API_BASE_URL}/library`; // Adjust the base URL as per your Spring Boot server
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {

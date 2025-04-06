@@ -1,8 +1,9 @@
 // api_user.js
 import axios from 'axios';
+import { API_BASE_URL } from './api';
 
 // Base URL for the API (adjust this to match your Spring Boot server URL)
-const API_URL = 'http://localhost:8080/api/users';
+const API_URL = `${API_BASE_URL}/users`;
 
 // Function to create a new user
 export const createUser = async (userData) => {

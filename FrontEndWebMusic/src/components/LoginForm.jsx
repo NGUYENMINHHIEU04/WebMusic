@@ -96,8 +96,9 @@ import { FaUser, FaLock } from 'react-icons/fa';
 import SocialLogin from './SocialLogin';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { API_BASE_URL } from '../apis/api';
 
-const API_URL = "http://localhost:8080/api/auth/sign-in";
+const API_URL = `${API_BASE_URL}/auth/sign-in`;
 
 function LoginForm({ isActive }) {
   const { login } = useContext(AuthContext); // Sử dụng AuthContext

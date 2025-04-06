@@ -109,8 +109,9 @@ import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import SocialLogin from './SocialLogin';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { API_BASE_URL } from '../apis/api';
 
-const API_URL = "http://localhost:8080/api/auth/sign-up";
+const API_URL = `${API_BASE_URL}/auth/sign-up`;
 
 function RegisterForm({ isActive }) {
   const [email, setEmail] = useState('');

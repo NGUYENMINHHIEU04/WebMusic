@@ -21,7 +21,7 @@ public class CorsConfig {
         config.addAllowedOriginPattern("*");
 
 
-//        config.setAllowedOrigins(Arrays.asList("http://localhost:3001", "http://yourfrontend.com")); // Define allowed origins
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3001", "https://admin.lmhmusic.io.vn/" , "https://lmhmusic.io.vn/")); // Define allowed origins
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
 
