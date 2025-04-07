@@ -112,23 +112,27 @@ const Homepage = () => {
     }
   };
 
-  const handlePlayPause = async (cardIndex, playlist) => {
-    if (!isLoggedIn) {
-      setShowLoginPage(true);
-      return;
-    }
 
-    if (currentPlayingCard !== cardIndex || currentPlaylistId !== playlist.id || !isPlaying) {
-      setCurrentPlayingCard(cardIndex);
-      setCurrentPlaylistId(playlist.id);
-      const tracks = await fetchTracks(playlist);
-      if (tracks.length > 0) {
-        handleTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
-      }
-    } else {
-      setIsPlaying(!isPlaying);
+const handlePlayPause = async (cardIndex, playlist) => {
+  if (!isLoggedIn) {
+    setShowLoginPage(true);
+    return;
+  }
+
+  // Nếu PlaylistCard mới được chọn hoặc đang không phát
+  if (currentPlayingCard !== cardIndex || currentPlaylistId !== playlist.id || !isPlaying) {
+    setCurrentPlayingCard(cardIndex);
+    setCurrentPlaylistId(playlist.id);
+    const tracks = await fetchTracks(playlist);
+    if (tracks.length > 0) {
+      // Reset thời gian về 0 khi chọn PlaylistCard mới
+      resetCurrentTimeRef.current(); // Reset thời gian phát
+      handleTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
     }
-  };
+  } else {
+    setIsPlaying(!isPlaying);
+  }
+};
 
   const fetchTracks = async (playlist) => {
     const songIds = playlist.songIds || [];

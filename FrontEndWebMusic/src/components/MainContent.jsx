@@ -44,9 +44,11 @@ const MainContent = ({
     setSelectedPlaylist(null);
   };
 
-  const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex) => {
-    onTrackSelect(track, tracks, playlistId, cardIndex);
-  };
+// MainContent.js
+const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex) => {
+  resetCurrentTime(); // Reset thời gian phát về 0
+  onTrackSelect(track, tracks, playlistId, cardIndex);
+};
 
   if (loading) {
     return (
