@@ -1,4 +1,3 @@
-// PlaylistDetail.js
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useLibrary } from '../context/LibraryContext';
@@ -27,12 +26,29 @@ const PlaylistDetail = ({
   const [error, setError] = useState(null);
   const [hoveredTrackId, setHoveredTrackId] = useState(null);
   const [currentTrackId, setCurrentTrackId] = useState(null);
+  const [playlistImageUrl, setPlaylistImageUrl] = useState('https://via.placeholder.com/150');
+
+  useEffect(() => {
+    const fetchImageUrl = async () => {
+      const imageUrl = await getImageUrl(playlist.coverImageId);
+      setPlaylistImageUrl(imageUrl);
+    };
+
+    fetchImageUrl();
+  }, [playlist.coverImageId]);
 
   useEffect(() => {
     const fetchTracks = async () => {
       try {
         setLoading(true);
         const songIds = playlist.songIds || [];
+
+        if (!songIds || songIds.length === 0) {
+          console.log('No songIds found in playlist:', playlist);
+          setTracks([]);
+          setLoading(false);
+          return;
+        }
 
         const formattedTracks = await Promise.all(
           songIds.map(async (songId, index) => {
@@ -43,7 +59,7 @@ const PlaylistDetail = ({
                 title: songData.title || songData.name || 'Unknown Title',
                 artist: songData.artistIds
                   ? songData.artistIds.join(', ')
-                  : songData.artists || 'Unknown Artist',
+                  : songData.artist || 'Unknown Artist',
                 category: songData.category || songData.genre || 'Unknown Category',
                 duration: songData.duration || '0:00',
                 songId: songId,
@@ -73,8 +89,9 @@ const PlaylistDetail = ({
       }
     };
 
+    console.log('Playlist data in PlaylistDetail:', playlist);
     fetchTracks();
-  }, [playlist.songIds]);
+  }, [playlist]);
 
   useEffect(() => {
     if (currentSong && tracks.length > 0) {
@@ -153,13 +170,19 @@ const PlaylistDetail = ({
     if (isInLibrary) {
       removeFromLibrary(playlist.id);
     } else {
-      addToLibrary(playlist);
+      const playlistToAdd = {
+        id: playlist.id,
+        type: 'Playlist',
+        title: playlist.name || playlist.title, // Đảm bảo tiêu đề được truyền đúng
+        creator: 'Spotify',
+        image: playlist.coverImageId ? getImageUrl(playlist.coverImageId) : 'https://via.placeholder.com/150',
+        coverImageId: playlist.coverImageId,
+        description: playlist.description || 'No description available',
+        songIds: playlist.songIds || [],
+      };
+      addToLibrary(playlistToAdd);
     }
   };
-
-  const playlistImageUrl = playlist.coverImageId
-    ? getImageUrl(playlist.coverImageId)
-    : 'https://via.placeholder.com/150';
 
   return (
     <div className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar font-sans">
@@ -169,10 +192,10 @@ const PlaylistDetail = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <img src={playlistImageUrl} alt={playlist.name} className="w-40 h-40 object-cover mr-5" />
+        <img src={playlistImageUrl} alt={playlist.title} className="w-40 h-40 object-cover mr-5" />
         <div>
           <p className="text-sm text-gray-400">Playlist</p>
-          <h1 className="text-4xl font-bold">{playlist.name}</h1>
+          <h1 className="text-4xl font-bold">{playlist.title || playlist.name || 'Unnamed Playlist'}</h1>
           <p className="text-gray-400 mt-2">{playlist.description}</p>
           <p className="text-gray-400 text-sm">Spotify • {tracks.length} songs</p>
         </div>
@@ -226,34 +249,38 @@ const PlaylistDetail = ({
                 <FiClock className="inline-block w-5 h-5" />
               </div>
             </div>
-            {tracks.map((track) => (
-              <div
-                key={track.id}
-                className="grid grid-cols-12 gap-4 py-2 hover:bg-[#282828] rounded-md cursor-pointer"
-                onMouseEnter={() => setHoveredTrackId(track.id)}
-                onMouseLeave={() => setHoveredTrackId(null)}
-              >
-                <div className="col-span-1 flex items-center">
-                  {hoveredTrackId === track.id || currentTrackId === track.id ? (
-                    <button onClick={() => handleTrackPlayPause(track)}>
-                      {isCurrentPlaylistPlaying() && currentTrackId === track.id ? (
-                        <FaPause className="text-white w-4 h-4" />
-                      ) : (
-                        <FaPlay className="text-white w-4 h-4" />
-                      )}
-                    </button>
-                  ) : (
-                    track.id
-                  )}
+            {tracks.length === 0 ? (
+              <p>No songs available in this playlist.</p>
+            ) : (
+              tracks.map((track) => (
+                <div
+                  key={track.id}
+                  className="grid grid-cols-12 gap-4 py-2 hover:bg-[#282828] rounded-md cursor-pointer"
+                  onMouseEnter={() => setHoveredTrackId(track.id)}
+                  onMouseLeave={() => setHoveredTrackId(null)}
+                >
+                  <div className="col-span-1 flex items-center">
+                    {hoveredTrackId === track.id || currentTrackId === track.id ? (
+                      <button onClick={() => handleTrackPlayPause(track)}>
+                        {isCurrentPlaylistPlaying() && currentTrackId === track.id ? (
+                          <FaPause className="text-white w-4 h-4" />
+                        ) : (
+                          <FaPlay className="text-white w-4 h-4" />
+                        )}
+                      </button>
+                    ) : (
+                      track.id
+                    )}
+                  </div>
+                  <div className="col-span-5">
+                    <p className="text-white">{track.title}</p>
+                    <p className="text-sm text-gray-400">{track.artist}</p>
+                  </div>
+                  <div className="col-span-4">{track.category}</div>
+                  <div className="col-span-2 text-right">{track.duration}</div>
                 </div>
-                <div className="col-span-5">
-                  <p className="text-white">{track.title}</p>
-                  <p className="text-sm text-gray-400">{track.artist}</p>
-                </div>
-                <div className="col-span-4">{track.category}</div>
-                <div className="col-span-2 text-right">{track.duration}</div>
-              </div>
-            ))}
+              ))
+            )}
           </>
         )}
       </div>

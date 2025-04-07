@@ -1,4 +1,3 @@
-// MainContent.js
 import React, { useState, useEffect } from 'react';
 import PlaylistCard from './PlaylistCard';
 import PlaylistDetail from './PlaylistDetail';
@@ -15,6 +14,7 @@ const MainContent = ({
   onArtistSelect,
   currentSong,
   resetCurrentTime,
+  selectedPlaylistFromLibrary, // Thêm prop mới
 }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
@@ -26,6 +26,7 @@ const MainContent = ({
       try {
         setLoading(true);
         const response = await getAllPlaylists();
+        console.log('Playlists from API:', response.data);
         setPlaylists(response.data);
         setLoading(false);
       } catch (err) {
@@ -36,6 +37,12 @@ const MainContent = ({
     fetchPlaylists();
   }, []);
 
+  useEffect(() => {
+    if (selectedPlaylistFromLibrary) {
+      setSelectedPlaylist(selectedPlaylistFromLibrary); // Cập nhật playlist được chọn từ LeftSidebar
+    }
+  }, [selectedPlaylistFromLibrary]);
+
   const handleCardClick = (playlist) => {
     setSelectedPlaylist(playlist);
   };
@@ -44,11 +51,10 @@ const MainContent = ({
     setSelectedPlaylist(null);
   };
 
-// MainContent.js
-const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex) => {
-  resetCurrentTime(); // Reset thời gian phát về 0
-  onTrackSelect(track, tracks, playlistId, cardIndex);
-};
+  const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex) => {
+    resetCurrentTime();
+    onTrackSelect(track, tracks, playlistId, cardIndex);
+  };
 
   if (loading) {
     return (

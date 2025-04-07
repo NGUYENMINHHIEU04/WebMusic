@@ -37,6 +37,7 @@ const Homepage = () => {
   });
   const [currentArtist, setCurrentArtist] = useState(null);
   const [currentPlaylistTracks, setCurrentPlaylistTracks] = useState([]);
+  const [selectedPlaylistFromLibrary, setSelectedPlaylistFromLibrary] = useState(null); // Thêm state mới
   const containerRef = useRef(null);
   const resetCurrentTimeRef = useRef(() => {});
 
@@ -112,27 +113,24 @@ const Homepage = () => {
     }
   };
 
-
-const handlePlayPause = async (cardIndex, playlist) => {
-  if (!isLoggedIn) {
-    setShowLoginPage(true);
-    return;
-  }
-
-  // Nếu PlaylistCard mới được chọn hoặc đang không phát
-  if (currentPlayingCard !== cardIndex || currentPlaylistId !== playlist.id || !isPlaying) {
-    setCurrentPlayingCard(cardIndex);
-    setCurrentPlaylistId(playlist.id);
-    const tracks = await fetchTracks(playlist);
-    if (tracks.length > 0) {
-      // Reset thời gian về 0 khi chọn PlaylistCard mới
-      resetCurrentTimeRef.current(); // Reset thời gian phát
-      handleTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
+  const handlePlayPause = async (cardIndex, playlist) => {
+    if (!isLoggedIn) {
+      setShowLoginPage(true);
+      return;
     }
-  } else {
-    setIsPlaying(!isPlaying);
-  }
-};
+
+    if (currentPlayingCard !== cardIndex || currentPlaylistId !== playlist.id || !isPlaying) {
+      setCurrentPlayingCard(cardIndex);
+      setCurrentPlaylistId(playlist.id);
+      const tracks = await fetchTracks(playlist);
+      if (tracks.length > 0) {
+        resetCurrentTimeRef.current();
+        handleTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
+      }
+    } else {
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   const fetchTracks = async (playlist) => {
     const songIds = playlist.songIds || [];
@@ -186,12 +184,14 @@ const handlePlayPause = async (cardIndex, playlist) => {
     setCurrentArtist(artist);
   };
 
-  const handleNextTrack = () => {
-    // Logic đã được xử lý trong MusicPlayer
-  };
+  const handleNextTrack = () => {};
 
   const handleLoginRedirect = () => {
     navigate('/auth');
+  };
+
+  const handlePlaylistSelectFromLibrary = (playlist) => {
+    setSelectedPlaylistFromLibrary(playlist); // Lưu playlist được chọn từ LeftSidebar
   };
 
   useEffect(() => {
@@ -246,7 +246,7 @@ const handlePlayPause = async (cardIndex, playlist) => {
               ref={containerRef}
             >
               <div style={{ width: `${leftSidebarWidth}%` }}>
-                <LeftSidebar />
+                <LeftSidebar onPlaylistSelect={handlePlaylistSelectFromLibrary} /> {/* Truyền prop */}
               </div>
 
               <div className="divider" onMouseDown={handleMouseDownLeft} />
@@ -274,6 +274,7 @@ const handlePlayPause = async (cardIndex, playlist) => {
                     onArtistSelect={handleArtistSelect}
                     currentSong={currentSong}
                     resetCurrentTime={resetCurrentTimeRef.current}
+                    selectedPlaylistFromLibrary={selectedPlaylistFromLibrary} // Truyền playlist từ LeftSidebar
                   />
                 )}
               </div>
@@ -301,8 +302,8 @@ const handlePlayPause = async (cardIndex, playlist) => {
                 setIsPlaying={setIsPlaying}
                 onNextTrack={handleNextTrack}
                 resetCurrentTime={resetCurrentTimeRef}
-                playlist={currentPlaylistTracks} // Truyền currentPlaylistTracks
-                setCurrentSong={setCurrentSong} // Truyền setCurrentSong
+                playlist={currentPlaylistTracks}
+                setCurrentSong={setCurrentSong}
               />
             ) : (
               <LoginBanner />
