@@ -1,4 +1,4 @@
-
+// PlaylistCard.js
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -8,11 +8,7 @@ const PlaylistCard = ({ index, image, title, artists, onCardClick, isPlaying, on
 
   const handlePlayPauseClick = (e) => {
     e.stopPropagation();
-    if (!isLoggedIn) {
-      onPlayPause(); // Gọi handlePlayPause từ Homepage để hiển thị LoginPage
-    } else {
-      onPlayPause();
-    }
+    onPlayPause();
   };
 
   return (
@@ -33,19 +29,11 @@ const PlaylistCard = ({ index, image, title, artists, onCardClick, isPlaying, on
           onClick={handlePlayPauseClick}
         >
           {isPlaying ? (
-            <svg
-              className="w-6 h-6 text-black"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
             </svg>
           ) : (
-            <svg
-              className="w-6 h-6 text-black"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
           )}
@@ -60,4 +48,3 @@ const PlaylistCard = ({ index, image, title, artists, onCardClick, isPlaying, on
 };
 
 export default PlaylistCard;
-
