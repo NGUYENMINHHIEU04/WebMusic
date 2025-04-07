@@ -1,3 +1,4 @@
+// src/pages/Homepage.js
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import LeftSidebar from '../components/LeftSidebar';
@@ -37,9 +38,16 @@ const Homepage = () => {
   });
   const [currentArtist, setCurrentArtist] = useState(null);
   const [currentPlaylistTracks, setCurrentPlaylistTracks] = useState([]);
-  const [selectedPlaylistFromLibrary, setSelectedPlaylistFromLibrary] = useState(null); // Thêm state mới
+  const [selectedPlaylistFromLibrary, setSelectedPlaylistFromLibrary] = useState(null);
+  const [resetTrigger, setResetTrigger] = useState(0); // Thêm state để kích hoạt reset
   const containerRef = useRef(null);
   const resetCurrentTimeRef = useRef(() => {});
+
+  // Hàm để reset về MainContent
+  const resetToMainContent = () => {
+    setSelectedPlaylistFromLibrary(null); // Reset playlist từ LeftSidebar
+    setResetTrigger((prev) => prev + 1); // Tăng resetTrigger để kích hoạt reset trong MainContent
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -191,7 +199,7 @@ const Homepage = () => {
   };
 
   const handlePlaylistSelectFromLibrary = (playlist) => {
-    setSelectedPlaylistFromLibrary(playlist); // Lưu playlist được chọn từ LeftSidebar
+    setSelectedPlaylistFromLibrary(playlist);
   };
 
   useEffect(() => {
@@ -236,7 +244,7 @@ const Homepage = () => {
         `}
       </style>
       <div className="flex flex-col h-screen">
-        <Header />
+        <Header onReset={resetToMainContent} />
         {showLoginPage ? (
           <LoginPage onLogin={handleLoginRedirect} />
         ) : (
@@ -246,7 +254,7 @@ const Homepage = () => {
               ref={containerRef}
             >
               <div style={{ width: `${leftSidebarWidth}%` }}>
-                <LeftSidebar onPlaylistSelect={handlePlaylistSelectFromLibrary} /> {/* Truyền prop */}
+                <LeftSidebar onPlaylistSelect={handlePlaylistSelectFromLibrary} />
               </div>
 
               <div className="divider" onMouseDown={handleMouseDownLeft} />
@@ -274,7 +282,8 @@ const Homepage = () => {
                     onArtistSelect={handleArtistSelect}
                     currentSong={currentSong}
                     resetCurrentTime={resetCurrentTimeRef.current}
-                    selectedPlaylistFromLibrary={selectedPlaylistFromLibrary} // Truyền playlist từ LeftSidebar
+                    selectedPlaylistFromLibrary={selectedPlaylistFromLibrary}
+                    resetTrigger={resetTrigger} // Truyền resetTrigger xuống MainContent
                   />
                 )}
               </div>

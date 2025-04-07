@@ -1,3 +1,4 @@
+// src/components/MainContent.js
 import React, { useState, useEffect } from 'react';
 import PlaylistCard from './PlaylistCard';
 import PlaylistDetail from './PlaylistDetail';
@@ -14,7 +15,8 @@ const MainContent = ({
   onArtistSelect,
   currentSong,
   resetCurrentTime,
-  selectedPlaylistFromLibrary, // Thêm prop mới
+  selectedPlaylistFromLibrary,
+  resetTrigger, // Thêm prop mới
 }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
@@ -42,6 +44,11 @@ const MainContent = ({
       setSelectedPlaylist(selectedPlaylistFromLibrary); // Cập nhật playlist được chọn từ LeftSidebar
     }
   }, [selectedPlaylistFromLibrary]);
+
+  useEffect(() => {
+    // Reset selectedPlaylist khi resetTrigger thay đổi
+    setSelectedPlaylist(null);
+  }, [resetTrigger]);
 
   const handleCardClick = (playlist) => {
     setSelectedPlaylist(playlist);
