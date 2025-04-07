@@ -39,14 +39,30 @@ const Homepage = () => {
   const [currentArtist, setCurrentArtist] = useState(null);
   const [currentPlaylistTracks, setCurrentPlaylistTracks] = useState([]);
   const [selectedPlaylistFromLibrary, setSelectedPlaylistFromLibrary] = useState(null);
-  const [resetTrigger, setResetTrigger] = useState(0); // Thêm state để kích hoạt reset
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const [searchResults, setSearchResults] = useState([]);
   const containerRef = useRef(null);
   const resetCurrentTimeRef = useRef(() => {});
 
-  // Hàm để reset về MainContent
   const resetToMainContent = () => {
-    setSelectedPlaylistFromLibrary(null); // Reset playlist từ LeftSidebar
-    setResetTrigger((prev) => prev + 1); // Tăng resetTrigger để kích hoạt reset trong MainContent
+    setSelectedPlaylistFromLibrary(null);
+    setSearchResults([]);
+    setResetTrigger((prev) => prev + 1);
+  };
+
+  const handleSearch = (filteredSongs) => {
+    const formattedTracks = filteredSongs.map((song, index) => ({
+      id: index + 1,
+      title: song.title || 'Unknown Title',
+      artist: song.artist || 'Unknown Artist',
+      category: song.category || 'Unknown Category',
+      duration: song.duration || '0:00',
+      songId: song.id,
+      url: song.audioUrl || '',
+      artistIds: song.artistIds || [],
+    }));
+    setSearchResults(formattedTracks);
+    setSelectedPlaylistFromLibrary(null);
   };
 
   useEffect(() => {
@@ -133,7 +149,9 @@ const Homepage = () => {
       const tracks = await fetchTracks(playlist);
       if (tracks.length > 0) {
         resetCurrentTimeRef.current();
-        handleTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
+        // Kiểm tra nếu playlist có selectedTrackIndex (từ search results)
+        const trackToPlayIndex = playlist.selectedTrackIndex !== undefined ? playlist.selectedTrackIndex : 0;
+        handleTrackSelect(tracks[trackToPlayIndex], tracks, playlist.id, cardIndex);
       }
     } else {
       setIsPlaying(!isPlaying);
@@ -151,7 +169,7 @@ const Homepage = () => {
             title: songData.title || songData.name || 'Unknown Title',
             artist: songData.artistIds
               ? songData.artistIds.join(', ')
-              : songData.artists || 'Unknown Artist',
+              : songData.artist || 'Unknown Artist',
             category: songData.category || songData.genre || 'Unknown Category',
             duration: songData.duration || '0:00',
             songId: songId,
@@ -200,6 +218,7 @@ const Homepage = () => {
 
   const handlePlaylistSelectFromLibrary = (playlist) => {
     setSelectedPlaylistFromLibrary(playlist);
+    setSearchResults([]);
   };
 
   useEffect(() => {
@@ -244,7 +263,7 @@ const Homepage = () => {
         `}
       </style>
       <div className="flex flex-col h-screen">
-        <Header onReset={resetToMainContent} />
+        <Header onReset={resetToMainContent} onSearch={handleSearch} />
         {showLoginPage ? (
           <LoginPage onLogin={handleLoginRedirect} />
         ) : (
@@ -283,7 +302,8 @@ const Homepage = () => {
                     currentSong={currentSong}
                     resetCurrentTime={resetCurrentTimeRef.current}
                     selectedPlaylistFromLibrary={selectedPlaylistFromLibrary}
-                    resetTrigger={resetTrigger} // Truyền resetTrigger xuống MainContent
+                    resetTrigger={resetTrigger}
+                    searchResults={searchResults}
                   />
                 )}
               </div>

@@ -16,7 +16,8 @@ const MainContent = ({
   currentSong,
   resetCurrentTime,
   selectedPlaylistFromLibrary,
-  resetTrigger, // Thêm prop mới
+  resetTrigger,
+  searchResults,
 }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
@@ -41,12 +42,11 @@ const MainContent = ({
 
   useEffect(() => {
     if (selectedPlaylistFromLibrary) {
-      setSelectedPlaylist(selectedPlaylistFromLibrary); // Cập nhật playlist được chọn từ LeftSidebar
+      setSelectedPlaylist(selectedPlaylistFromLibrary);
     }
   }, [selectedPlaylistFromLibrary]);
 
   useEffect(() => {
-    // Reset selectedPlaylist khi resetTrigger thay đổi
     setSelectedPlaylist(null);
   }, [resetTrigger]);
 
@@ -61,6 +61,17 @@ const MainContent = ({
   const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex) => {
     resetCurrentTime();
     onTrackSelect(track, tracks, playlistId, cardIndex);
+  };
+
+  // Tạo playlist giả từ searchResults
+  const createSearchPlaylist = (selectedTrackIndex) => {
+    return {
+      id: 'search-results',
+      name: 'Search Results',
+      songIds: searchResults.map((track) => track.songId),
+      tracks: searchResults,
+      selectedTrackIndex, // Thêm thông tin về bài hát được chọn
+    };
   };
 
   if (loading) {
@@ -78,6 +89,8 @@ const MainContent = ({
       </div>
     );
   }
+
+  const hasSearchResults = searchResults && searchResults.length > 0;
 
   return (
     <>
@@ -113,38 +126,68 @@ const MainContent = ({
             resetCurrentTime={resetCurrentTime}
             cardIndex={playlists.findIndex((p) => p.id === selectedPlaylist.id)}
           />
-        ) : (
-          <>
-            <div className="p-5 text-white font-sans">
-              <div className="flex justify-between items-center mb-5">
-                <h2 className="text-2xl font-bold uppercase">MADE FOR MANH NGUYEN</h2>
-                <a
-                  href="#"
-                  className="text-gray-400 text-sm hover:text-white hover:underline"
-                >
-                  SHOW ALL
-                </a>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-                {playlists.map((playlist, index) => (
-                  <PlaylistCard
-                    key={playlist.id}
-                    index={index}
-                    image={
-                      playlist.coverImageId
-                        ? getImageUrl(playlist.coverImageId)
-                        : 'https://via.placeholder.com/150'
-                    }
-                    title={playlist.name}
-                    artists={playlist.description || 'No description available'}
-                    onCardClick={() => handleCardClick(playlist)}
-                    isPlaying={isPlaying && currentPlayingCard === index}
-                    onPlayPause={() => handlePlayPause(index, playlist)}
-                  />
-                ))}
-              </div>
+        ) : hasSearchResults ? (
+          <div className="p-5 text-white font-sans">
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="text-2xl font-bold uppercase">SEARCH RESULTS</h2>
             </div>
-          </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+              {searchResults.map((track, index) => (
+                <div
+                  key={track.songId}
+                  className="bg-gray-900 p-4 rounded-lg flex flex-col items-center"
+                >
+                  <img
+                    src={'https://via.placeholder.com/150'}
+                    alt={track.title}
+                    className="w-32 h-32 object-cover rounded-md mb-2"
+                  />
+                  <h3 className="text-lg font-semibold text-center">{track.title}</h3>
+                  <p className="text-gray-400 text-sm text-center">{track.artist}</p>
+                  <button
+                    onClick={() => handlePlayPause(index, createSearchPlaylist(index))}
+                    className="mt-2 px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600"
+                  >
+                    {isPlaying &&
+                    currentPlayingCard === index &&
+                    currentPlaylistId === 'search-results'
+                      ? 'Pause'
+                      : 'Play'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-5 text-white font-sans">
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="text-2xl font-bold uppercase">MADE FOR MANH NGUYEN</h2>
+              <a
+                href="#"
+                className="text-gray-400 text-sm hover:text-white hover:underline"
+              >
+                SHOW ALL
+              </a>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+              {playlists.map((playlist, index) => (
+                <PlaylistCard
+                  key={playlist.id}
+                  index={index}
+                  image={
+                    playlist.coverImageId
+                      ? getImageUrl(playlist.coverImageId)
+                      : 'https://via.placeholder.com/150'
+                  }
+                  title={playlist.name}
+                  artists={playlist.description || 'No description available'}
+                  onCardClick={() => handleCardClick(playlist)}
+                  isPlaying={isPlaying && currentPlayingCard === index}
+                  onPlayPause={() => handlePlayPause(index, playlist)}
+                />
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </>

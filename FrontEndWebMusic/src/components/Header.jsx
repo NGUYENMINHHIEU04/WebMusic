@@ -5,10 +5,11 @@ import { IoIosMore } from 'react-icons/io';
 import Logo from '../images/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import { getUserById } from '../apis/api_user';
+import { getAllSongs } from '../apis/api_song'; // Import API để lấy danh sách bài hát
 
-export default function Header({ onReset }) {
+export default function Header({ onReset, onSearch }) {
   const { isLoggedIn, logout, userId } = useContext(AuthContext);
-  const [search, setSearch] = React.useState('');
+  const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [user, setUser] = useState(null);
@@ -43,6 +44,35 @@ export default function Header({ onReset }) {
     if (onReset) {
       onReset(); // Gọi resetToMainContent từ Homepage
     }
+    setSearch(''); // Reset ô tìm kiếm
+  };
+
+  // Hàm xử lý tìm kiếm
+  const handleSearch = async () => {
+    if (!search.trim()) {
+      handleReset(); // Nếu ô tìm kiếm trống thì reset
+      return;
+    }
+
+    try {
+      const songs = await getAllSongs(); // Lấy tất cả bài hát
+      const filteredSongs = songs.filter(song => 
+        song.title?.toLowerCase().includes(search.toLowerCase())
+      ); // Lọc bài hát theo tên
+      
+      if (onSearch) {
+        onSearch(filteredSongs); // Gửi kết quả tìm kiếm lên component cha
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+  };
+
+  // Xử lý khi nhấn Enter trong input
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -68,10 +98,16 @@ export default function Header({ onReset }) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onKeyPress={handleKeyPress} // Thêm sự kiện nhấn Enter
           className="w-full pl-10 pr-10 py-2 bg-gray-900 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-600"
-          placeholder="What content do you want to broadcast?"
+          placeholder="Search songs by title..."
         />
-        <IoIosMore className="absolute right-3 top-2.5 text-gray-400 text-xl" />
+        <button
+          onClick={handleSearch}
+          className="absolute right-3 top-2.5 text-gray-400 hover:text-white"
+        >
+          <IoIosMore className="text-xl" />
+        </button>
       </div>
 
       <div className="flex items-center space-x-6 text-gray-400 text-sm font-semibold">
