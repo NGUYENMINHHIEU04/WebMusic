@@ -1,19 +1,47 @@
 
+import { useQuery } from '@tanstack/react-query';
 import { Music, Album, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import StatCard from '../components/Dashboard/StatCard';
 import RecentSection from '../components/Dashboard/RecentSection';
+import songApi from '../services/api_song';
+import artistApi from '../services/api_artist';
 
 const Dashboard = () => {
-  // Mock data
+  // Fetch songs data
+  const { data: songs = [] } = useQuery({
+    queryKey: ['songs'],
+    queryFn: songApi.getAllSongs,
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+
+  // Fetch albums data (placeholder for now)
+  const { data: albums = [] } = useQuery({
+    queryKey: ['albums'],
+    queryFn: () => Promise.resolve([]), // Replace with actual API call when available
+    staleTime: 5 * 60 * 1000
+  });
+
+  // Fetch artists data
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: artistApi.getAllArtists,
+    staleTime: 5 * 60 * 1000
+  });
+
+  // Get stats
   const stats = {
-    songs: 0,
-    albums: 0,
-    users: 0
+    songs: songs.length,
+    albums: albums.length,
+    users: 0 // Placeholder for now
   };
 
-  const recentSongs = [];
-  const recentAlbums = [];
+  // Get recent songs (last 6)
+  const recentSongs = songs.slice(0, 6);
+
+  // Get recent albums (placeholder for now)
+  const recentAlbums = albums.slice(0, 6);
 
   return (
     <motion.div 

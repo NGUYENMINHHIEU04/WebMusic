@@ -83,4 +83,8 @@ const audioApi = {
   }
 };
 
+// Export individual functions for direct imports
+export const { getAllAudios, getAudioById, uploadAudio, updateAudio, deleteAudio, getAudioData } = audioApi;
+
+// Also export the entire API object as default
 export default audioApi;

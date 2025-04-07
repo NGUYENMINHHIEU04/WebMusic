@@ -73,4 +73,8 @@ const artistApi = {
   }
 };
 
+// Export individual functions for direct imports
+export const { getAllArtists, getArtistById, createArtist, deleteArtist } = artistApi;
+
+// Also export the entire API object as default
 export default artistApi;
