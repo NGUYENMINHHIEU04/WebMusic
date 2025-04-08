@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getImageUrl } from '../apis/api_playlist';
+import { getImageUrl } from '../apis/api_playlistcard';
 import { getLibrary, addPlaylistCard, removePlaylistCard } from '../apis/api_library';
 import { AuthContext } from './AuthContext';
 

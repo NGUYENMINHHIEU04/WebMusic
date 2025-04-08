@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useLibrary } from '../context/LibraryContext';
 import { getSongAudio } from '../apis/api_song';
-import { getImageUrl } from '../apis/api_playlist';
+import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';

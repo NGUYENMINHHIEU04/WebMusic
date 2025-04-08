@@ -1,8 +1,8 @@
 // src/components/MainContent.js
 import React, { useState, useEffect } from 'react';
-import PlaylistCard from './PlaylistCard';
+import Playlist from './Playlist'; // Import component Playlist
 import PlaylistDetail from './PlaylistDetail';
-import { getAllPlaylists, getImageUrl } from '../apis/api_playlist';
+import { getAllPlaylists, getImageUrl } from '../apis/api_playlistcard';
 
 const MainContent = ({
   showSingerInfo,
@@ -63,14 +63,13 @@ const MainContent = ({
     onTrackSelect(track, tracks, playlistId, cardIndex);
   };
 
-  // Tạo playlist giả từ searchResults
   const createSearchPlaylist = (selectedTrackIndex) => {
     return {
       id: 'search-results',
       name: 'Search Results',
       songIds: searchResults.map((track) => track.songId),
       tracks: searchResults,
-      selectedTrackIndex, // Thêm thông tin về bài hát được chọn
+      selectedTrackIndex,
     };
   };
 
@@ -159,35 +158,14 @@ const MainContent = ({
             </div>
           </div>
         ) : (
-          <div className="p-5 text-white font-sans">
-            <div className="flex justify-between items-center mb-5">
-              <h2 className="text-2xl font-bold uppercase">Discover picks for you</h2>
-              <a
-                href="#"
-                className="text-gray-400 text-sm hover:text-white hover:underline"
-              >
-                SHOW ALL
-              </a>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-              {playlists.map((playlist, index) => (
-                <PlaylistCard
-                  key={playlist.id}
-                  index={index}
-                  image={
-                    playlist.coverImageId
-                      ? getImageUrl(playlist.coverImageId)
-                      : 'https://via.placeholder.com/150'
-                  }
-                  title={playlist.name}
-                  artists={playlist.description || 'No description available'}
-                  onCardClick={() => handleCardClick(playlist)}
-                  isPlaying={isPlaying && currentPlayingCard === index}
-                  onPlayPause={() => handlePlayPause(index, playlist)}
-                />
-              ))}
-            </div>
-          </div>
+          <Playlist
+            playlists={playlists}
+            isPlaying={isPlaying}
+            currentPlayingCard={currentPlayingCard}
+            currentPlaylistId={currentPlaylistId}
+            handlePlayPause={handlePlayPause}
+            onCardClick={handleCardClick}
+          />
         )}
       </div>
     </>
