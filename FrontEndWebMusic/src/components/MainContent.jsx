@@ -161,7 +161,7 @@ const MainContent = ({
         ) : (
           <div className="p-5 text-white font-sans">
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-2xl font-bold uppercase">MADE FOR MANH NGUYEN</h2>
+              <h2 className="text-2xl font-bold uppercase">Discover picks for you</h2>
               <a
                 href="#"
                 className="text-gray-400 text-sm hover:text-white hover:underline"
