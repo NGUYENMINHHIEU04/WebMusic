@@ -1,285 +1,297 @@
-
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
-} from '@/components/ui/dialog';
-import { 
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger, 
-} from '@/components/ui/alert-dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Pencil, Trash2, PlusCircle, Loader2, Music, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Mic, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import artistApi from '../services/api_artist';
 import imageApi from '../services/api_image';
-import { toast } from 'react-toastify';
 
 const Artists = () => {
+  const { toast } = useToast();
+  const [artists, setArtists] = useState([]);
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newArtist, setNewArtist] = useState({
-    name: '',
-    description: '',
-    imageId: ''
+    name: "",
+    description: "",
+    imageId: ""
   });
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Fetch artists data
-  const {
-    data: artists = [],
-    isLoading,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ['artists'],
-    queryFn: artistApi.getAllArtists
-  });
+  useEffect(() => {
+    fetchArtists();
+    fetchImages();
+  }, []);
+
+  const fetchArtists = async () => {
+    setIsLoading(true);
+    try {
+      const data = await artistApi.getAllArtists();
+      console.log("Fetched artists:", data);
+      setArtists(data);
+    } catch (error) {
+      console.error("Error in fetchArtists:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load artists. Please try again later.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchImages = async () => {
+    try {
+      const imageIds = await imageApi.getAllImages();
+      console.log("Fetched images:", imageIds);
+      
+      if (!Array.isArray(imageIds)) {
+        console.warn("Received non-array data from getAllImages, setting empty array");
+        setImages([]);
+        return;
+      }
+      
+      const imagesWithUrls = imageIds.map(id => ({
+        id,
+        url: imageApi.getImageUrl(id),
+        name: `Image ${id.substring(0, 6)}...`
+      }));
+      
+      setImages(imagesWithUrls);
+    } catch (error) {
+      console.error("Error in fetchImages:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load images. Please try again later.",
+        variant: "destructive"
+      });
+      setImages([]);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewArtist(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setSelectedImage(file);
-    // Preview image
-    const reader = new FileReader();
-    reader.onload = () => {
-      document.getElementById('preview-image').src = reader.result;
-      document.getElementById('preview-container').classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
+  const handleImageSelect = (imageId) => {
+    setNewArtist(prev => ({ ...prev, imageId }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
+    
+    if (!newArtist.name || !newArtist.imageId) {
+      toast({
+        title: "Validation Error",
+        description: "Artist name and image selection are required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
-      // Upload image first if selected
-      let imageId = null;
-      if (selectedImage) {
-        imageId = await imageApi.uploadImage(selectedImage);
-      }
-
-      // Create artist with image ID
-      const artistData = {
-        ...newArtist,
-        imageId: imageId || ''
-      };
-
-      const response = await artistApi.createArtist(artistData);
+      await artistApi.createArtist({
+        name: newArtist.name,
+        description: newArtist.description,
+        imageId: newArtist.imageId
+      });
       
-      if (response) {
-        toast.success('Artist created successfully!');
-        // Reset form
-        setNewArtist({
-          name: '',
-          description: '',
-          imageId: ''
-        });
-        setSelectedImage(null);
-        document.getElementById('preview-container').classList.add('hidden');
-        setDialogOpen(false);
-        refetch(); // Refresh the list
-      }
+      toast({
+        title: "Success",
+        description: "Artist created successfully",
+      });
+      
+      setNewArtist({ name: "", description: "", imageId: "" });
+      setIsDialogOpen(false);
+      fetchArtists();
     } catch (error) {
-      console.error('Error creating artist:', error);
-      toast.error('Failed to create artist');
-    } finally {
-      setIsSubmitting(false);
+      toast({
+        title: "Error",
+        description: "Failed to create artist. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
   const handleDelete = async (id) => {
-    try {
-      const success = await artistApi.deleteArtist(id);
-      if (success) {
-        refetch(); // Refresh the list
+    if (window.confirm("Are you sure you want to delete this artist?")) {
+      try {
+        await artistApi.deleteArtist(id);
+        toast({
+          title: "Success",
+          description: "Artist deleted successfully",
+        });
+        fetchArtists();
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete artist. Please try again.",
+          variant: "destructive"
+        });
       }
-    } catch (error) {
-      console.error('Error deleting artist:', error);
     }
   };
+
+  const filteredArtists = artists.filter(artist => 
+    artist.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <motion.div 
       className="container mx-auto px-4 py-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Artists</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Artist
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <form onSubmit={handleSubmit}>
-              <DialogHeader>
-                <DialogTitle>Add New Artist</DialogTitle>
-                <DialogDescription>
-                  Enter the details for the new artist.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <label htmlFor="name">Name</label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={newArtist.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="description">Description</label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    value={newArtist.description}
-                    onChange={handleInputChange}
-                    rows={4}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label htmlFor="image">Profile Image</label>
-                  <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  <div id="preview-container" className="hidden mt-2">
-                    <p className="text-sm text-gray-500 mb-1">Image Preview:</p>
-                    <img
-                      id="preview-image"
-                      className="w-full max-h-40 object-cover rounded-md"
-                      alt="Preview"
-                    />
-                  </div>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    'Save Artist'
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <div>
+          <h1 className="text-2xl font-bold mb-1">Artists</h1>
+          <p className="text-gray-500">Manage your artist profiles</p>
+        </div>
+        <Button onClick={() => setIsDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" /> Add New Artist
+        </Button>
       </div>
-
+      
+      <div className="mb-8">
+        <Input
+          type="text"
+          placeholder="Search artists..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-md"
+        />
+      </div>
+      
       {isLoading ? (
-        <div className="flex justify-center items-center min-h-[400px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2">Loading artists...</span>
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center py-12">
-          <AlertCircle className="h-16 w-16 mb-4 text-red-500" />
-          <h2 className="text-xl font-semibold mb-2">Error Loading Artists</h2>
-          <p className="text-center mb-6 text-red-500">{error.message || "An error occurred"}</p>
-          <Button onClick={() => refetch()}>Try Again</Button>
-        </div>
-      ) : artists.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {artists.map((artist) => (
-            <motion.div 
-              key={artist.id}
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Card className="overflow-hidden h-full flex flex-col hover:shadow-lg transition-shadow">
-                <div className="aspect-square overflow-hidden bg-gray-100">
-                  <img 
-                    src={artist.imageUrl || "/placeholder.svg"} 
-                    alt={artist.name} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "/placeholder.svg";
-                    }}
-                  />
-                </div>
-                <CardHeader className="p-4 pb-0">
-                  <CardTitle className="text-xl">{artist.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-2 flex-grow">
-                  <p className="text-sm text-gray-600 line-clamp-3">{artist.description}</p>
-                </CardContent>
-                <CardFooter className="p-4 pt-0 flex justify-end gap-2">
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Artist</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete {artist.name}? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={() => handleDelete(artist.id)} 
-                          className="bg-red-600 hover:bg-red-700"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </CardFooter>
-              </Card>
-            </motion.div>
-          ))}
+        <div className="flex justify-center py-8">Loading artists...</div>
+      ) : filteredArtists.length === 0 ? (
+        <div className="text-center py-10">
+          <Mic size={48} className="mx-auto mb-4 text-gray-400" />
+          <h2 className="text-xl font-semibold">No artists available</h2>
+          <p className="text-gray-500 mt-2">Get started by adding your first artist</p>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12">
-          <Music className="h-16 w-16 mb-4 text-gray-400" />
-          <h2 className="text-xl font-semibold mb-2">No Artists Found</h2>
-          <p className="text-gray-500 mb-6">Get started by adding your first artist</p>
-          <Button onClick={() => setDialogOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Artist
-          </Button>
+        <div className="grid grid-cols-1 gap-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="text-right w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredArtists.map(artist => (
+                <TableRow key={artist.id}>
+                  <TableCell>
+                    <Avatar className="h-12 w-12">
+                      {artist.imageUrl ? (
+                        <AvatarImage src={artist.imageUrl} alt={artist.name} />
+                      ) : (
+                        <AvatarFallback>
+                          <ImageIcon className="h-6 w-6 text-gray-400" />
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                  </TableCell>
+                  <TableCell className="font-medium">{artist.name}</TableCell>
+                  <TableCell className="max-w-md truncate">{artist.description}</TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => handleDelete(artist.id)}
+                      className="ml-auto"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
+      
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Artist</DialogTitle>
+            <DialogDescription>
+              Create a new artist and associate it with an existing image.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-4 py-4">
+              <div className="grid w-full items-center gap-1.5">
+                <label htmlFor="name" className="text-sm font-medium">Name</label>
+                <Input 
+                  id="name" 
+                  name="name"
+                  value={newArtist.name}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              
+              <div className="grid w-full items-center gap-1.5">
+                <label htmlFor="description" className="text-sm font-medium">Description</label>
+                <Textarea 
+                  id="description" 
+                  name="description"
+                  value={newArtist.description}
+                  onChange={handleInputChange}
+                  rows={4}
+                />
+              </div>
+              
+              <div className="grid w-full items-center gap-1.5">
+                <label htmlFor="imageId" className="text-sm font-medium">Select Image</label>
+                {images && images.length > 0 ? (
+                  <Select 
+                    value={newArtist.imageId} 
+                    onValueChange={handleImageSelect}
+                  >
+                    <SelectTrigger id="imageId">
+                      <SelectValue placeholder="Select an image" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {images.map((image) => (
+                        <SelectItem key={image.id} value={image.id}>
+                          <div className="flex items-center">
+                            <span>{image.name}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="text-sm text-gray-500">No images available</div>
+                )}
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save Artist</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 };

@@ -1,19 +1,48 @@
 
+import { useQuery } from '@tanstack/react-query';
 import { Music, Album, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import StatCard from '../components/Dashboard/StatCard';
 import RecentSection from '../components/Dashboard/RecentSection';
+import songApi from '../services/api_song';
+import userApi from '../services/api_user';
+import playlistCardApi from '../services/api_playlistcard';
 
 const Dashboard = () => {
-  // Mock data
+  // Fetch songs data
+  const { data: songs = [] } = useQuery({
+    queryKey: ['songs'],
+    queryFn: songApi.getAllSongs,
+    staleTime: 5 * 60 * 1000 // 5 minutes
+  });
+
+  // Fetch albums data
+  const { data: albums = [] } = useQuery({
+    queryKey: ['albums'],
+    queryFn: playlistCardApi.getAllPlaylists,
+    staleTime: 5 * 60 * 1000
+  });
+
+  // Fetch users data
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: userApi.getAllUsers,
+    staleTime: 5 * 60 * 1000
+  });
+
+  // Get stats
   const stats = {
-    songs: 0,
-    albums: 0,
-    users: 0
+    songs: songs.length,
+    albums: albums.length,
+    users: users.length
   };
 
-  const recentSongs = [];
-  const recentAlbums = [];
+  // Get recent songs (last 6)
+  const recentSongs = songs.slice(0, 6);
+
+  // Get recent albums (last 6)
+  const recentAlbums = albums.slice(0, 6);
 
   return (
     <motion.div 
@@ -27,7 +56,7 @@ const Dashboard = () => {
         <p className="text-gray-500">Manage your songs, albums, and users</p>
       </div>
 
-      {/* Stats Cards - Giờ đặt trong 1 hàng */}
+      {/* Stats Cards */}
       <div className="flex flex-wrap gap-6 mb-8">
         <div className="flex-1 min-w-[250px]">
           <StatCard 

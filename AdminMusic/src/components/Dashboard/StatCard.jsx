@@ -1,30 +1,37 @@
 
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent } from '../ui/card';
+import { motion } from 'framer-motion';
 
 const StatCard = ({ icon: Icon, title, count, viewAllLink, iconBgColor }) => {
   return (
-    <motion.div 
-      className="bg-white rounded-lg border border-gray-100 shadow-sm p-6"
-      whileHover={{ y: -5 }}
-      transition={{ type: "spring", stiffness: 300 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="flex items-center mb-4">
-        <div className={`${iconBgColor} p-2 rounded-full`}>
-          <Icon className="h-5 w-5 text-white" />
-        </div>
-        <h3 className="ml-3 font-medium">{title}</h3>
-      </div>
-      
-      <div className="mt-2 mb-4">
-        <span className="text-4xl font-bold">{count}</span>
-      </div>
-      
-      <Link to={viewAllLink} className="text-blue-500 hover:text-blue-700 flex items-center text-sm">
-        View all
-        <ArrowRight className="h-4 w-4 ml-1" />
-      </Link>
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-center">
+            <div className={`w-12 h-12 rounded-full ${iconBgColor} flex items-center justify-center text-white`}>
+              <Icon className="h-6 w-6" />
+            </div>
+            <div className="ml-4 flex-grow">
+              <h3 className="font-semibold text-lg mb-1">{title}</h3>
+              <div className="flex justify-between items-center">
+                <p className="text-3xl font-bold">{count}</p>
+                <Link 
+                  to={viewAllLink} 
+                  className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  View all
+                </Link>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };

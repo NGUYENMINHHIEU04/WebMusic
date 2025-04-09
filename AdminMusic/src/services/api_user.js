@@ -1,8 +1,9 @@
 
 import axios from 'axios';
+import { API_BASE_URL } from './api';
 
 // Define the base URL for the API
-const BASE_URL = 'http://localhost:8080/api/users';
+const BASE_URL = `${API_BASE_URL}/users`;
 
 // Object containing API methods related to users
 const userApi = {

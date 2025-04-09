@@ -1,9 +1,10 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from './api';
 
 // Define the base URL for the API
-const BASE_URL = 'http://localhost:8080/api/images';
+const BASE_URL = `${API_BASE_URL}/images`;
 
 // Image API service
 const imageApi = {
@@ -107,13 +108,41 @@ const imageApi = {
   getAllImages: async () => {
     try {
       const response = await axios.get(BASE_URL);
-      return response.data.data; // Array of image IDs
+      console.log("Raw image response:", response);
+      
+      // Handle different response formats
+      if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data; // Array of image IDs
+      } else if (response.data && Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.warn("Unexpected response format from images API, returning empty array");
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching image IDs:', error);
       toast.error(`Failed to fetch image IDs: ${error.message}`);
       return [];
     }
+  },
+
+  /**
+   * Get direct image URL from ID
+   * @param {string} id - The ID of the image
+   * @returns {string} - The URL to the image
+   */
+  getImageUrl: (id) => {
+    return `${BASE_URL}/${id}`;
   }
 };
 
+// Export individual functions for direct import
+export const getImage = imageApi.getImage;
+export const uploadImage = imageApi.uploadImage;
+export const updateImage = imageApi.updateImage;
+export const deleteImage = imageApi.deleteImage;
+export const getAllImages = imageApi.getAllImages;
+export const getImageUrl = imageApi.getImageUrl;
+
+// Export the whole API object as default
 export default imageApi;

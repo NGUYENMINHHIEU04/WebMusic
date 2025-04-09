@@ -225,7 +225,7 @@ const Images = () => {
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleDeleteImage(image.id)}
-                              className="bg-red-500 hover:bg-red-600"
+                              className="bg-red-500 hover:bg-red-600 text-white"
                             >
                               Delete
                             </AlertDialogAction>
