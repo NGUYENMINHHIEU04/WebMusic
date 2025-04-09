@@ -36,35 +36,40 @@ const RecentSection = ({ title, items, emptyMessage, addButtonText, viewAllLink,
 
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {items.map((item, index) => (
-          <Link to={`${viewAllLink}/${item.id}`} key={item.id || index} className="no-underline">
-            <Card className="hover:shadow-md transition-shadow duration-200">
-              <CardContent className="p-3 flex items-center gap-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded overflow-hidden bg-gray-100">
-                  {item.image && item.image.url ? (
-                    <img 
-                      src={item.image.url} 
-                      alt={item.title || item.name || 'thumbnail'} 
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                      <Music className="h-5 w-5 text-gray-500" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-grow overflow-hidden">
-                  <h3 className="font-medium text-sm mb-0.5 truncate">
-                    {item.title || item.name}
-                  </h3>
-                  <p className="text-xs text-gray-500 truncate">
-                    {item.artists ? item.artists.join(', ') : (item.description || '')}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+        {items.map((item, index) => {
+          // Determine the correct link based on viewAllLink
+          let itemLink = `${viewAllLink}/${item.id}`;
+          
+          return (
+            <Link to={itemLink} key={item.id || index} className="no-underline">
+              <Card className="hover:shadow-md transition-shadow duration-200">
+                <CardContent className="p-3 flex items-center gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded overflow-hidden bg-gray-100">
+                    {item.image && item.image.url ? (
+                      <img 
+                        src={item.image.url} 
+                        alt={item.title || item.name || 'thumbnail'} 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <Music className="h-5 w-5 text-gray-500" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-grow overflow-hidden">
+                    <h3 className="font-medium text-sm mb-0.5 truncate">
+                      {item.title || item.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 truncate">
+                      {item.artists ? item.artists.join(', ') : (item.description || '')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     );
   };

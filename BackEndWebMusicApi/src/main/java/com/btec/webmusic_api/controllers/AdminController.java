@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -30,6 +32,24 @@ public class AdminController {
     public ResponseEntity<Admin> getAdminById(@PathVariable String id) {
         Optional<Admin> admin = adminService.getAdminById(id);
         return admin.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> loginAdmin(@RequestBody Map<String, String> loginRequest) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
+
+        Admin admin = adminService.getAdminByEmail(email);
+        if (admin != null && adminService.verifyPassword(password, admin.getPassword())) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("admin", admin);
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "Invalid email or password");
+            return ResponseEntity.status(401).body(response);
+        }
     }
 
     @PutMapping("/{id}")

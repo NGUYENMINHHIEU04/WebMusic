@@ -27,6 +27,10 @@ public class AdminService {
         return adminRepository.findByEmail(email);
     }
 
+    public boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
     public List<Admin> getAllAdmins() {
         return adminRepository.findAll();
     }

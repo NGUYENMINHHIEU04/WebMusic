@@ -108,7 +108,17 @@ const imageApi = {
   getAllImages: async () => {
     try {
       const response = await axios.get(BASE_URL);
-      return response.data.data; // Array of image IDs
+      console.log("Raw image response:", response);
+      
+      // Handle different response formats
+      if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        return response.data.data; // Array of image IDs
+      } else if (response.data && Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.warn("Unexpected response format from images API, returning empty array");
+        return [];
+      }
     } catch (error) {
       console.error('Error fetching image IDs:', error);
       toast.error(`Failed to fetch image IDs: ${error.message}`);

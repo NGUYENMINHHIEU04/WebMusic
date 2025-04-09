@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Music, Album, Users, Settings, Image, Headphones, Mic } from 'lucide-react';
+import { Home, Music, Album, Users, Settings, Image, Headphones, Mic, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const Sidebar = () => {
+const Sidebar = ({ onLogout }) => {
   const location = useLocation();
   const [isHovered, setIsHovered] = useState(false);
 
@@ -61,6 +61,18 @@ const Sidebar = () => {
             );
           })}
         </nav>
+      </div>
+      
+      {/* Logout Button */}
+      <div className="p-4 border-t border-gray-100">
+        <motion.button
+          whileHover={{ x: 5 }}
+          onClick={onLogout}
+          className="flex items-center w-full px-3 py-3 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
+        >
+          <LogOut className="mr-4 h-5 w-5" />
+          <span>Logout</span>
+        </motion.button>
       </div>
     </motion.div>
   );

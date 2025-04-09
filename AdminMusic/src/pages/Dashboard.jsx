@@ -6,7 +6,8 @@ import { Link } from 'react-router-dom';
 import StatCard from '../components/Dashboard/StatCard';
 import RecentSection from '../components/Dashboard/RecentSection';
 import songApi from '../services/api_song';
-import artistApi from '../services/api_artist';
+import userApi from '../services/api_user';
+import playlistCardApi from '../services/api_playlistcard';
 
 const Dashboard = () => {
   // Fetch songs data
@@ -16,17 +17,17 @@ const Dashboard = () => {
     staleTime: 5 * 60 * 1000 // 5 minutes
   });
 
-  // Fetch albums data (placeholder for now)
+  // Fetch albums data
   const { data: albums = [] } = useQuery({
     queryKey: ['albums'],
-    queryFn: () => Promise.resolve([]), // Replace with actual API call when available
+    queryFn: playlistCardApi.getAllPlaylists,
     staleTime: 5 * 60 * 1000
   });
 
-  // Fetch artists data
-  const { data: artists = [] } = useQuery({
-    queryKey: ['artists'],
-    queryFn: artistApi.getAllArtists,
+  // Fetch users data
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: userApi.getAllUsers,
     staleTime: 5 * 60 * 1000
   });
 
@@ -34,13 +35,13 @@ const Dashboard = () => {
   const stats = {
     songs: songs.length,
     albums: albums.length,
-    users: 0 // Placeholder for now
+    users: users.length
   };
 
   // Get recent songs (last 6)
   const recentSongs = songs.slice(0, 6);
 
-  // Get recent albums (placeholder for now)
+  // Get recent albums (last 6)
   const recentAlbums = albums.slice(0, 6);
 
   return (
@@ -55,7 +56,7 @@ const Dashboard = () => {
         <p className="text-gray-500">Manage your songs, albums, and users</p>
       </div>
 
-      {/* Stats Cards - Giờ đặt trong 1 hàng */}
+      {/* Stats Cards */}
       <div className="flex flex-wrap gap-6 mb-8">
         <div className="flex-1 min-w-[250px]">
           <StatCard 

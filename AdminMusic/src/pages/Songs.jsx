@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -106,7 +105,14 @@ const Songs = () => {
     try {
       const data = await getAllImages();
       console.log("Fetched images:", data);
-      setImageIds(Array.isArray(data) ? data : []);
+      
+      // Ensure we always have an array of image IDs
+      if (Array.isArray(data)) {
+        setImageIds(data);
+      } else {
+        console.warn("Received non-array data from getAllImages, setting empty array");
+        setImageIds([]);
+      }
     } catch (error) {
       console.error("Error in fetchImages:", error);
       toast({
@@ -114,6 +120,7 @@ const Songs = () => {
         description: "Failed to load images. Please try again later.",
         variant: "destructive"
       });
+      setImageIds([]);
     }
   };
 
