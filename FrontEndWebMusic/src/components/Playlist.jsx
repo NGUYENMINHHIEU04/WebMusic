@@ -14,23 +14,20 @@ const Playlist = ({
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
-  const [showAll, setShowAll] = useState(false); // New state to toggle layout
+  const [showAll, setShowAll] = useState(false);
 
-  // Hàm xử lý cuộn sang trái
   const scrollLeft = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
     }
   };
 
-  // Hàm xử lý cuộn sang phải
   const scrollRight = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
     }
   };
 
-  // Hàm kiểm tra vị trí cuộn để hiển thị/ẩn các nút điều hướng
   const handleScroll = () => {
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
@@ -39,10 +36,9 @@ const Playlist = ({
     }
   };
 
-  // Hàm xử lý khi bấm "SHOW ALL" hoặc "SHOW LESS"
   const handleShowAll = (e) => {
-    e.preventDefault(); // Prevent default anchor behavior
-    setShowAll((prev) => !prev); // Toggle the showAll state
+    e.preventDefault();
+    setShowAll((prev) => !prev);
   };
 
   return (
@@ -54,11 +50,10 @@ const Playlist = ({
           onClick={handleShowAll}
           className="text-gray-400 text-sm hover:text-white hover:underline"
         >
-          {showAll ? 'SHOW LESS' : 'SHOW ALL'} {/* Toggle text based on state */}
+          {showAll ? 'SHOW LESS' : 'SHOW ALL'}
         </a>
       </div>
       <div className="relative">
-        {/* Hiển thị nút điều hướng trái (chỉ khi không ở chế độ SHOW ALL) */}
         {!showAll && showLeftArrow && (
           <button
             onClick={scrollLeft}
@@ -68,26 +63,25 @@ const Playlist = ({
           </button>
         )}
 
-        {/* Danh sách PlaylistCard */}
         <div
           ref={scrollRef}
           onScroll={handleScroll}
           className={`${
             showAll
-              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5' // Grid layout for SHOW ALL
-              : 'flex overflow-x-auto gap-5 scrollbar-hide' // Scrollable row for default view
+              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5'
+              : 'flex overflow-x-auto gap-5 scrollbar-hide'
           }`}
-          style={showAll ? {} : { scrollSnapType: 'x mandatory' }} // Remove scroll snap in grid mode
+          style={showAll ? {} : { scrollSnapType: 'x mandatory' }}
         >
           {playlists.map((playlist, index) => (
             <div
               key={playlist.id}
-              className={showAll ? '' : 'flex-none'} // Remove flex-none in grid mode
-              style={showAll ? {} : { width: '200px' }} // Remove fixed width in grid mode
+              className={`${showAll ? '' : 'flex-none'}`}
+              style={showAll ? { height: 'auto' } : { width: '200px', height: '300px' }} // Đặt chiều cao cố định cho chế độ cuộn ngang
             >
               <PlaylistCard
                 index={index}
-                image={playlist.imageUrl || 'https://via.placeholder.com/150'} // Use imageUrl from previous update
+                image={playlist.imageUrl || 'https://via.placeholder.com/150'}
                 title={playlist.name}
                 artists={playlist.description || 'Best songs of all time'}
                 onCardClick={() => onCardClick(playlist)}
@@ -102,7 +96,6 @@ const Playlist = ({
           ))}
         </div>
 
-        {/* Hiển thị nút điều hướng phải (chỉ khi không ở chế độ SHOW ALL) */}
         {!showAll && showRightArrow && (
           <button
             onClick={scrollRight}
@@ -113,15 +106,14 @@ const Playlist = ({
         )}
       </div>
 
-      {/* CSS để ẩn thanh cuộn mặc định nhưng vẫn cho phép cuộn (chỉ áp dụng khi không ở chế độ SHOW ALL) */}
       <style>
         {`
           .scrollbar-hide::-webkit-scrollbar {
             display: none;
           }
           .scrollbar-hide {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
           }
         `}
       </style>

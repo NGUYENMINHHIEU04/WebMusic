@@ -196,7 +196,7 @@ const PlaylistDetail = ({
         id: playlist.id,
         type: 'Playlist',
         title: playlist.name || playlist.title,
-        creator: 'Spotify',
+        creator: 'LmhMusic',
         image: playlist.coverImageId ? getImageUrl(playlist.coverImageId) : 'https://via.placeholder.com/150',
         coverImageId: playlist.coverImageId,
         description: playlist.description || 'No description available',
@@ -219,7 +219,7 @@ const PlaylistDetail = ({
           <p className="text-sm text-gray-400">Playlist</p>
           <h1 className="text-4xl font-bold">{playlist.title || playlist.name || 'Unnamed Playlist'}</h1>
           <p className="text-gray-400 mt-2">{playlist.description}</p>
-          <p className="text-gray-400 text-sm">Spotify • {tracks.length} songs</p>
+          <p className="text-gray-400 text-sm">LmhMusic • {tracks.length} songs</p>
         </div>
       </div>
 

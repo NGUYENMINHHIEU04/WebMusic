@@ -1,4 +1,4 @@
-// PlaylistCard.js
+// PlaylistCard.jsx
 import React, { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
@@ -13,10 +13,11 @@ const PlaylistCard = ({ index, image, title, artists, onCardClick, isPlaying, on
 
   return (
     <div
-      className="relative bg-[#181818] rounded-lg overflow-hidden transition-all duration-300 hover:bg-[#282828] cursor-pointer"
+      className="relative bg-[#181818] rounded-lg overflow-hidden transition-all duration-300 hover:bg-[#282828] cursor-pointer flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onCardClick}
+      style={{ height: '100%' }} // Đảm bảo thẻ chiếm toàn bộ chiều cao của container cha
     >
       <img src={image} alt={title} className="w-full h-44 object-cover" />
       <div
@@ -39,9 +40,9 @@ const PlaylistCard = ({ index, image, title, artists, onCardClick, isPlaying, on
           )}
         </button>
       </div>
-      <div className="p-3">
-        <h3 className="text-white text-base font-bold">{title}</h3>
-        <p className="text-gray-400 text-sm mt-1 line-clamp-2">{artists}</p>
+      <div className="p-3 flex-1 flex flex-col">
+        <h3 className="text-white text-base font-bold line-clamp-2">{title}</h3>
+        <p className="text-gray-400 text-sm mt-1 line-clamp-2 flex-1">{artists}</p>
       </div>
     </div>
   );
