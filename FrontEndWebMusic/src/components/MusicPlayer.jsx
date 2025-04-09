@@ -12,7 +12,6 @@ import { FaCirclePause, FaCirclePlay } from 'react-icons/fa6';
 import { FiVolumeX, FiVolume, FiVolume1, FiVolume2 } from 'react-icons/fi';
 import MusicPlayerFullScreen from './MusicPlayerFullScreen';
 import { useLibrary } from '../context/LibraryContext';
-import { AuthContext } from '../context/AuthContext';
 
 const MusicPlayer = ({
   onToggleSingerInfo,
@@ -43,6 +42,7 @@ const MusicPlayer = ({
   const audioRef = useRef(new Audio());
   const progressRef = useRef(null);
 
+  // Initialize audio when song changes
   useEffect(() => {
     if (!song) return;
     const audio = audioRef.current;
@@ -54,6 +54,7 @@ const MusicPlayer = ({
     }
   }, [song?.url]);
 
+  // Handle play/pause and volume changes
   useEffect(() => {
     if (!song) return;
     const audio = audioRef.current;
@@ -67,33 +68,65 @@ const MusicPlayer = ({
     audio.volume = volume;
   }, [isPlaying, volume]);
 
+  // Update shuffle playlist when playlist changes
+  useEffect(() => {
+    if (!playlist || playlist.length === 0) {
+      setShuffledPlaylist([]);
+      return;
+    }
+    if (isShuffleActive) {
+      // Create a new shuffled playlist excluding the current song
+      const currentSongIndex = playlist.findIndex((track) => track.url === song?.url);
+      const otherSongs = playlist.filter((_, index) => index !== currentSongIndex);
+      const shuffled = [...otherSongs].sort(() => Math.random() - 0.5);
+      // Place the current song at the start of the shuffled playlist
+      if (currentSongIndex !== -1) {
+        setShuffledPlaylist([playlist[currentSongIndex], ...shuffled]);
+      } else {
+        setShuffledPlaylist(shuffled);
+      }
+    } else {
+      setShuffledPlaylist([]);
+    }
+  }, [playlist, isShuffleActive, song]);
+
+  // Handle audio events (time update, duration, and end of track)
   useEffect(() => {
     if (!song) return;
     const audio = audioRef.current;
     const updateTime = () => setCurrentTime(audio.currentTime);
     const setAudioDuration = () => setDuration(audio.duration);
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', setAudioDuration);
-    audio.addEventListener('ended', () => {
+    const handleTrackEnd = () => {
       if (repeatMode === 'repeat1') {
+        // Repeat the current song
         setCurrentTime(0);
         audio.currentTime = 0;
         if (isPlaying) {
           audio.play().catch((err) => console.error('Error playing audio:', err));
         }
-      } else if (repeatMode === 'repeat' || repeatMode === 'inactive') {
+      } else if (repeatMode === 'repeat' || (isShuffleActive && repeatMode === 'inactive')) {
+        // Repeat the playlist (or shuffled playlist)
         handleNextTrack();
+      } else {
+        // No repeat, stop playing
+        setIsPlaying(false);
+        setCurrentTime(0);
       }
-    });
+    };
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', setAudioDuration);
+    audio.addEventListener('ended', handleTrackEnd);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', setAudioDuration);
-      audio.removeEventListener('ended', () => {});
+      audio.removeEventListener('ended', handleTrackEnd);
     };
-  }, [song, repeatMode]);
+  }, [song, repeatMode, isShuffleActive]);
 
+  // Reset liked state when song changes
   useEffect(() => {
     if (!song) return;
     setIsLiked(false);
@@ -143,16 +176,7 @@ const MusicPlayer = ({
   };
 
   const toggleShuffle = () => {
-    setIsShuffleActive((prev) => {
-      const newState = !prev;
-      if (newState) {
-        const shuffled = [...playlist].sort(() => Math.random() - 0.5);
-        setShuffledPlaylist(shuffled);
-      } else {
-        setShuffledPlaylist([]);
-      }
-      return newState;
-    });
+    setIsShuffleActive((prev) => !prev);
   };
 
   const handlePreviousTrack = () => {
@@ -162,6 +186,16 @@ const MusicPlayer = ({
     const currentIndex = currentPlaylist.findIndex((track) => track.url === song.url);
 
     if (currentIndex === -1) return;
+
+    // If repeat1 is active, ignore previous track and replay the current song
+    if (repeatMode === 'repeat1') {
+      setCurrentTime(0);
+      audioRef.current.currentTime = 0;
+      if (isPlaying) {
+        audioRef.current.play().catch((err) => console.error('Error playing audio:', err));
+      }
+      return;
+    }
 
     const previousIndex = currentIndex === 0 ? currentPlaylist.length - 1 : currentIndex - 1;
     const previousSong = currentPlaylist[previousIndex];
@@ -182,6 +216,16 @@ const MusicPlayer = ({
     const currentIndex = currentPlaylist.findIndex((track) => track.url === song.url);
 
     if (currentIndex === -1) return;
+
+    // If repeat1 is active, ignore next track and replay the current song
+    if (repeatMode === 'repeat1') {
+      setCurrentTime(0);
+      audioRef.current.currentTime = 0;
+      if (isPlaying) {
+        audioRef.current.play().catch((err) => console.error('Error playing audio:', err));
+      }
+      return;
+    }
 
     const nextIndex = currentIndex === currentPlaylist.length - 1 ? 0 : currentIndex + 1;
     const nextSong = currentPlaylist[nextIndex];
@@ -270,15 +314,15 @@ const MusicPlayer = ({
         />
       ) : (
         <div className="container mx-auto flex items-center justify-between">
-          {/* Phần hiển thị thông tin bài hát */}
+          {/* Song Info */}
           <div className="flex items-center space-x-4 w-[30%]">
             {song ? (
               <>
                 <img
-                  src={song.imageUrl || 'https://via.placeholder.com/50'} // Use song.imageUrl with fallback
+                  src={song.imageUrl || 'https://via.placeholder.com/50'}
                   alt="Album Cover"
                   className="w-12 h-12 rounded shadow-md"
-                  onError={(e) => (e.target.src = 'https://via.placeholder.com/50')} // Fallback on error
+                  onError={(e) => (e.target.src = 'https://via.placeholder.com/50')}
                 />
                 <div>
                   <p className="font-semibold">{song.title}</p>
@@ -301,7 +345,7 @@ const MusicPlayer = ({
             )}
           </div>
 
-          {/* Phần điều khiển phát nhạc */}
+          {/* Playback Controls */}
           <div className="flex flex-col items-center space-y-2 w-[40%]">
             <div className="flex items-center space-x-4">
               <div className="relative group">
@@ -315,7 +359,7 @@ const MusicPlayer = ({
                   <span className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-1 h-1 bg-green-500 rounded-full"></span>
                 )}
                 <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg whitespace-nowrap">
-                  Enable shuffle
+                  {isShuffleActive ? 'Disable shuffle' : 'Enable shuffle'}
                 </span>
               </div>
               <div className="relative group">
@@ -378,7 +422,7 @@ const MusicPlayer = ({
                   <span className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-1 h-1 bg-green-500 rounded-full"></span>
                 )}
                 <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg whitespace-nowrap">
-                  Enable repeat
+                  {repeatMode === 'inactive' ? 'Enable repeat' : repeatMode === 'repeat' ? 'Repeat one' : 'Disable repeat'}
                 </span>
               </div>
             </div>
@@ -399,7 +443,7 @@ const MusicPlayer = ({
             </div>
           </div>
 
-          {/* Phần điều khiển bên phải */}
+          {/* Right Controls */}
           <div className="flex items-center justify-end space-x-4 w-[30%]">
             <div className="relative group">
               <AiOutlinePlaySquare
