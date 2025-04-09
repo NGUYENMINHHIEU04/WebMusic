@@ -1,1 +1,1 @@
-export const API_BASE_URL = 'https://api.lmhmusic.io.vn/api'; // Replace with your actual API base URL
+export const API_BASE_URL = 'http://localhost:8080/api'; // Replace with your actual API base URL
