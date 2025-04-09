@@ -4,7 +4,8 @@ import { useLibrary } from '../context/LibraryContext';
 import { getSongAudio } from '../apis/api_song';
 import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
-import { getImage } from '../apis/api_image'; // Import getImage
+import { getImage } from '../apis/api_image';
+import { addHistory } from '../apis/api_history'; // Import the addHistory API
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';
 
@@ -20,7 +21,7 @@ const PlaylistDetail = ({
   resetCurrentTime,
   cardIndex,
 }) => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, userId } = useContext(AuthContext); // Get userId from AuthContext
   const { libraryItems, addToLibrary, removeFromLibrary } = useLibrary();
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,8 +56,7 @@ const PlaylistDetail = ({
           songIds.map(async (songId, index) => {
             try {
               const songData = await getSongAudio(songId);
-              // Fetch the image URL using idImage
-              let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+              let imageUrl = 'https://via.placeholder.com/50';
               if (songData.idImage) {
                 try {
                   imageUrl = await getImage(songData.idImage);
@@ -74,7 +74,7 @@ const PlaylistDetail = ({
                 songId: songId,
                 url: songData.audioUrl || '',
                 artistIds: songData.artistIds || [],
-                imageUrl, // Use the fetched image URL
+                imageUrl,
               };
             } catch (err) {
               console.error(`Failed to fetch song ${songId}:`, err);
@@ -86,7 +86,7 @@ const PlaylistDetail = ({
                 duration: '0:00',
                 songId: songId,
                 artistIds: [],
-                imageUrl: 'https://via.placeholder.com/50', // Fallback image
+                imageUrl: 'https://via.placeholder.com/50',
               };
             }
           })
@@ -159,6 +159,17 @@ const PlaylistDetail = ({
         resetCurrentTime();
         onTrackSelect(track, tracks, playlist.id, cardIndex);
         setIsPlaying(true);
+
+        // Add the song to the user's history
+        if (userId) {
+          const historyData = {
+            userId: userId,
+            songId: track.songId,
+            timestamp: new Date().toISOString(),
+          };
+          await addHistory(historyData);
+          console.log(`Added song ${track.songId} to history for user ${userId}`);
+        }
 
         if (track.artistIds && track.artistIds.length > 0) {
           const artists = await getArtistsByIds(track.artistIds);
@@ -288,7 +299,7 @@ const PlaylistDetail = ({
                       src={track.imageUrl}
                       alt={track.title}
                       className="w-10 h-10 object-cover mr-3 rounded"
-                      onError={(e) => (e.target.src = 'https://via.placeholder.com/50')} // Fallback on error
+                      onError={(e) => (e.target.src = 'https://via.placeholder.com/50')}
                     />
                     <div>
                       <p className="text-white">{track.title}</p>
