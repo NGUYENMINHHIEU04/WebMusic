@@ -1,31 +1,47 @@
 package com.btec.webmusic_api.entities;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Document(collection = "history")
+@Entity
+@Table(name = "history")
 public class History {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
-    private String userId;       // ID của người dùng
-    private String songId;       // ID của bài hát
-    private LocalDateTime timestamp; // Thời gian nghe (tùy chọn)
+
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+
+    @Column(name = "song_id", nullable = false)
+    private String songId;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "artist")
+    private String artist;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
 
     // Constructors
-    public History() {
-        this.timestamp = LocalDateTime.now(); // Mặc định là thời gian hiện tại
-    }
+    public History() {}
 
-    public History(String userId, String songId) {
+    public History(String userId, String songId, String title, String artist, String imageUrl, LocalDateTime timestamp) {
         this.userId = userId;
         this.songId = songId;
-        this.timestamp = LocalDateTime.now();
+        this.title = title;
+        this.artist = artist;
+        this.imageUrl = imageUrl;
+        this.timestamp = timestamp;
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -48,6 +64,30 @@ public class History {
 
     public void setSongId(String songId) {
         this.songId = songId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public LocalDateTime getTimestamp() {

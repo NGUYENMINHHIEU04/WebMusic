@@ -13,6 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/history")
+@CrossOrigin(origins = "http://localhost:3000") // Allow CORS for React frontend
 public class HistoryController {
 
     private final HistoryService historyService;
