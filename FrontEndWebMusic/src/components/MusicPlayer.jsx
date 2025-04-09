@@ -21,10 +21,10 @@ const MusicPlayer = ({
   song,
   isPlaying,
   setIsPlaying,
-  onNextTrack,
+  onNextTrack, // Hàm từ PlaylistDetail để chuyển bài tiếp theo
   resetCurrentTime,
-  playlist,
-  setCurrentSong,
+  playlist, // Danh sách bài hát từ PlaylistDetail
+  setCurrentSong, // Hàm để cập nhật bài hát hiện tại
 }) => {
   const { addToLikedSongs } = useLibrary();
   const [showMiniPlayer, setShowMiniPlayer] = useState(false);
@@ -75,11 +75,9 @@ const MusicPlayer = ({
       return;
     }
     if (isShuffleActive) {
-      // Create a new shuffled playlist excluding the current song
       const currentSongIndex = playlist.findIndex((track) => track.url === song?.url);
       const otherSongs = playlist.filter((_, index) => index !== currentSongIndex);
       const shuffled = [...otherSongs].sort(() => Math.random() - 0.5);
-      // Place the current song at the start of the shuffled playlist
       if (currentSongIndex !== -1) {
         setShuffledPlaylist([playlist[currentSongIndex], ...shuffled]);
       } else {
@@ -105,11 +103,14 @@ const MusicPlayer = ({
         if (isPlaying) {
           audio.play().catch((err) => console.error('Error playing audio:', err));
         }
-      } else if (repeatMode === 'repeat' || (isShuffleActive && repeatMode === 'inactive')) {
-        // Repeat the playlist (or shuffled playlist)
-        handleNextTrack();
+      } else if (repeatMode === 'repeat' || (isShuffleActive && shuffledPlaylist.length > 0)) {
+        // Repeat the playlist or shuffled playlist
+        onNextTrack(); // Gọi hàm từ PlaylistDetail để chuyển bài tiếp theo
+      } else if (playlist && playlist.length > 0) {
+        // Chuyển sang bài tiếp theo nếu không lặp lại
+        onNextTrack(); // Gọi hàm từ PlaylistDetail để chuyển bài tiếp theo
       } else {
-        // No repeat, stop playing
+        // Không có danh sách hoặc không lặp lại, dừng phát
         setIsPlaying(false);
         setCurrentTime(0);
       }
@@ -124,7 +125,7 @@ const MusicPlayer = ({
       audio.removeEventListener('loadedmetadata', setAudioDuration);
       audio.removeEventListener('ended', handleTrackEnd);
     };
-  }, [song, repeatMode, isShuffleActive]);
+  }, [song, repeatMode, isShuffleActive, playlist, onNextTrack, setIsPlaying]);
 
   // Reset liked state when song changes
   useEffect(() => {
@@ -187,7 +188,6 @@ const MusicPlayer = ({
 
     if (currentIndex === -1) return;
 
-    // If repeat1 is active, ignore previous track and replay the current song
     if (repeatMode === 'repeat1') {
       setCurrentTime(0);
       audioRef.current.currentTime = 0;
@@ -217,7 +217,6 @@ const MusicPlayer = ({
 
     if (currentIndex === -1) return;
 
-    // If repeat1 is active, ignore next track and replay the current song
     if (repeatMode === 'repeat1') {
       setCurrentTime(0);
       audioRef.current.currentTime = 0;
