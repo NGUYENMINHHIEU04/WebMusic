@@ -3,25 +3,21 @@ package com.btec.webmusic_api.entities;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "users")
-public class User {
+@Document(collection = "admins")
+public class Admin {
 
     @Id
     private String id;
     private String email;
     private String password;
-    private String firstName;
-    private String lastName;
 
     // Default constructor
-    public User() {}
+    public Admin() {}
 
-    // Constructor with all fields
-    public User(String email, String password, String firstName, String lastName) {
+    // Constructor with fields
+    public Admin(String email, String password) {
         this.email = email;
         this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
     }
 
     // Getters and Setters
@@ -47,21 +43,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
     }
 }

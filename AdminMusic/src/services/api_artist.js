@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // Define the base URL for the API
-const BASE_URL = 'http://localhost:8080/api/artists';
+const BASE_URL = `${API_BASE_URL}/artists`;
 
 // Artist API service
 const artistApi = {

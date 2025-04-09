@@ -7,28 +7,17 @@ import java.util.List;
 
 @Document(collection = "songs")
 public class Song {
+
     @Id
     private String id;
     private String title;
-    private List<String> artistIds; // Danh sách ID nghệ sĩ
-    private String idAudio;  // ID trỏ tới Audio
-    private String idImage;  // ID trỏ tới Image
-    private String category; // Thể loại
-    private String lyrics;   // Lời bài hát
+    private List<String> artistIds;
+    private String idAudio;
+    private String idImage;
+    private String category;
+    private String description; // Trường description đã có từ trước
 
-    // Constructors
-    public Song() {}
-
-    public Song(String title, List<String> artistIds, String idAudio, String idImage, String category, String lyrics) {
-        this.title = title;
-        this.artistIds = artistIds;
-        this.idAudio = idAudio;
-        this.idImage = idImage;
-        this.category = category;
-        this.lyrics = lyrics;
-    }
-
-    // Getters & Setters
+    // Getters và setters
     public String getId() {
         return id;
     }
@@ -77,11 +66,11 @@ public class Song {
         this.category = category;
     }
 
-    public String getLyrics() {
-        return lyrics;
+    public String getDescription() {
+        return description;
     }
 
-    public void setLyrics(String lyrics) {
-        this.lyrics = lyrics;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
