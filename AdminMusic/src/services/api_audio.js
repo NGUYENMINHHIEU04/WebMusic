@@ -1,8 +1,9 @@
 
 import axios from 'axios';
+import { API_BASE_URL } from './api';
 
 // URL cơ sở cho API
-const BASE_URL = 'http://localhost:8080/api/audios';
+const BASE_URL = `${API_BASE_URL}/audios`;
 
 // Object chứa các phương thức gọi API liên quan đến audio
 const audioApi = {

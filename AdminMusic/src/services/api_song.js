@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // Define the base URL for the API
-const BASE_URL = 'http://localhost:8080/api/songs';
+const BASE_URL = `${API_BASE_URL}/songs`;
 
 // Song API service
 const songApi = {
