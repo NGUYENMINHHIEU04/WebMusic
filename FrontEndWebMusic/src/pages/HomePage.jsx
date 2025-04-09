@@ -16,6 +16,7 @@ import open_hand from '../images/002-palm.png';
 import { useNavigate } from 'react-router-dom';
 import { getSongAudio } from '../apis/api_song';
 import { getImage } from '../apis/api_image';
+import Chatbot from '../components/Chatbot'; // Import Chatbot component
 
 const Homepage = () => {
   const { isLoggedIn, userId } = useContext(AuthContext);
@@ -25,6 +26,7 @@ const Homepage = () => {
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showDevice, setShowDevice] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false); // Trạng thái để hiển thị Chatbot
   const [leftSidebarWidth, setLeftSidebarWidth] = useState(20);
   const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
   const [isDraggingLeft, setIsDraggingLeft] = useState(false);
@@ -54,7 +56,7 @@ const Homepage = () => {
   const handleSearch = async (filteredSongs) => {
     const formattedTracks = await Promise.all(
       filteredSongs.map(async (song, index) => {
-        let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+        let imageUrl = 'https://via.placeholder.com/50';
         try {
           const songData = await getSongAudio(song.id);
           if (songData.idImage) {
@@ -72,7 +74,7 @@ const Homepage = () => {
           songId: song.id,
           url: song.audioUrl || '',
           artistIds: song.artistIds || [],
-          imageUrl, // Include imageUrl
+          imageUrl,
         };
       })
     );
@@ -126,6 +128,10 @@ const Homepage = () => {
     setShowQueue(false);
   };
 
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
+  };
+
   const handleMouseDownLeft = () => setIsDraggingLeft(true);
   const handleMouseUpLeft = () => setIsDraggingLeft(false);
 
@@ -164,7 +170,6 @@ const Homepage = () => {
       const tracks = await fetchTracks(playlist);
       if (tracks.length > 0) {
         resetCurrentTimeRef.current();
-        // Kiểm tra nếu playlist có selectedTrackIndex (từ search results)
         const trackToPlayIndex = playlist.selectedTrackIndex !== undefined ? playlist.selectedTrackIndex : 0;
         handleTrackSelect(tracks[trackToPlayIndex], tracks, playlist.id, cardIndex);
       }
@@ -179,7 +184,7 @@ const Homepage = () => {
       songIds.map(async (songId, index) => {
         try {
           const songData = await getSongAudio(songId);
-          let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+          let imageUrl = 'https://via.placeholder.com/50';
           if (songData.idImage) {
             try {
               imageUrl = await getImage(songData.idImage);
@@ -198,7 +203,7 @@ const Homepage = () => {
             songId: songId,
             url: songData.audioUrl || '',
             artistIds: songData.artistIds || [],
-            imageUrl, // Include imageUrl
+            imageUrl,
           };
         } catch (err) {
           console.error(`Failed to fetch song ${songId}:`, err);
@@ -210,7 +215,7 @@ const Homepage = () => {
             duration: '0:00',
             songId: songId,
             artistIds: [],
-            imageUrl: 'https://via.placeholder.com/50', // Fallback image
+            imageUrl: 'https://via.placeholder.com/50',
           };
         }
       })
@@ -288,7 +293,7 @@ const Homepage = () => {
           }
         `}
       </style>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen relative">
         <Header onReset={resetToMainContent} onSearch={handleSearch} />
         {showLoginPage ? (
           <LoginPage onLogin={handleLoginRedirect} />
@@ -364,6 +369,34 @@ const Homepage = () => {
               <LoginBanner />
             )}
           </>
+        )}
+
+        {/* Chatbot Icon */}
+        <div
+          className="fixed bottom-20 right-4 w-12 h-12 bg-red-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-red-600 transition-colors z-50"
+          onClick={toggleChatbot}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+            />
+          </svg>
+        </div>
+
+        {/* Chatbot Component */}
+        {showChatbot && (
+          <div className="fixed bottom-20 right-4 z-50">
+            <Chatbot onClose={toggleChatbot} />
+          </div>
         )}
       </div>
     </>
