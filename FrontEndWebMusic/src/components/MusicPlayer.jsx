@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { FaHeart } from 'react-icons/fa';
 import { MdImportantDevices, MdLyrics, MdSkipNext, MdSkipPrevious } from 'react-icons/md';
 import { RxShuffle } from 'react-icons/rx';
-import musicImage from '../images/music.png';
 import { AiOutlinePlaySquare } from 'react-icons/ai';
 import { LuRepeat, LuRepeat1 } from 'react-icons/lu';
 import { HiMiniQueueList } from 'react-icons/hi2';
@@ -25,18 +24,17 @@ const MusicPlayer = ({
   setIsPlaying,
   onNextTrack,
   resetCurrentTime,
-  playlist, // Thêm prop playlist
-  setCurrentSong, // Thêm prop để thay đổi bài hát hiện tại
+  playlist,
+  setCurrentSong,
 }) => {
   const { addToLikedSongs } = useLibrary();
   const [showMiniPlayer, setShowMiniPlayer] = useState(false);
-
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.5);
   const [isShuffleActive, setIsShuffleActive] = useState(false);
-  const [shuffledPlaylist, setShuffledPlaylist] = useState([]); // Danh sách bài hát đã xáo trộn
+  const [shuffledPlaylist, setShuffledPlaylist] = useState([]);
   const [repeatMode, setRepeatMode] = useState('inactive');
   const [activeRightIcon, setActiveRightIcon] = useState(null);
   const [isLyricsVisible, setIsLyricsVisible] = useState(false);
@@ -46,7 +44,7 @@ const MusicPlayer = ({
   const progressRef = useRef(null);
 
   useEffect(() => {
-    if (!song) return; // Không làm gì nếu chưa có bài hát
+    if (!song) return;
     const audio = audioRef.current;
     audio.src = song.url;
     audio.load();
@@ -79,14 +77,12 @@ const MusicPlayer = ({
     audio.addEventListener('loadedmetadata', setAudioDuration);
     audio.addEventListener('ended', () => {
       if (repeatMode === 'repeat1') {
-        // Lặp lại bài hiện tại
         setCurrentTime(0);
         audio.currentTime = 0;
         if (isPlaying) {
           audio.play().catch((err) => console.error('Error playing audio:', err));
         }
       } else if (repeatMode === 'repeat' || repeatMode === 'inactive') {
-        // Chuyển sang bài tiếp theo
         handleNextTrack();
       }
     });
@@ -98,22 +94,19 @@ const MusicPlayer = ({
     };
   }, [song, repeatMode]);
 
+  useEffect(() => {
+    if (!song) return;
+    setIsLiked(false);
+  }, [song]);
 
- // Kiểm tra xem bài hát đã được thích chưa (có thể kiểm tra từ localStorage hoặc API nếu cần)
- useEffect(() => {
-  if (!song) return;
-  // Giả sử bạn có thể kiểm tra từ libraryItems hoặc localStorage
-  setIsLiked(false); // Reset trạng thái khi bài hát thay đổi
-}, [song]);
-
-const handleLikeSong = () => {
-  if (!song) return;
-  addToLikedSongs(song); // Thêm bài hát vào "Liked Songs"
-  setIsLiked(true); // Cập nhật trạng thái để đổi màu biểu tượng
-};
+  const handleLikeSong = () => {
+    if (!song) return;
+    addToLikedSongs(song);
+    setIsLiked(true);
+  };
 
   const togglePlay = () => {
-    if (!song) return; // Không toggle nếu chưa có bài hát
+    if (!song) return;
     setIsPlaying(!isPlaying);
   };
 
@@ -153,11 +146,9 @@ const handleLikeSong = () => {
     setIsShuffleActive((prev) => {
       const newState = !prev;
       if (newState) {
-        // Khi bật shuffle: xáo trộn playlist
         const shuffled = [...playlist].sort(() => Math.random() - 0.5);
         setShuffledPlaylist(shuffled);
       } else {
-        // Khi tắt shuffle: quay lại playlist gốc
         setShuffledPlaylist([]);
       }
       return newState;
@@ -170,13 +161,13 @@ const handleLikeSong = () => {
     const currentPlaylist = isShuffleActive && shuffledPlaylist.length > 0 ? shuffledPlaylist : playlist;
     const currentIndex = currentPlaylist.findIndex((track) => track.url === song.url);
 
-    if (currentIndex === -1) return; // Không tìm thấy bài hát hiện tại
+    if (currentIndex === -1) return;
 
     const previousIndex = currentIndex === 0 ? currentPlaylist.length - 1 : currentIndex - 1;
     const previousSong = currentPlaylist[previousIndex];
 
-    setCurrentSong(previousSong); // Chuyển sang bài trước đó
-    setCurrentTime(0); // Reset thời gian về 0
+    setCurrentSong(previousSong);
+    setCurrentTime(0);
     audioRef.current.currentTime = 0;
 
     if (isPlaying) {
@@ -190,13 +181,13 @@ const handleLikeSong = () => {
     const currentPlaylist = isShuffleActive && shuffledPlaylist.length > 0 ? shuffledPlaylist : playlist;
     const currentIndex = currentPlaylist.findIndex((track) => track.url === song.url);
 
-    if (currentIndex === -1) return; // Không tìm thấy bài hát hiện tại
+    if (currentIndex === -1) return;
 
     const nextIndex = currentIndex === currentPlaylist.length - 1 ? 0 : currentIndex + 1;
     const nextSong = currentPlaylist[nextIndex];
 
-    setCurrentSong(nextSong); // Chuyển sang bài tiếp theo
-    setCurrentTime(0); // Reset thời gian về 0
+    setCurrentSong(nextSong);
+    setCurrentTime(0);
     audioRef.current.currentTime = 0;
 
     if (isPlaying) {
@@ -283,13 +274,18 @@ const handleLikeSong = () => {
           <div className="flex items-center space-x-4 w-[30%]">
             {song ? (
               <>
-                <img src={musicImage} alt="Album Cover" className="w-12 h-12 rounded shadow-md" />
+                <img
+                  src={song.imageUrl || 'https://via.placeholder.com/50'} // Use song.imageUrl with fallback
+                  alt="Album Cover"
+                  className="w-12 h-12 rounded shadow-md"
+                  onError={(e) => (e.target.src = 'https://via.placeholder.com/50')} // Fallback on error
+                />
                 <div>
                   <p className="font-semibold">{song.title}</p>
                   <p className="text-sm text-gray-400">{song.artist}</p>
                 </div>
                 <div className="relative group">
-                <FaHeart
+                  <FaHeart
                     className={`w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200 ${
                       isLiked ? 'text-red-500' : 'text-gray-400 hover:text-white'
                     }`}
@@ -301,7 +297,7 @@ const handleLikeSong = () => {
                 </div>
               </>
             ) : (
-              <div className="text-gray-400"></div>
+              <div className="text-gray-400">No Song Selected</div>
             )}
           </div>
 
