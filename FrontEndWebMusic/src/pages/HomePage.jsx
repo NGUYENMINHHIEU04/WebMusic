@@ -16,6 +16,7 @@ import open_hand from '../images/002-palm.png';
 import { useNavigate } from 'react-router-dom';
 import { getSongAudio } from '../apis/api_song';
 import { getImage } from '../apis/api_image';
+import Chatbot from '../components/Chatbot'; // Import Chatbot component
 
 const Homepage = () => {
   const { isLoggedIn, userId } = useContext(AuthContext);
@@ -25,6 +26,7 @@ const Homepage = () => {
   const [showLyrics, setShowLyrics] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [showDevice, setShowDevice] = useState(false);
+  const [showChatbot, setShowChatbot] = useState(false); // Trạng thái để hiển thị Chatbot
   const [leftSidebarWidth, setLeftSidebarWidth] = useState(20);
   const [rightSidebarWidth, setRightSidebarWidth] = useState(20);
   const [isDraggingLeft, setIsDraggingLeft] = useState(false);
@@ -124,6 +126,10 @@ const Homepage = () => {
     setShowDevice(!showDevice);
     setShowSingerInfo(false);
     setShowQueue(false);
+  };
+
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
   };
 
   const handleMouseDownLeft = () => setIsDraggingLeft(true);
@@ -305,7 +311,7 @@ const Homepage = () => {
           }
         `}
       </style>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen relative">
         <Header onReset={resetToMainContent} onSearch={handleSearch} />
         {showLoginPage ? (
           <LoginPage onLogin={handleLoginRedirect} />
@@ -382,6 +388,34 @@ const Homepage = () => {
               <LoginBanner />
             )}
           </>
+        )}
+
+        {/* Chatbot Icon */}
+        <div
+          className="fixed bottom-20 right-4 w-12 h-12 bg-red-500 rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:bg-red-600 transition-colors z-50"
+          onClick={toggleChatbot}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+            />
+          </svg>
+        </div>
+
+        {/* Chatbot Component */}
+        {showChatbot && (
+          <div className="fixed bottom-20 right-4 z-50">
+            <Chatbot onClose={toggleChatbot} />
+          </div>
         )}
       </div>
     </>
