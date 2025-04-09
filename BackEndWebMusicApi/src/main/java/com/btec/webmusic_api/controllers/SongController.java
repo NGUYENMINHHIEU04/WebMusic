@@ -1,34 +1,38 @@
 package com.btec.webmusic_api.controllers;
 
 import com.btec.webmusic_api.dtos.ResponseObject;
+import com.btec.webmusic_api.entities.Artist;
 import com.btec.webmusic_api.entities.Song;
+import com.btec.webmusic_api.services.ArtistService;
 import com.btec.webmusic_api.services.SongService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/songs")
 public class SongController {
 
     private final SongService songService;
+    private final ArtistService artistService; // Thêm ArtistService
 
-    public SongController(SongService songService) {
+    @Autowired
+    public SongController(SongService songService, ArtistService artistService) {
         this.songService = songService;
+        this.artistService = artistService;
     }
 
     // Tạo bài hát mới
     @PostMapping
     public ResponseEntity<ResponseObject<Song>> createSong(@RequestBody Song song) {
         try {
+            // Kiểm tra artistIds trước khi lưu
+            List<String> validArtistIds = validateArtistIds(song.getArtistIds());
+            song.setArtistIds(validArtistIds); // Cập nhật artistIds đã kiểm tra
             Song createdSong = songService.createSong(song);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject<>(200, createdSong, "Song created successfully"));
@@ -59,16 +63,24 @@ public class SongController {
         }
     }
 
-    // Cập nhật bài hátb
+    // Cập nhật bài hát
     @PutMapping("/{id}")
     public ResponseEntity<ResponseObject<Song>> updateSong(@PathVariable String id, @RequestBody Song updatedSong) {
-        Optional<Song> songOptional = songService.updateSong(id, updatedSong);
-        if (songOptional.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(new ResponseObject<>(200, songOptional.get(), "Song updated successfully"));
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ResponseObject<>(404, null, "Song not found"));
+        try {
+            // Kiểm tra artistIds trước khi cập nhật
+            List<String> validArtistIds = validateArtistIds(updatedSong.getArtistIds());
+            updatedSong.setArtistIds(validArtistIds); // Cập nhật artistIds đã kiểm tra
+            Optional<Song> songOptional = songService.updateSong(id, updatedSong);
+            if (songOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new ResponseObject<>(200, songOptional.get(), "Song updated successfully"));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject<>(404, null, "Song not found"));
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ResponseObject<>(400, null, e.getMessage()));
         }
     }
 
@@ -97,7 +109,6 @@ public class SongController {
             String title = (String) audioData.get("title");
             String category = (String) audioData.get("category");
             String artist = (String) audioData.get("artist");
-            Map<String, Object> image = (Map<String, Object>) audioData.get("image");
 
             // Chuyển dữ liệu âm thanh thành base64
             String audioBase64 = Base64.getEncoder().encodeToString(mp3Data);
@@ -110,7 +121,6 @@ public class SongController {
             response.put("title", title);
             response.put("category", category);
             response.put("artist", artist);
-            response.put("image", image);
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -119,5 +129,21 @@ public class SongController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ResponseObject<>(404, null, "Audio for song not found"));
         }
+    }
+
+    // Phương thức kiểm tra artistIds
+    private List<String> validateArtistIds(List<String> artistIds) {
+        if (artistIds == null || artistIds.isEmpty()) {
+            throw new IllegalArgumentException("At least one artist is required.");
+        }
+        List<String> validArtistIds = new ArrayList<>();
+        for (String artistId : artistIds) {
+            Optional<Artist> artist = artistService.getArtistById(artistId);
+            if (artist.isEmpty()) {
+                throw new IllegalArgumentException("Artist ID " + artistId + " not found.");
+            }
+            validArtistIds.add(artist.get().getId()); // Đảm bảo ID là _id thực tế (ObjectId)
+        }
+        return validArtistIds;
     }
 }

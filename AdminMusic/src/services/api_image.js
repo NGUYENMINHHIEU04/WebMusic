@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from './api';
 
 // Define the base URL for the API
 const BASE_URL = `${API_BASE_URL}/images`;
