@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import Playlist from './Playlist';
 import PlaylistDetail from './PlaylistDetail';
 import { getAllPlaylists, getImageUrl } from '../apis/api_playlistcard';
-import { getHistoryByUserId } from '../apis/api_history'; // Import history API
-import { getSongAudio } from '../apis/api_song'; // To fetch song details
-import { getImage } from '../apis/api_image'; // To fetch song images
+import { getHistoryByUserId } from '../apis/api_history';
+import { getSongAudio } from '../apis/api_song';
+import { getImage } from '../apis/api_image';
 import { AuthContext } from '../context/AuthContext';
 
 const MainContent = ({
@@ -21,15 +21,15 @@ const MainContent = ({
   selectedPlaylistFromLibrary,
   resetTrigger,
   searchResults,
+  onNextTrack, // Nhận onNextTrack từ HomePage
 }) => {
-  const { isLoggedIn, userId } = useContext(AuthContext); // Get userId from AuthContext
+  const { isLoggedIn, userId } = useContext(AuthContext);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
-  const [historyItems, setHistoryItems] = useState([]); // State for history items
+  const [historyItems, setHistoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch playlists
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
@@ -62,7 +62,6 @@ const MainContent = ({
     fetchPlaylists();
   }, []);
 
-  // Fetch listening history
   useEffect(() => {
     const fetchHistory = async () => {
       if (!isLoggedIn || !userId) {
@@ -74,7 +73,6 @@ const MainContent = ({
         const historyData = await getHistoryByUserId(userId);
         console.log('History data:', historyData);
 
-        // Fetch song details for each history entry
         const formattedHistory = await Promise.all(
           historyData.map(async (historyEntry, index) => {
             try {
@@ -104,7 +102,6 @@ const MainContent = ({
           })
         );
 
-        // Filter out any failed fetches
         setHistoryItems(formattedHistory.filter((item) => item !== null));
       } catch (err) {
         console.error('Error fetching history:', err);
@@ -220,6 +217,7 @@ const MainContent = ({
             currentPlaylistId={currentPlaylistId}
             resetCurrentTime={resetCurrentTime}
             cardIndex={playlists.findIndex((p) => p.id === selectedPlaylist.id)}
+            onNextTrack={onNextTrack} // Truyền onNextTrack vào PlaylistDetail
           />
         ) : hasSearchResults ? (
           <div className="p-5 text-white font-sans">
@@ -257,7 +255,6 @@ const MainContent = ({
           </div>
         ) : (
           <div>
-            {/* Listening History Section */}
             {isLoggedIn && historyItems.length > 0 && (
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-5">
@@ -285,7 +282,6 @@ const MainContent = ({
               </div>
             )}
 
-            {/* Playlists Section */}
             <Playlist
               playlists={playlists}
               isPlaying={isPlaying}

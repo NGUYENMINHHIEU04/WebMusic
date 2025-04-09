@@ -54,7 +54,7 @@ const Homepage = () => {
   const handleSearch = async (filteredSongs) => {
     const formattedTracks = await Promise.all(
       filteredSongs.map(async (song, index) => {
-        let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+        let imageUrl = 'https://via.placeholder.com/50';
         try {
           const songData = await getSongAudio(song.id);
           if (songData.idImage) {
@@ -72,7 +72,7 @@ const Homepage = () => {
           songId: song.id,
           url: song.audioUrl || '',
           artistIds: song.artistIds || [],
-          imageUrl, // Include imageUrl
+          imageUrl,
         };
       })
     );
@@ -164,7 +164,6 @@ const Homepage = () => {
       const tracks = await fetchTracks(playlist);
       if (tracks.length > 0) {
         resetCurrentTimeRef.current();
-        // Kiểm tra nếu playlist có selectedTrackIndex (từ search results)
         const trackToPlayIndex = playlist.selectedTrackIndex !== undefined ? playlist.selectedTrackIndex : 0;
         handleTrackSelect(tracks[trackToPlayIndex], tracks, playlist.id, cardIndex);
       }
@@ -179,7 +178,7 @@ const Homepage = () => {
       songIds.map(async (songId, index) => {
         try {
           const songData = await getSongAudio(songId);
-          let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+          let imageUrl = 'https://via.placeholder.com/50';
           if (songData.idImage) {
             try {
               imageUrl = await getImage(songData.idImage);
@@ -198,7 +197,7 @@ const Homepage = () => {
             songId: songId,
             url: songData.audioUrl || '',
             artistIds: songData.artistIds || [],
-            imageUrl, // Include imageUrl
+            imageUrl,
           };
         } catch (err) {
           console.error(`Failed to fetch song ${songId}:`, err);
@@ -210,7 +209,7 @@ const Homepage = () => {
             duration: '0:00',
             songId: songId,
             artistIds: [],
-            imageUrl: 'https://via.placeholder.com/50', // Fallback image
+            imageUrl: 'https://via.placeholder.com/50',
           };
         }
       })
@@ -236,7 +235,25 @@ const Homepage = () => {
     setCurrentArtist(artist);
   };
 
-  const handleNextTrack = () => {};
+  const handleNextTrack = () => {
+    if (!currentPlaylistTracks || currentPlaylistTracks.length === 0 || !currentSong) return;
+
+    const currentIndex = currentPlaylistTracks.findIndex((track) => track.url === currentSong.url);
+    if (currentIndex === -1) return;
+
+    const nextIndex = currentIndex === currentPlaylistTracks.length - 1 ? 0 : currentIndex + 1;
+    const nextTrack = currentPlaylistTracks[nextIndex];
+
+    setCurrentSong({
+      title: nextTrack.title,
+      artist: nextTrack.artist,
+      url: nextTrack.url,
+      lyrics: nextTrack.lyrics || '',
+      imageUrl: nextTrack.imageUrl,
+    });
+    resetCurrentTimeRef.current();
+    setIsPlaying(true);
+  };
 
   const handleLoginRedirect = () => {
     navigate('/auth');
@@ -330,6 +347,7 @@ const Homepage = () => {
                     selectedPlaylistFromLibrary={selectedPlaylistFromLibrary}
                     resetTrigger={resetTrigger}
                     searchResults={searchResults}
+                    onNextTrack={handleNextTrack} // Truyền handleNextTrack vào MainContent
                   />
                 )}
               </div>
@@ -355,7 +373,7 @@ const Homepage = () => {
                 song={currentSong}
                 isPlaying={isPlaying}
                 setIsPlaying={setIsPlaying}
-                onNextTrack={handleNextTrack}
+                onNextTrack={handleNextTrack} // Truyền handleNextTrack vào MusicPlayer
                 resetCurrentTime={resetCurrentTimeRef}
                 playlist={currentPlaylistTracks}
                 setCurrentSong={setCurrentSong}

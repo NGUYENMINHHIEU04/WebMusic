@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useLibrary } from '../context/LibraryContext';
 import { getSongAudio } from '../apis/api_song';
 import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
 import { getImage } from '../apis/api_image';
-import { addHistory } from '../apis/api_history'; // Import the addHistory API
+import { addHistory } from '../apis/api_history';
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';
+import LoginPage from './LoginPage';
 
 const PlaylistDetail = ({
   playlist,
@@ -20,8 +22,9 @@ const PlaylistDetail = ({
   currentPlaylistId,
   resetCurrentTime,
   cardIndex,
+  onNextTrack: parentOnNextTrack, // Nếu bạn truyền onNextTrack từ component cha
 }) => {
-  const { isLoggedIn, userId } = useContext(AuthContext); // Get userId from AuthContext
+  const { isLoggedIn, userId } = useContext(AuthContext);
   const { libraryItems, addToLibrary, removeFromLibrary } = useLibrary();
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,6 +32,8 @@ const PlaylistDetail = ({
   const [hoveredTrackId, setHoveredTrackId] = useState(null);
   const [currentTrackId, setCurrentTrackId] = useState(null);
   const [playlistImageUrl, setPlaylistImageUrl] = useState('https://via.placeholder.com/150');
+  const [showLogin, setShowLogin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchImageUrl = async () => {
@@ -135,6 +140,11 @@ const PlaylistDetail = ({
   };
 
   const handlePlayPauseClick = () => {
+    if (!isLoggedIn) {
+      setShowLogin(true);
+      return;
+    }
+
     if (tracks.length > 0) {
       if (!isCurrentPlaylistPlaying()) {
         setCurrentTrackId(tracks[0].id);
@@ -146,12 +156,12 @@ const PlaylistDetail = ({
   };
 
   const handleTrackPlayPause = async (track) => {
-    try {
-      if (!isLoggedIn) {
-        onTrackSelect(track, tracks, playlist.id, cardIndex);
-        return;
-      }
+    if (!isLoggedIn) {
+      setShowLogin(true);
+      return;
+    }
 
+    try {
       if (currentTrackId === track.id && isCurrentPlaylistPlaying()) {
         setIsPlaying(!isPlaying);
       } else {
@@ -160,7 +170,6 @@ const PlaylistDetail = ({
         onTrackSelect(track, tracks, playlist.id, cardIndex);
         setIsPlaying(true);
 
-        // Add the song to the user's history
         if (userId) {
           const historyData = {
             userId: userId,
@@ -179,6 +188,43 @@ const PlaylistDetail = ({
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleNextTrack = async () => {
+    if (!tracks || tracks.length === 0 || !currentSong) return;
+
+    const currentIndex = tracks.findIndex((track) => track.url === currentSong.url);
+    if (currentIndex === -1) return;
+
+    // Chuyển sang bài tiếp theo, quay lại đầu nếu ở cuối danh sách
+    const nextIndex = currentIndex === tracks.length - 1 ? 0 : currentIndex + 1;
+    const nextTrack = tracks[nextIndex];
+
+    setCurrentTrackId(nextTrack.id);
+    resetCurrentTime();
+    onTrackSelect(nextTrack, tracks, playlist.id, cardIndex);
+    setIsPlaying(true);
+
+    // Nếu có userId, thêm vào lịch sử
+    if (userId) {
+      const historyData = {
+        userId: userId,
+        songId: nextTrack.songId,
+        timestamp: new Date().toISOString(),
+      };
+      await addHistory(historyData);
+      console.log(`Added song ${nextTrack.songId} to history for user ${userId}`);
+    }
+
+    // Cập nhật thông tin nghệ sĩ nếu cần
+    if (nextTrack.artistIds && nextTrack.artistIds.length > 0) {
+      const artists = await getArtistsByIds(nextTrack.artistIds);
+      onArtistSelect(artists[0]);
+    }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/auth');
   };
 
   const isInLibrary = libraryItems.some((item) => item.id === playlist.id);
@@ -205,6 +251,10 @@ const PlaylistDetail = ({
       addToLibrary(playlistToAdd);
     }
   };
+
+  if (showLogin) {
+    return <LoginPage onLogin={handleLoginRedirect} />;
+  }
 
   return (
     <div className="bg-gray-800 p-5 text-white rounded-lg h-screen overflow-y-auto custom-scrollbar font-sans">
