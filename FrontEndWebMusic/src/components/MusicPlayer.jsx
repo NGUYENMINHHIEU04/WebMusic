@@ -12,6 +12,8 @@ import MiniPlayer from './MiniPlayer';
 import { FaCirclePause, FaCirclePlay } from 'react-icons/fa6';
 import { FiVolumeX, FiVolume, FiVolume1, FiVolume2 } from 'react-icons/fi';
 import MusicPlayerFullScreen from './MusicPlayerFullScreen';
+import { useLibrary } from '../context/LibraryContext';
+import { AuthContext } from '../context/AuthContext';
 
 const MusicPlayer = ({
   onToggleSingerInfo,
@@ -26,7 +28,9 @@ const MusicPlayer = ({
   playlist, // Thêm prop playlist
   setCurrentSong, // Thêm prop để thay đổi bài hát hiện tại
 }) => {
+  const { addToLikedSongs } = useLibrary();
   const [showMiniPlayer, setShowMiniPlayer] = useState(false);
+
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -36,6 +40,7 @@ const MusicPlayer = ({
   const [repeatMode, setRepeatMode] = useState('inactive');
   const [activeRightIcon, setActiveRightIcon] = useState(null);
   const [isLyricsVisible, setIsLyricsVisible] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const musicPlayerRef = useRef(null);
   const audioRef = useRef(new Audio());
   const progressRef = useRef(null);
@@ -92,6 +97,20 @@ const MusicPlayer = ({
       audio.removeEventListener('ended', () => {});
     };
   }, [song, repeatMode]);
+
+
+ // Kiểm tra xem bài hát đã được thích chưa (có thể kiểm tra từ localStorage hoặc API nếu cần)
+ useEffect(() => {
+  if (!song) return;
+  // Giả sử bạn có thể kiểm tra từ libraryItems hoặc localStorage
+  setIsLiked(false); // Reset trạng thái khi bài hát thay đổi
+}, [song]);
+
+const handleLikeSong = () => {
+  if (!song) return;
+  addToLikedSongs(song); // Thêm bài hát vào "Liked Songs"
+  setIsLiked(true); // Cập nhật trạng thái để đổi màu biểu tượng
+};
 
   const togglePlay = () => {
     if (!song) return; // Không toggle nếu chưa có bài hát
@@ -270,9 +289,14 @@ const MusicPlayer = ({
                   <p className="text-sm text-gray-400">{song.artist}</p>
                 </div>
                 <div className="relative group">
-                  <FaHeart className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer hover:scale-110 transition-transform duration-200" />
+                <FaHeart
+                    className={`w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-200 ${
+                      isLiked ? 'text-red-500' : 'text-gray-400 hover:text-white'
+                    }`}
+                    onClick={handleLikeSong}
+                  />
                   <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs font-bold rounded-lg px-3 py-1 shadow-lg whitespace-nowrap">
-                    Favorite
+                    {isLiked ? 'Unlike' : 'Favorite'}
                   </span>
                 </div>
               </>

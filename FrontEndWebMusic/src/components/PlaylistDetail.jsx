@@ -4,6 +4,7 @@ import { useLibrary } from '../context/LibraryContext';
 import { getSongAudio } from '../apis/api_song';
 import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
+import { getImage } from '../apis/api_image'; // Import getImage
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';
 
@@ -54,17 +55,26 @@ const PlaylistDetail = ({
           songIds.map(async (songId, index) => {
             try {
               const songData = await getSongAudio(songId);
+              // Fetch the image URL using idImage
+              let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+              if (songData.idImage) {
+                try {
+                  imageUrl = await getImage(songData.idImage);
+                } catch (imageError) {
+                  console.error(`Failed to fetch image for song ${songId}:`, imageError);
+                }
+              }
+
               return {
                 id: index + 1,
-                title: songData.title || songData.name || 'Unknown Title',
-                artist: songData.artistIds
-                  ? songData.artistIds.join(', ')
-                  : songData.artist || 'Unknown Artist',
-                category: songData.category || songData.genre || 'Unknown Category',
+                title: songData.title || 'Unknown Title',
+                artist: songData.artist || 'Unknown Artist',
+                category: songData.category || 'Unknown Category',
                 duration: songData.duration || '0:00',
                 songId: songId,
                 url: songData.audioUrl || '',
                 artistIds: songData.artistIds || [],
+                imageUrl, // Use the fetched image URL
               };
             } catch (err) {
               console.error(`Failed to fetch song ${songId}:`, err);
@@ -76,6 +86,7 @@ const PlaylistDetail = ({
                 duration: '0:00',
                 songId: songId,
                 artistIds: [],
+                imageUrl: 'https://via.placeholder.com/50', // Fallback image
               };
             }
           })
@@ -173,7 +184,7 @@ const PlaylistDetail = ({
       const playlistToAdd = {
         id: playlist.id,
         type: 'Playlist',
-        title: playlist.name || playlist.title, // Đảm bảo tiêu đề được truyền đúng
+        title: playlist.name || playlist.title,
         creator: 'Spotify',
         image: playlist.coverImageId ? getImageUrl(playlist.coverImageId) : 'https://via.placeholder.com/150',
         coverImageId: playlist.coverImageId,
@@ -272,9 +283,17 @@ const PlaylistDetail = ({
                       track.id
                     )}
                   </div>
-                  <div className="col-span-5">
-                    <p className="text-white">{track.title}</p>
-                    <p className="text-sm text-gray-400">{track.artist}</p>
+                  <div className="col-span-5 flex items-center">
+                    <img
+                      src={track.imageUrl}
+                      alt={track.title}
+                      className="w-10 h-10 object-cover mr-3 rounded"
+                      onError={(e) => (e.target.src = 'https://via.placeholder.com/50')} // Fallback on error
+                    />
+                    <div>
+                      <p className="text-white">{track.title}</p>
+                      <p className="text-sm text-gray-400">{track.artist}</p>
+                    </div>
                   </div>
                   <div className="col-span-4">{track.category}</div>
                   <div className="col-span-2 text-right">{track.duration}</div>

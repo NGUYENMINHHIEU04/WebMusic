@@ -248,7 +248,7 @@ public class SongService {
         return true;
     }
 
-    // Lấy file MP3 và thông tin bài hát
+    // In SongService.java, update the getSongAudio method
     public Optional<Map<String, Object>> getSongAudio(String songId) {
         Optional<Song> songOptional = songRepository.findById(songId);
         if (songOptional.isEmpty()) {
@@ -269,6 +269,7 @@ public class SongService {
         audioData.put("title", song.getTitle() != null ? song.getTitle() : "Unknown Title");
         audioData.put("category", song.getCategory() != null ? song.getCategory() : "Unknown Category");
         audioData.put("artist", String.join(", ", getArtistNames(song.getArtistIds())));
+        audioData.put("idImage", song.getIdImage()); // Include idImage instead of imageUrl
 
         return Optional.of(audioData);
     }
