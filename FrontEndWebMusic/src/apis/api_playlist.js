@@ -1,104 +1,8 @@
-// // api_playlist.js
+// api_playlist.js
 
-import { API_BASE_URL } from "./api";
+const BASE_URL = 'http://localhost:8080/api/playlists'; // Adjust this URL based on your Spring Boot server
 
-// const BASE_URL = 'http://localhost:8080/api/playlistCards';
-// const IMAGE_BASE_URL = 'http://localhost:8080/api/images'; // Adjust if different
-
-// const handleResponse = async (response) => {
-//   const data = await response.json();
-//   if (!response.ok) {
-//     throw new Error(data.message || 'Something went wrong');
-//   }
-//   return data;
-// };
-
-// // Existing playlist functions remain unchanged
-// export const getAllPlaylists = async () => {
-//   try {
-//     const response = await fetch(BASE_URL, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     return await handleResponse(response);
-//   } catch (error) {
-//     console.error('Error fetching all playlists:', error);
-//     throw error;
-//   }
-// };
-
-// export const getPlaylistById = async (id) => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/${id}`, {
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     return await handleResponse(response);
-//   } catch (error) {
-//     console.error('Error fetching playlist:', error);
-//     throw error;
-//   }
-// };
-
-// export const createPlaylist = async (playlistData) => {
-//   try {
-//     const response = await fetch(BASE_URL, {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(playlistData),
-//     });
-//     return await handleResponse(response);
-//   } catch (error) {
-//     console.error('Error creating playlist:', error);
-//     throw error;
-//   }
-// };
-
-// export const updatePlaylist = async (id, playlistData) => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/${id}`, {
-//       method: 'PUT',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(playlistData),
-//     });
-//     return await handleResponse(response);
-//   } catch (error) {
-//     console.error('Error updating playlist:', error);
-//     throw error;
-//   }
-// };
-
-// export const deletePlaylist = async (id) => {
-//   try {
-//     const response = await fetch(`${BASE_URL}/${id}`, {
-//       method: 'DELETE',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     });
-//     return await handleResponse(response);
-//   } catch (error) {
-//     console.error('Error deleting playlist:', error);
-//     throw error;
-//   }
-// };
-
-// // New function to fetch image by ID
-// export const getImageUrl = (imageId) => {
-//   return `${IMAGE_BASE_URL}/${imageId}`;
-// };
-
-const BASE_URL = `${API_BASE_URL}/playlistCards`;
-const IMAGE_BASE_URL = `${API_BASE_URL}/images`; // Adjust if different
-
+// Helper function to handle fetch responses
 const handleResponse = async (response) => {
   const data = await response.json();
   if (!response.ok) {
@@ -107,23 +11,24 @@ const handleResponse = async (response) => {
   return data;
 };
 
-// Existing playlist functions remain unchanged
-export const getAllPlaylists = async () => {
+// Create a new playlist
+export const createPlaylist = async (playlistData) => {
   try {
-    const response = await fetch(BASE_URL, {
-      method: 'GET',
+    const response = await fetch(`${BASE_URL}`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(playlistData),
     });
     return await handleResponse(response);
   } catch (error) {
-    console.error('Error fetching all playlists:', error);
-    throw error;
+    throw new Error(error.message);
   }
 };
 
-export const getPlaylistById = async (id) => {
+// Get a specific playlist by ID
+export const getPlaylist = async (id) => {
   try {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'GET',
@@ -133,27 +38,41 @@ export const getPlaylistById = async (id) => {
     });
     return await handleResponse(response);
   } catch (error) {
-    console.error('Error fetching playlist:', error);
-    throw error;
+    throw new Error(error.message);
   }
 };
 
-export const createPlaylist = async (playlistData) => {
+// Get all playlists
+export const getAllPlaylists = async () => {
   try {
-    const response = await fetch(BASE_URL, {
-      method: 'POST',
+    const response = await fetch(`${BASE_URL}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(playlistData),
     });
     return await handleResponse(response);
   } catch (error) {
-    console.error('Error creating playlist:', error);
-    throw error;
+    throw new Error(error.message);
   }
 };
 
+// Get playlists by card ID
+export const getPlaylistsByCardId = async (playlistCardId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/card/${playlistCardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Update a playlist
 export const updatePlaylist = async (id, playlistData) => {
   try {
     const response = await fetch(`${BASE_URL}/${id}`, {
@@ -165,11 +84,41 @@ export const updatePlaylist = async (id, playlistData) => {
     });
     return await handleResponse(response);
   } catch (error) {
-    console.error('Error updating playlist:', error);
-    throw error;
+    throw new Error(error.message);
   }
 };
 
+// Add a playlist card
+export const addPlaylistCard = async (id, playlistCardId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}/add-card/${playlistCardId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Remove a playlist card
+export const removePlaylistCard = async (id, playlistCardId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}/remove-card/${playlistCardId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return await handleResponse(response);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Delete a playlist
 export const deletePlaylist = async (id) => {
   try {
     const response = await fetch(`${BASE_URL}/${id}`, {
@@ -180,16 +129,6 @@ export const deletePlaylist = async (id) => {
     });
     return await handleResponse(response);
   } catch (error) {
-    console.error('Error deleting playlist:', error);
-    throw error;
+    throw new Error(error.message);
   }
-};
-
-// Updated function to fetch image by ID with validation
-export const getImageUrl = (imageId) => {
-  if (!imageId) {
-    console.warn('getImageUrl: imageId is undefined or null, returning default image URL');
-    return 'https://via.placeholder.com/50?text=Default'; // Fallback image if imageId is invalid
-  }
-  return `${IMAGE_BASE_URL}/${imageId}`;
 };

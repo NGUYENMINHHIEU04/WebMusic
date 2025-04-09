@@ -97,7 +97,7 @@ public class SongController {
         }
     }
 
-    // Lấy file MP3 và thông tin bài hát
+    // In SongController.java, update the getSongAudio method
     @GetMapping("/{id}/audios")
     public ResponseEntity<?> getSongAudio(@PathVariable String id) {
         Optional<Map<String, Object>> audioDataOptional = songService.getSongAudio(id);
@@ -106,6 +106,20 @@ public class SongController {
             byte[] mp3Data = (byte[]) audioData.get("mp3Data");
             String duration = (String) audioData.get("duration");
             String fileName = (String) audioData.get("fileName");
+
+            String idImage = (String) audioData.get("idImage"); // Get idImage
+
+            // Lấy thông tin bài hát từ SongService
+            Optional<Map<String, Object>> songOptional = songService.getSongById(id);
+            if (!songOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject<>(404, null, "Song not found"));
+            }
+
+            Map<String, Object> songData = songOptional.get();
+            String title = (String) songData.getOrDefault("title", "Unknown Title");
+            String category = (String) songData.getOrDefault("category", "Unknown Category");
+            String artist = (String) songData.getOrDefault("artist", "Unknown Artist");
             String title = (String) audioData.get("title");
             String category = (String) audioData.get("category");
             String artist = (String) audioData.get("artist");
@@ -121,6 +135,7 @@ public class SongController {
             response.put("title", title);
             response.put("category", category);
             response.put("artist", artist);
+            response.put("idImage", idImage); // Include idImage
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)

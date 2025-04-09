@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useLibrary } from '../context/LibraryContext';
 import { getSongAudio } from '../apis/api_song';
-import { getImageUrl } from '../apis/api_playlist';
+import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
+import { getImage } from '../apis/api_image';
+import { addHistory } from '../apis/api_history'; // Import the addHistory API
 import { FaPlay, FaPause } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';
 
@@ -19,7 +21,7 @@ const PlaylistDetail = ({
   resetCurrentTime,
   cardIndex,
 }) => {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, userId } = useContext(AuthContext); // Get userId from AuthContext
   const { libraryItems, addToLibrary, removeFromLibrary } = useLibrary();
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,17 +56,25 @@ const PlaylistDetail = ({
           songIds.map(async (songId, index) => {
             try {
               const songData = await getSongAudio(songId);
+              let imageUrl = 'https://via.placeholder.com/50';
+              if (songData.idImage) {
+                try {
+                  imageUrl = await getImage(songData.idImage);
+                } catch (imageError) {
+                  console.error(`Failed to fetch image for song ${songId}:`, imageError);
+                }
+              }
+
               return {
                 id: index + 1,
-                title: songData.title || songData.name || 'Unknown Title',
-                artist: songData.artistIds
-                  ? songData.artistIds.join(', ')
-                  : songData.artist || 'Unknown Artist',
-                category: songData.category || songData.genre || 'Unknown Category',
+                title: songData.title || 'Unknown Title',
+                artist: songData.artist || 'Unknown Artist',
+                category: songData.category || 'Unknown Category',
                 duration: songData.duration || '0:00',
                 songId: songId,
                 url: songData.audioUrl || '',
                 artistIds: songData.artistIds || [],
+                imageUrl,
               };
             } catch (err) {
               console.error(`Failed to fetch song ${songId}:`, err);
@@ -76,6 +86,7 @@ const PlaylistDetail = ({
                 duration: '0:00',
                 songId: songId,
                 artistIds: [],
+                imageUrl: 'https://via.placeholder.com/50',
               };
             }
           })
@@ -149,6 +160,17 @@ const PlaylistDetail = ({
         onTrackSelect(track, tracks, playlist.id, cardIndex);
         setIsPlaying(true);
 
+        // Add the song to the user's history
+        if (userId) {
+          const historyData = {
+            userId: userId,
+            songId: track.songId,
+            timestamp: new Date().toISOString(),
+          };
+          await addHistory(historyData);
+          console.log(`Added song ${track.songId} to history for user ${userId}`);
+        }
+
         if (track.artistIds && track.artistIds.length > 0) {
           const artists = await getArtistsByIds(track.artistIds);
           onArtistSelect(artists[0]);
@@ -173,7 +195,7 @@ const PlaylistDetail = ({
       const playlistToAdd = {
         id: playlist.id,
         type: 'Playlist',
-        title: playlist.name || playlist.title, // Đảm bảo tiêu đề được truyền đúng
+        title: playlist.name || playlist.title,
         creator: 'Spotify',
         image: playlist.coverImageId ? getImageUrl(playlist.coverImageId) : 'https://via.placeholder.com/150',
         coverImageId: playlist.coverImageId,
@@ -272,9 +294,17 @@ const PlaylistDetail = ({
                       track.id
                     )}
                   </div>
-                  <div className="col-span-5">
-                    <p className="text-white">{track.title}</p>
-                    <p className="text-sm text-gray-400">{track.artist}</p>
+                  <div className="col-span-5 flex items-center">
+                    <img
+                      src={track.imageUrl}
+                      alt={track.title}
+                      className="w-10 h-10 object-cover mr-3 rounded"
+                      onError={(e) => (e.target.src = 'https://via.placeholder.com/50')}
+                    />
+                    <div>
+                      <p className="text-white">{track.title}</p>
+                      <p className="text-sm text-gray-400">{track.artist}</p>
+                    </div>
                   </div>
                   <div className="col-span-4">{track.category}</div>
                   <div className="col-span-2 text-right">{track.duration}</div>

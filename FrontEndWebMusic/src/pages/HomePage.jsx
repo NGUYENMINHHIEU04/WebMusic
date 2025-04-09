@@ -15,6 +15,7 @@ import closed_hand from '../images/001-hand.png';
 import open_hand from '../images/002-palm.png';
 import { useNavigate } from 'react-router-dom';
 import { getSongAudio } from '../apis/api_song';
+import { getImage } from '../apis/api_image';
 
 const Homepage = () => {
   const { isLoggedIn, userId } = useContext(AuthContext);
@@ -50,17 +51,31 @@ const Homepage = () => {
     setResetTrigger((prev) => prev + 1);
   };
 
-  const handleSearch = (filteredSongs) => {
-    const formattedTracks = filteredSongs.map((song, index) => ({
-      id: index + 1,
-      title: song.title || 'Unknown Title',
-      artist: song.artist || 'Unknown Artist',
-      category: song.category || 'Unknown Category',
-      duration: song.duration || '0:00',
-      songId: song.id,
-      url: song.audioUrl || '',
-      artistIds: song.artistIds || [],
-    }));
+  const handleSearch = async (filteredSongs) => {
+    const formattedTracks = await Promise.all(
+      filteredSongs.map(async (song, index) => {
+        let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+        try {
+          const songData = await getSongAudio(song.id);
+          if (songData.idImage) {
+            imageUrl = await getImage(songData.idImage);
+          }
+        } catch (err) {
+          console.error(`Failed to fetch image for song ${song.id}:`, err);
+        }
+        return {
+          id: index + 1,
+          title: song.title || 'Unknown Title',
+          artist: song.artist || 'Unknown Artist',
+          category: song.category || 'Unknown Category',
+          duration: song.duration || '0:00',
+          songId: song.id,
+          url: song.audioUrl || '',
+          artistIds: song.artistIds || [],
+          imageUrl, // Include imageUrl
+        };
+      })
+    );
     setSearchResults(formattedTracks);
     setSelectedPlaylistFromLibrary(null);
   };
@@ -164,6 +179,14 @@ const Homepage = () => {
       songIds.map(async (songId, index) => {
         try {
           const songData = await getSongAudio(songId);
+          let imageUrl = 'https://via.placeholder.com/50'; // Default fallback
+          if (songData.idImage) {
+            try {
+              imageUrl = await getImage(songData.idImage);
+            } catch (imageError) {
+              console.error(`Failed to fetch image for song ${songId}:`, imageError);
+            }
+          }
           return {
             id: index + 1,
             title: songData.title || songData.name || 'Unknown Title',
@@ -175,6 +198,7 @@ const Homepage = () => {
             songId: songId,
             url: songData.audioUrl || '',
             artistIds: songData.artistIds || [],
+            imageUrl, // Include imageUrl
           };
         } catch (err) {
           console.error(`Failed to fetch song ${songId}:`, err);
@@ -186,6 +210,7 @@ const Homepage = () => {
             duration: '0:00',
             songId: songId,
             artistIds: [],
+            imageUrl: 'https://via.placeholder.com/50', // Fallback image
           };
         }
       })
@@ -199,6 +224,7 @@ const Homepage = () => {
       artist: track.artist,
       url: track.url,
       lyrics: track.lyrics || '',
+      imageUrl: track.imageUrl,
     });
     setCurrentPlaylistTracks(tracks);
     setCurrentPlaylistId(playlistId);
