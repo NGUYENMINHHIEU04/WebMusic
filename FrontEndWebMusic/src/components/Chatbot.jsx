@@ -1,47 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
-import { getAllSongs, recommendSongs, getLikedSongs } from "../apis/api_song"; // Import các hàm từ api_song.js
+import { getAllSongs } from "../apis/api_song"; // Import function from api_song.js
 
-// Danh sách từ khóa để phân tích tâm trạng
+// List of keywords to analyze mood (kept consistent with SongService.java)
 const MOOD_KEYWORDS = {
-  happy: ["love", "joy", "happy", "bright", "cheerful", "smile", "dance"],
-  sad: ["sad", "cry", "heartbreak", "lonely", "tears", "blue"],
-  relax: ["calm", "peace", "chill", "relax", "soothe", "mellow"],
+  happy: ["love", "happy", "joy", "fun", "dance", "smile", "bright", "cheer"],
+  sad: ["sad", "cry", "tears", "alone", "heartbreak", "loss", "blue", "lonely"],
+  relax: ["calm", "peace", "chill", "slow", "soft", "dream", "quiet", "serene"],
+  angry: ["rage", "angry", "fight", "hate", "fire", "storm", "break", "fury"],
 };
 
-// Hàm phân tích tâm trạng từ tiêu đề và mô tả
-const analyzeMood = (title = "", description = "") => {
-  const text = `${title.toLowerCase()} ${description.toLowerCase()}`;
-  let detectedMood = "unknown";
-
-  for (const [mood, keywords] of Object.entries(MOOD_KEYWORDS)) {
-    if (keywords.some((keyword) => text.includes(keyword))) {
-      detectedMood = mood;
-      break;
-    }
-  }
-
-  return detectedMood;
+// List of categories by mood (kept consistent with SongService.java)
+const MOOD_TO_CATEGORY = {
+  happy: ["Pop", "Dance", "Rock", "Chill"],
+  sad: ["Ballad", "Acoustic"],
+  relax: ["Jazz", "Classical", "Ambient", "Pop", "Dance", "Rock", "Chill"],
+  angry: ["Rock", "Metal"],
 };
 
-// Hàm tính tần suất category và artist từ lịch sử nghe
-const calculateFrequencies = (history) => {
-  const categoryFrequency = {};
-  const artistFrequency = {};
-
-  history.forEach((song) => {
-    const category = song.category || "Unknown Category";
-    const artist = song.artist || "Unknown Artist";
-
-    categoryFrequency[category] = (categoryFrequency[category] || 0) + 1;
-    artistFrequency[artist] = (artistFrequency[artist] || 0) + 1;
-  });
-
-  return { categoryFrequency, artistFrequency };
-};
-
-const Chatbot = ({ onClose, userId = "user123" }) => { // Giả sử userId được truyền từ Homepage
+const Chatbot = ({ onClose, userId = "user123" }) => {
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Xin chào! Tôi là Chatbot. Bạn đang cảm thấy thế nào? (Ví dụ: happy, sad, relax)" },
+    {
+      sender: "bot",
+      text: "Hello! I’m Chatbot. How are you feeling? (e.g., happy, sad, relax, angry, or words like love, cry, calm, rage...)",
+    },
   ]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -62,88 +43,119 @@ const Chatbot = ({ onClose, userId = "user123" }) => { // Giả sử userId đư
     setInput("");
 
     try {
-      // Kiểm tra nếu người dùng yêu cầu gợi ý bài hát dựa trên tâm trạng
-      const moodMatch = text.toLowerCase().match(/(happy|sad|relax)/);
-      if (moodMatch) {
-        const mood = moodMatch[0];
-        await recommendSongsBasedOnMood(mood);
+      // Check if the user input contains keywords from MOOD_KEYWORDS
+      const detectedMood = detectMoodFromInput(text.toLowerCase());
+      if (detectedMood !== "unknown") {
+        await recommendSongsByMood(detectedMood);
       } else {
-        // Phản hồi mặc định nếu không nhận diện được yêu cầu
         setMessages((prevMessages) => [
           ...prevMessages,
-          { sender: "bot", text: "Tôi không hiểu. Bạn có thể nói rõ tâm trạng của bạn không? (Ví dụ: happy, sad, relax)" },
+          {
+            sender: "bot",
+            text: "I couldn’t recognize a mood from your message. Try words like happy, sad, relax, angry, love, cry, calm, rage...",
+          },
         ]);
       }
     } catch (error) {
       console.error(error);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: "Có lỗi xảy ra. Vui lòng thử lại!" },
+        { sender: "bot", text: "An error occurred. Please try again!" },
       ]);
     }
   };
 
-  const recommendSongsBasedOnMood = async (mood) => {
+  // Function to check keywords in input and determine mood
+  const detectMoodFromInput = (inputText) => {
+    let detectedMood = "unknown";
+
+    for (const [mood, keywords] of Object.entries(MOOD_KEYWORDS)) {
+      if (keywords.some((keyword) => inputText.includes(keyword))) {
+        detectedMood = mood;
+        break;
+      }
+    }
+
+    return detectedMood;
+  };
+
+  // Function to recommend songs based on mood and category
+  const recommendSongsByMood = async (mood) => {
     try {
-      // Gọi API để lấy lịch sử nghe và danh sách bài hát
-      const history = await getLikedSongs(userId); // Lấy lịch sử nghe (giả sử getLikedSongs trả về danh sách bài hát đã thích)
-      const allSongs = await getAllSongs(); // Lấy tất cả bài hát
+      // Fetch all songs
+      const allSongs = await getAllSongs();
 
-      // Tính tần suất category và artist từ lịch sử nghe
-      const { categoryFrequency, artistFrequency } = calculateFrequencies(history);
+      // Get the list of categories suitable for the mood from MOOD_TO_CATEGORY
+      const validCategories = MOOD_TO_CATEGORY[mood] || [];
 
-      // Phân tích tâm trạng và gán nhãn cho từng bài hát
-      const songsWithMood = allSongs.map((song) => {
-        const detectedMood = analyzeMood(song.title, song.description || "");
-        return { ...song, mood: detectedMood };
-      });
-
-      // Lọc các bài hát phù hợp với tâm trạng
-      const moodFilteredSongs = songsWithMood.filter((song) => song.mood === mood);
-
-      // Tính điểm cá nhân hóa cho từng bài hát
-      const scoredSongs = moodFilteredSongs.map((song) => {
-        let score = 0;
-
-        // Tăng điểm nếu category phù hợp với sở thích người dùng
-        const categoryScore = categoryFrequency[song.category] || 0;
-        score += categoryScore * 2; // Nhân với trọng số
-
-        // Tăng điểm nếu artist phù hợp với sở thích người dùng
-        const artistScore = artistFrequency[song.artist] || 0;
-        score += artistScore * 3; // Nhân với trọng số cao hơn cho artist
-
-        return { ...song, score };
-      });
-
-      // Sắp xếp bài hát theo điểm số (cao đến thấp)
-      const sortedSongs = scoredSongs.sort((a, b) => b.score - a.score);
-
-      // Lấy top 3 bài hát để gợi ý
-      const topSongs = sortedSongs.slice(0, 3);
-
-      if (topSongs.length === 0) {
+      if (validCategories.length === 0) {
         setMessages((prevMessages) => [
           ...prevMessages,
-          { sender: "bot", text: `Không tìm thấy bài hát nào phù hợp với tâm trạng "${mood}". Hãy thử tâm trạng khác!` },
+          {
+            sender: "bot",
+            text: `No song categories match the mood "${mood}". Try a different mood!`,
+          },
         ]);
         return;
       }
 
-      // Tạo phản hồi gợi ý
-      const recommendationMessage = `Dựa trên tâm trạng "${mood}" và sở thích của bạn, tôi gợi ý các bài hát sau:\n${topSongs
-        .map((song, index) => `${index + 1}. ${song.title} - ${song.artist} (${song.category})`)
-        .join("\n")}`;
+      // Filter songs that belong to the suitable categories
+      const filteredSongs = allSongs.filter((song) =>
+        validCategories.includes(song.category)
+      );
+
+      if (filteredSongs.length === 0) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            sender: "bot",
+            text: `No songs found in categories matching the mood "${mood}" (${validCategories.join(
+              ", "
+            )}). Try a different mood!`,
+          },
+        ]);
+        return;
+      }
+
+      // Calculate the frequency of categories in the list of matching songs
+      const categoryFrequency = {};
+      filteredSongs.forEach((song) => {
+        const category = song.category || "Unknown Category";
+        categoryFrequency[category] = (categoryFrequency[category] || 0) + 1;
+      });
+
+      // Find the most common category
+      const mostCommonCategory = Object.entries(categoryFrequency).reduce(
+        (a, b) => (b[1] > a[1] ? b : a),
+        ["Unknown", 0]
+      )[0];
+
+      // Get the top 3 songs from the most common category
+      const topSongsInCategory = filteredSongs
+        .filter((song) => song.category === mostCommonCategory)
+        .slice(0, 3);
+
+      // Create response
+      let responseMessage = `Based on your mood "${mood}", I found that suitable songs often belong to these categories: ${validCategories.join(
+        ", "
+      )}. The most common category is "${mostCommonCategory}". Here are some suggestions:\n`;
+      if (topSongsInCategory.length > 0) {
+        responseMessage += topSongsInCategory
+          .map((song, index) => `${index + 1}. ${song.title} - ${song.artist}`)
+          .join("\n");
+      } else {
+        responseMessage += "No songs in this category to suggest.";
+      }
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: recommendationMessage },
+        { sender: "bot", text: responseMessage },
       ]);
     } catch (error) {
       console.error(error);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: "Có lỗi khi gợi ý bài hát. Vui lòng thử lại!" },
+        { sender: "bot", text: "An error occurred while suggesting songs. Please try again!" },
       ]);
     }
   };
@@ -207,14 +219,14 @@ const Chatbot = ({ onClose, userId = "user123" }) => { // Giả sử userId đư
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Nhập tâm trạng (happy, sad, relax)..."
+          placeholder="Enter your mood (happy, sad, relax, angry, love, cry...)"
           className="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={() => sendMessage(input)}
           className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors"
         >
-          Gửi
+          Send
         </button>
       </div>
     </div>
