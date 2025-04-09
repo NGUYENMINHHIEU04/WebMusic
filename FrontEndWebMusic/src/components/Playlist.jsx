@@ -14,6 +14,7 @@ const Playlist = ({
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [showAll, setShowAll] = useState(false); // New state to toggle layout
 
   // Hàm xử lý cuộn sang trái
   const scrollLeft = () => {
@@ -34,8 +35,14 @@ const Playlist = ({
     if (scrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1); // -1 để tránh lỗi làm tròn
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
     }
+  };
+
+  // Hàm xử lý khi bấm "SHOW ALL" hoặc "SHOW LESS"
+  const handleShowAll = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    setShowAll((prev) => !prev); // Toggle the showAll state
   };
 
   return (
@@ -44,14 +51,15 @@ const Playlist = ({
         <h2 className="text-2xl font-bold uppercase">Discover picks for you</h2>
         <a
           href="#"
+          onClick={handleShowAll}
           className="text-gray-400 text-sm hover:text-white hover:underline"
         >
-          SHOW ALL
+          {showAll ? 'SHOW LESS' : 'SHOW ALL'} {/* Toggle text based on state */}
         </a>
       </div>
       <div className="relative">
-        {/* Nút điều hướng trái */}
-        {showLeftArrow && (
+        {/* Hiển thị nút điều hướng trái (chỉ khi không ở chế độ SHOW ALL) */}
+        {!showAll && showLeftArrow && (
           <button
             onClick={scrollLeft}
             className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-800 p-2 rounded-full z-10 hover:bg-gray-700"
@@ -64,24 +72,24 @@ const Playlist = ({
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex overflow-x-auto gap-5 scrollbar-hide"
-          style={{ scrollSnapType: 'x mandatory' }}
+          className={`${
+            showAll
+              ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5' // Grid layout for SHOW ALL
+              : 'flex overflow-x-auto gap-5 scrollbar-hide' // Scrollable row for default view
+          }`}
+          style={showAll ? {} : { scrollSnapType: 'x mandatory' }} // Remove scroll snap in grid mode
         >
           {playlists.map((playlist, index) => (
             <div
               key={playlist.id}
-              className="flex-none"
-              style={{ width: '200px' }} // Chiều rộng cố định cho mỗi card
+              className={showAll ? '' : 'flex-none'} // Remove flex-none in grid mode
+              style={showAll ? {} : { width: '200px' }} // Remove fixed width in grid mode
             >
               <PlaylistCard
                 index={index}
-                image={
-                  playlist.coverImageId
-                    ? playlist.coverImageId
-                    : 'https://via.placeholder.com/150'
-                }
+                image={playlist.imageUrl || 'https://via.placeholder.com/150'} // Use imageUrl from previous update
                 title={playlist.name}
-                artists={playlist.description || 'No description available'}
+                artists={playlist.description || 'Best songs of all time'}
                 onCardClick={() => onCardClick(playlist)}
                 isPlaying={
                   isPlaying &&
@@ -94,8 +102,8 @@ const Playlist = ({
           ))}
         </div>
 
-        {/* Nút điều hướng phải */}
-        {showRightArrow && (
+        {/* Hiển thị nút điều hướng phải (chỉ khi không ở chế độ SHOW ALL) */}
+        {!showAll && showRightArrow && (
           <button
             onClick={scrollRight}
             className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-800 p-2 rounded-full z-10 hover:bg-gray-700"
@@ -105,7 +113,7 @@ const Playlist = ({
         )}
       </div>
 
-      {/* CSS để ẩn thanh cuộn mặc định nhưng vẫn cho phép cuộn */}
+      {/* CSS để ẩn thanh cuộn mặc định nhưng vẫn cho phép cuộn (chỉ áp dụng khi không ở chế độ SHOW ALL) */}
       <style>
         {`
           .scrollbar-hide::-webkit-scrollbar {

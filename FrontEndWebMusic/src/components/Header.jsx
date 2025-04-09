@@ -5,7 +5,8 @@ import { IoIosMore } from 'react-icons/io';
 import Logo from '../images/logo.png';
 import { AuthContext } from '../context/AuthContext';
 import { getUserById } from '../apis/api_user';
-import { getAllSongs } from '../apis/api_song'; // Import API để lấy danh sách bài hát
+import { getAllSongs } from '../apis/api_song';
+import { getImage } from '../apis/api_image';
 
 export default function Header({ onReset, onSearch }) {
   const { isLoggedIn, logout, userId } = useContext(AuthContext);
@@ -42,33 +43,53 @@ export default function Header({ onReset, onSearch }) {
 
   const handleReset = () => {
     if (onReset) {
-      onReset(); // Gọi resetToMainContent từ Homepage
+      onReset();
     }
-    setSearch(''); // Reset ô tìm kiếm
+    setSearch('');
   };
 
-  // Hàm xử lý tìm kiếm
   const handleSearch = async () => {
     if (!search.trim()) {
-      handleReset(); // Nếu ô tìm kiếm trống thì reset
+      handleReset();
       return;
     }
 
     try {
-      const songs = await getAllSongs(); // Lấy tất cả bài hát
-      const filteredSongs = songs.filter(song => 
+      const songs = await getAllSongs();
+      console.log('All songs from API:', songs); // Debug: Log the raw song data
+
+      const filteredSongs = songs.filter(song =>
         song.title?.toLowerCase().includes(search.toLowerCase())
-      ); // Lọc bài hát theo tên
-      
+      );
+      console.log('Filtered songs:', filteredSongs); // Debug: Log the filtered songs
+
+      const songsWithImages = await Promise.all(
+        filteredSongs.map(async (song) => {
+          let imageUrl = 'https://via.placeholder.com/150'; // Default placeholder
+          if (song.imageId) { // Check if imageId exists
+            try {
+              imageUrl = await getImage(song.imageId);
+              console.log(`Image URL for song ${song.songId}:`, imageUrl); // Debug: Log the fetched image URL
+            } catch (err) {
+              console.error(`Failed to fetch image for song ${song.songId}:`, err);
+            }
+          } else {
+            console.warn(`No imageId found for song ${song.songId}`); // Debug: Warn if imageId is missing
+          }
+          return { ...song, imageUrl };
+        })
+      );
+
+      console.log('Songs with images:', songsWithImages); // Debug: Log the final songs with image URLs
+
       if (onSearch) {
-        onSearch(filteredSongs); // Gửi kết quả tìm kiếm lên component cha
+        onSearch(songsWithImages);
       }
     } catch (error) {
       console.error('Search failed:', error);
     }
   };
 
-  // Xử lý khi nhấn Enter trong input
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
@@ -98,7 +119,7 @@ export default function Header({ onReset, onSearch }) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          onKeyPress={handleKeyPress} // Thêm sự kiện nhấn Enter
+          onKeyPress={handleKeyPress}
           className="w-full pl-10 pr-10 py-2 bg-gray-900 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-gray-600"
           placeholder="What do you want to play?"
         />

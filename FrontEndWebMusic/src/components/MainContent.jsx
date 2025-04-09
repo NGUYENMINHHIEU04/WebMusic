@@ -1,6 +1,6 @@
 // src/components/MainContent.js
 import React, { useState, useEffect } from 'react';
-import Playlist from './Playlist'; // Import component Playlist
+import Playlist from './Playlist';
 import PlaylistDetail from './PlaylistDetail';
 import { getAllPlaylists, getImageUrl } from '../apis/api_playlistcard';
 
@@ -30,7 +30,23 @@ const MainContent = ({
         setLoading(true);
         const response = await getAllPlaylists();
         console.log('Playlists from API:', response.data);
-        setPlaylists(response.data);
+
+        const updatedPlaylists = await Promise.all(
+          response.data.map(async (playlist) => {
+            let imageUrl = 'https://via.placeholder.com/150';
+            if (playlist.coverImageId) {
+              try {
+                const url = await getImageUrl(playlist.coverImageId);
+                imageUrl = url;
+              } catch (err) {
+                console.error(`Failed to fetch image for playlist ${playlist.id}:`, err);
+              }
+            }
+            return { ...playlist, imageUrl };
+          })
+        );
+
+        setPlaylists(updatedPlaylists);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -134,15 +150,18 @@ const MainContent = ({
               {searchResults.map((track, index) => (
                 <div
                   key={track.songId}
-                  className="bg-gray-900 p-4 rounded-lg flex flex-col items-center"
+                  className="bg-gray-900 p-4 rounded-lg flex flex-col items-start"
                 >
-                  <img
-                    src={'https://via.placeholder.com/150'}
-                    alt={track.title}
-                    className="w-32 h-32 object-cover rounded-md mb-2"
-                  />
-                  <h3 className="text-lg font-semibold text-center">{track.title}</h3>
-                  <p className="text-gray-400 text-sm text-center">{track.artist}</p>
+                  {/* Remove the image since the UI doesn't show it */}
+                  <div className="flex items-center mb-2">
+                    <div className="w-10 h-10 bg-gray-700 rounded-md flex items-center justify-center mr-3">
+                      <span className="text-gray-400 text-sm">♪</span> {/* Placeholder icon for music */}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold">{track.title}</h3>
+                      <p className="text-gray-400 text-sm">{track.artist || 'Unknown Artist'}</p>
+                    </div>
+                  </div>
                   <button
                     onClick={() => handlePlayPause(index, createSearchPlaylist(index))}
                     className="mt-2 px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600"
