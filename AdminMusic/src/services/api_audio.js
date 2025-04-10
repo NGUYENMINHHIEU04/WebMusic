@@ -1,9 +1,8 @@
 
 import axios from 'axios';
-import { API_BASE_URL } from './api';
 
-// URL cơ sở cho API
-const BASE_URL = `${API_BASE_URL}/audios`;
+// Base URL for API
+const BASE_URL = 'http://localhost:8080/api/audios';
 
 // Utility to get duration from audio file
 const getAudioDuration = (file) => {

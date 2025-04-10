@@ -1,10 +1,9 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from './api'; // Adjust the import path as necessary
 
 // Define the base URL for the API
-const BASE_URL = `${API_BASE_URL}/artists`;
+const BASE_URL = 'http://localhost:8080/api/artists';
 
 // Artist API service
 const artistApi = {

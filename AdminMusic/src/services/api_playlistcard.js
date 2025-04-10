@@ -1,10 +1,9 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from './api'; // Adjust the import path as necessary
 
 // Define the base URL for the API
-const BASE_URL = `${API_BASE_URL}/playlistCards`;
+const BASE_URL = 'http://localhost:8080/api/playlistCards';
 
 // Playlist Card API service
 const playlistCardApi = {
@@ -15,7 +14,9 @@ const playlistCardApi = {
    */
   getPlaylist: async (id) => {
     try {
+      console.log(`Fetching playlist with ID: ${id}`);
       const response = await axios.get(`${BASE_URL}/${id}`);
+      console.log('Playlist API response:', response);
       
       // Handle different response formats
       if (response.data && response.data.data) {
@@ -36,7 +37,9 @@ const playlistCardApi = {
    */
   createPlaylist: async (playlistData) => {
     try {
+      console.log('Creating playlist with data:', playlistData);
       const response = await axios.post(BASE_URL, playlistData);
+      console.log('Create playlist response:', response);
       
       toast.success('Album created successfully');
       // Return the playlist ID from the response
@@ -56,7 +59,9 @@ const playlistCardApi = {
    */
   updatePlaylist: async (id, playlistData) => {
     try {
+      console.log(`Updating playlist ${id} with data:`, playlistData);
       const response = await axios.put(`${BASE_URL}/${id}`, playlistData);
+      console.log('Update playlist response:', response);
       
       toast.success('Album updated successfully');
       return response.data.data || response.data || true;

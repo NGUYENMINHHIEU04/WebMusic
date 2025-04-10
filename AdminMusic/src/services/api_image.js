@@ -1,10 +1,9 @@
 
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_BASE_URL } from './api';
 
 // Define the base URL for the API
-const BASE_URL = `${API_BASE_URL}/images`;
+const BASE_URL = 'http://localhost:8080/api/images';
 
 // Image API service
 const imageApi = {

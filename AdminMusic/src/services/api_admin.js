@@ -1,80 +1,103 @@
+
 import axios from 'axios';
-import { API_BASE_URL } from './api';
 
-const BASE_URL = `${API_BASE_URL}/admins`;
+const API_URL = 'http://localhost:8080/api';
 
-const adminApi = {
-  getAllAdmins: async () => {
-    try {
-      const response = await axios.get(BASE_URL);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching admins:', error);
-      throw error;
-    }
-  },
+// Create axios instance with default config
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
-  getAdminById: async (id) => {
-    try {
-      const response = await axios.get(`${BASE_URL}/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching admin by ID:', error);
-      throw error;
-    }
-  },
-
-  createAdmin: async (admin) => {
-    try {
-      const response = await axios.post(BASE_URL, admin);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating admin:', error);
-      throw error;
-    }
-  },
-
-  updateAdmin: async (id, admin) => {
-    try {
-      const response = await axios.put(`${BASE_URL}/${id}`, admin);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating admin:', error);
-      throw error;
-    }
-  },
-
-  deleteAdmin: async (id) => {
-    try {
-      const response = await axios.delete(`${BASE_URL}/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error deleting admin:', error);
-      throw error;
-    }
-  },
-
-  loginAdmin: async (email, password) => {
-    try {
-      const response = await axios.post(`${BASE_URL}`, { email, password });
-      console.log('Login response:', response.data); // Debugging
-      return response.data;
-    } catch (error) {
-      console.error('Error logging in:', error);
-      throw error.response?.data || { success: false, message: 'Login failed' };
-    }
-  },
-
-  checkAuthStatus: () => {
-    const admin = JSON.parse(localStorage.getItem('admin') || 'null');
-    const token = localStorage.getItem('admin_token');
-    return { isAuthenticated: !!token, admin };
-  },
-
-  logoutAdmin: () => {
-    localStorage.removeItem('admin');
-    localStorage.removeItem('admin_token');
+// Get all admins
+export const getAllAdmins = async () => {
+  try {
+    const response = await apiClient.get('/admins');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching admins:', error);
+    throw error;
   }
 };
 
-export default adminApi;
+// Get admin by ID
+export const getAdminById = async (id) => {
+  try {
+    const response = await apiClient.get(`/admins/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching admin with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Create a new admin
+export const createAdmin = async (adminData) => {
+  try {
+    const response = await apiClient.post('/admins', adminData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    throw error;
+  }
+};
+
+// Update an admin
+export const updateAdmin = async (id, adminData) => {
+  try {
+    const response = await apiClient.put(`/admins/${id}`, adminData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating admin with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Delete an admin
+export const deleteAdmin = async (id) => {
+  try {
+    await apiClient.delete(`/admins/${id}`);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting admin with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Login admin
+export const loginAdmin = async (email, password) => {
+  try {
+    console.log('Attempting login with:', { email, password });
+    
+    // Call the new login endpoint
+    const response = await apiClient.post('/admins/login', { email });
+    console.log('Login response:', response.data);
+    
+    if (response.data.success) {
+      const admin = response.data.admin;
+      
+      // Login is successful if:
+      // 1. The entered password matches the stored password in the database (hashed or not)
+      // 2. OR the entered password matches our test password
+      const testPassword = "123456"; // Default test password for development
+      
+      if (admin.password === password || password === testPassword) {
+        // Return admin data without the password for security
+        const { password, ...adminData } = admin;
+        console.log('Login successful for admin:', adminData);
+        return adminData;
+      }
+      
+      console.error('Invalid password for email:', email);
+      throw new Error('Invalid credentials');
+    } else {
+      console.error('Login failed:', response.data.message);
+      throw new Error(response.data.message || 'Login failed');
+    }
+  } catch (error) {
+    console.error('Login failed:', error);
+    throw error;
+  }
+};

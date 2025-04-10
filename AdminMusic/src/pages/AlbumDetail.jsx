@@ -63,15 +63,23 @@ const AlbumDetail = () => {
   // Filter songs that belong to the album
   useEffect(() => {
     if (album && allSongs.length > 0) {
+      console.log("Album data:", album);
+      console.log("All songs:", allSongs);
+      
       const songsInAlbum = allSongs.filter(song => 
         album.songIds && album.songIds.includes(song.id)
       );
+      
+      console.log("Songs in album:", songsInAlbum);
       setAlbumSongs(songsInAlbum);
       
       // Set available songs for adding (excluding ones already in album)
-      setAvailableSongs(allSongs.filter(song => 
+      const availableSongsFiltered = allSongs.filter(song => 
         !album.songIds || !album.songIds.includes(song.id)
-      ));
+      );
+      
+      setAvailableSongs(availableSongsFiltered);
+      console.log("Available songs:", availableSongsFiltered);
 
       // Initialize selected songs
       setSelectedSongs([]);
@@ -94,6 +102,8 @@ const AlbumDetail = () => {
     try {
       // Create updated song list by combining current and new songs
       const updatedSongIds = [...(album.songIds || []), ...selectedSongs];
+      
+      console.log("Updated song IDs:", updatedSongIds);
       
       // Update the album with new song list
       await updatePlaylist(album.id, { ...album, songIds: updatedSongIds });
@@ -213,7 +223,7 @@ const AlbumDetail = () => {
       </motion.h2>
 
       {/* Songs Table */}
-      {albumSongs.length > 0 ? (
+      {albumSongs && albumSongs.length > 0 ? (
         <motion.div 
           className="border rounded-md overflow-hidden bg-white"
           variants={containerVariants}
@@ -236,7 +246,7 @@ const AlbumDetail = () => {
                   className="border-b hover:bg-gray-50 transition-colors"
                   variants={itemVariants}
                 >
-                  <td className="py-3 px-4">
+                  <TableCell className="py-3 px-4">
                     <motion.div whileHover={{ scale: 1.2 }} whileTap={{ scale: 0.9 }}>
                       <Button
                         variant="ghost"
@@ -247,17 +257,17 @@ const AlbumDetail = () => {
                         <Play className="h-4 w-4" />
                       </Button>
                     </motion.div>
-                  </td>
-                  <td className="py-3 px-4">
+                  </TableCell>
+                  <TableCell className="py-3 px-4">
                     <div className="font-medium">{song.title}</div>
                     {song.subTitle && (
                       <div className="text-sm text-gray-500">{song.subTitle}</div>
                     )}
-                  </td>
-                  <td className="py-3 px-4">
+                  </TableCell>
+                  <TableCell className="py-3 px-4">
                     {Array.isArray(song.artists) ? song.artists.join(', ') : 'Unknown Artist'}
-                  </td>
-                  <td className="py-3 px-4 text-right">{song.category || 'Uncategorized'}</td>
+                  </TableCell>
+                  <TableCell className="py-3 px-4 text-right">{song.category || 'Uncategorized'}</TableCell>
                 </motion.tr>
               ))}
             </TableBody>

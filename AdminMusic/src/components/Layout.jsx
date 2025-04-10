@@ -1,19 +1,16 @@
 
-import { Outlet, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import Sidebar from './Sidebar';
+import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import adminApi from '../services/api_admin';
+import Sidebar from './Sidebar';
+import { useAuth } from '../contexts/AuthContext';
 
 const Layout = () => {
-  const navigate = useNavigate();
+  const { logout } = useAuth();
   
   // Add logout handler
   const handleLogout = () => {
-    adminApi.logoutAdmin();
-    toast.info('You have been logged out');
-    navigate('/admin/login');
+    logout();
   };
   
   return (

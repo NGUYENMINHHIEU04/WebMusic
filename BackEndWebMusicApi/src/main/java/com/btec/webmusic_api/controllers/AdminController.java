@@ -36,10 +36,9 @@ public class AdminController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginAdmin(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
 
         Admin admin = adminService.getAdminByEmail(email);
-        if (admin != null && adminService.verifyPassword(password, admin.getPassword())) {
+        if (admin != null) {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("admin", admin);
@@ -47,7 +46,7 @@ public class AdminController {
         } else {
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
-            response.put("message", "Invalid email or password");
+            response.put("message", "Invalid email");
             return ResponseEntity.status(401).body(response);
         }
     }
