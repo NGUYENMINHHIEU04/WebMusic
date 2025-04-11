@@ -5,6 +5,7 @@ import { getAllPlaylists, getImageUrl } from '../apis/api_playlistcard';
 import { getHistoryByUserId } from '../apis/api_history';
 import { getSongAudio } from '../apis/api_song';
 import { getImage } from '../apis/api_image';
+import { getRecommendations } from '../apis/api_recommendation'; // Thêm API mới
 import { AuthContext } from '../context/AuthContext';
 
 const MainContent = ({
@@ -21,12 +22,13 @@ const MainContent = ({
   selectedPlaylistFromLibrary,
   resetTrigger,
   searchResults,
-  onNextTrack, // Nhận onNextTrack từ HomePage
+  onNextTrack,
 }) => {
   const { isLoggedIn, userId } = useContext(AuthContext);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [playlists, setPlaylists] = useState([]);
   const [historyItems, setHistoryItems] = useState([]);
+  const [recommendedItems, setRecommendedItems] = useState([]); // Thêm state cho gợi ý
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -112,6 +114,26 @@ const MainContent = ({
     fetchHistory();
   }, [isLoggedIn, userId]);
 
+  // Thêm useEffect để lấy gợi ý
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      if (!isLoggedIn || !userId) {
+        setRecommendedItems([]);
+        return;
+      }
+
+      try {
+        const recommendations = await getRecommendations(userId);
+        setRecommendedItems(recommendations);
+      } catch (err) {
+        console.error('Error fetching recommendations:', err);
+        setRecommendedItems([]);
+      }
+    };
+
+    fetchRecommendations();
+  }, [isLoggedIn, userId]);
+
   useEffect(() => {
     if (selectedPlaylistFromLibrary) {
       setSelectedPlaylist(selectedPlaylistFromLibrary);
@@ -155,8 +177,29 @@ const MainContent = ({
     };
   };
 
+  const createRecommendationPlaylist = (selectedTrackIndex) => {
+    return {
+      id: 'recommendation-playlist',
+      name: 'Recommended Songs',
+      songIds: recommendedItems.map((item) => item.songId),
+      tracks: recommendedItems,
+      selectedTrackIndex,
+    };
+  };
+
   const handleHistoryPlayPause = (index) => {
     const playlist = createHistoryPlaylist(index);
+    handleTrackSelectWithTracks(
+      playlist.tracks[index],
+      playlist.tracks,
+      playlist.id,
+      index
+    );
+    setIsPlaying(true);
+  };
+
+  const handleRecommendationPlayPause = (index) => {
+    const playlist = createRecommendationPlaylist(index);
     handleTrackSelectWithTracks(
       playlist.tracks[index],
       playlist.tracks,
@@ -217,7 +260,7 @@ const MainContent = ({
             currentPlaylistId={currentPlaylistId}
             resetCurrentTime={resetCurrentTime}
             cardIndex={playlists.findIndex((p) => p.id === selectedPlaylist.id)}
-            onNextTrack={onNextTrack} // Truyền onNextTrack vào PlaylistDetail
+            onNextTrack={onNextTrack}
           />
         ) : hasSearchResults ? (
           <div className="p-5 text-white font-sans">
@@ -255,6 +298,33 @@ const MainContent = ({
           </div>
         ) : (
           <div>
+            {isLoggedIn && recommendedItems.length > 0 && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-5">
+                  <h2 className="text-2xl font-bold">Recommended for You</h2>
+                  <button className="text-gray-400 hover:text-white text-sm">SHOW ALL</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                  {recommendedItems.slice(0, 5).map((item, index) => (
+                    <div
+                      key={item.songId}
+                      className="bg-gray-900 p-4 rounded-lg flex flex-col items-start cursor-pointer hover:bg-gray-700"
+                      onClick={() => handleRecommendationPlayPause(index)}
+                    >
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-40 object-cover rounded-md mb-3"
+                        onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
+                      />
+                      <h3 className="text-lg font-semibold">{item.title}</h3>
+                      <p className="text-gray-400 text-sm">{item.artist}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {isLoggedIn && historyItems.length > 0 && (
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-5">
