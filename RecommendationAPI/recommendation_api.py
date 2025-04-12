@@ -2,9 +2,6 @@ from flask import Flask, request, jsonify
 from surprise import SVD, Dataset, Reader
 import pandas as pd
 from pymongo import MongoClient
-import os
-
-print("Step 1: Starting the application...")
 
 app = Flask(__name__)
 
@@ -30,8 +27,13 @@ def load_data():
     for entry in history_data:
         user_id = entry.get('userId')
         song_id = entry.get('songId')
+        listen_count = entry.get('listenCount', 1)
+        user_rating = entry.get('rating', None)
+        # Kết hợp listenCount và user_rating thành rating tổng
+        # Quy tắc: Nếu có user_rating, ưu tiên user_rating; nếu không, dùng listenCount (giới hạn tối đa 5)
+        rating = user_rating if user_rating is not None else min(listen_count, 5)
         if user_id and song_id:
-            data.append({'user_id': user_id, 'song_id': song_id, 'rating': 1})
+            data.append({'user_id': user_id, 'song_id': song_id, 'rating': rating})
         else:
             print(f"Skipping invalid history entry: {entry}")
     df = pd.DataFrame(data)
@@ -48,7 +50,6 @@ def train_model():
     try:
         reader = Reader(rating_scale=(1, 5))
         data = Dataset.load_from_df(df[['user_id', 'song_id', 'rating']], reader)
-        # Dùng toàn bộ dữ liệu để huấn luyện
         trainset = data.build_full_trainset()
         model = SVD()
         model.fit(trainset)
@@ -97,12 +98,10 @@ def recommend():
     for pred in top_recommendations:
         song = songs_collection.find_one({'_id': pred['song_id']})
         if song:
-            # Lấy tên nghệ sĩ từ artistIds
             artist_id = song.get('artistIds', [])[0] if song.get('artistIds') else None
             artist = artists_collection.find_one({'_id': artist_id}) if artist_id else None
             artist_name = artist.get('name', 'Unknown Artist') if artist else 'Unknown Artist'
 
-            # Chuyển đổi idImage và idAudio thành URL
             image_url = f"http://localhost:8080/api/images/{song.get('idImage', 'default')}"
             audio_url = f"http://localhost:8080/api/audios/{song.get('idAudio', '')}"
 

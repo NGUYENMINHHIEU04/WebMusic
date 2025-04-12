@@ -2,6 +2,7 @@ package com.btec.webmusic_api.controllers;
 
 import com.btec.webmusic_api.dtos.ResponseObject;
 import com.btec.webmusic_api.entities.Artist;
+import com.btec.webmusic_api.entities.History;
 import com.btec.webmusic_api.entities.Song;
 import com.btec.webmusic_api.services.ArtistService;
 import com.btec.webmusic_api.services.HistoryService;
@@ -13,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/songs")
+@CrossOrigin(origins = "http://localhost:3000") // Allow CORS for React frontend
 public class SongController {
 
     private final SongService songService;
@@ -46,7 +49,24 @@ public class SongController {
         }
 
         try {
-            List<Map<String, Object>> history = historyService.getHistoryByUserId(userId);
+            // Lấy lịch sử nghe nhạc
+            List<History> historyList = historyService.getHistoryByUserId(userId);
+            // Chuyển đổi List<History> thành List<Map<String, Object>>
+            List<Map<String, Object>> history = historyList.stream()
+                    .map(historyEntry -> {
+                        Map<String, Object> historyMap = new HashMap<>();
+                        historyMap.put("songId", historyEntry.getSongId());
+                        historyMap.put("title", historyEntry.getTitle() != null ? historyEntry.getTitle() : "Unknown Song");
+                        historyMap.put("artist", historyEntry.getArtist() != null ? historyEntry.getArtist() : "Unknown Artist");
+                        historyMap.put("imageUrl", historyEntry.getImageUrl() != null ? historyEntry.getImageUrl() : "https://via.placeholder.com/150");
+                        historyMap.put("listenCount", historyEntry.getListenCount() != null ? historyEntry.getListenCount() : 0);
+                        historyMap.put("rating", historyEntry.getRating());
+                        historyMap.put("timestamp", historyEntry.getTimestamp());
+                        return historyMap;
+                    })
+                    .collect(Collectors.toList());
+
+            // Gọi service để lấy gợi ý bài hát
             List<Map<String, Object>> recommendations = songService.recommendSongs(userId, mood, history);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ResponseObject<>(200, recommendations, "Recommended songs retrieved successfully"));

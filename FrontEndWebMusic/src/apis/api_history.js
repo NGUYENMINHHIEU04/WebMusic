@@ -77,3 +77,33 @@ export const deleteHistory = async (id) => {
     throw error;
   }
 };
+
+// Ghi nhận khi user nghe bài hát
+export const recordListen = async (userId, songId) => {
+  try {
+      const response = await fetch('http://localhost:8080/api/history/listen', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, songId })
+      });
+      return await response.json();
+  } catch (error) {
+      console.error('Error recording listen:', error);
+      throw error;
+  }
+};
+
+// Ghi nhận khi user đánh giá bài hát
+export const rateSong = async (userId, songId, rating) => {
+  try {
+      const response = await fetch('http://localhost:8080/api/history/rate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, songId, rating })
+      });
+      return await response.json();
+  } catch (error) {
+      console.error('Error rating song:', error);
+      throw error;
+  }
+};
