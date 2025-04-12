@@ -6,8 +6,8 @@ import { getSongAudio } from '../apis/api_song';
 import { getImageUrl } from '../apis/api_playlistcard';
 import { getArtistsByIds } from '../apis/api_artist';
 import { getImage } from '../apis/api_image';
-import { addHistory } from '../apis/api_history';
-import { FaPlay, FaPause } from 'react-icons/fa';
+import { addHistory, recordListen, rateSong } from '../apis/api_history';
+import { FaPlay, FaPause, FaStar } from 'react-icons/fa';
 import { FiClock } from 'react-icons/fi';
 import LoginPage from './LoginPage';
 
@@ -22,7 +22,7 @@ const PlaylistDetail = ({
   currentPlaylistId,
   resetCurrentTime,
   cardIndex,
-  onNextTrack: parentOnNextTrack, // Nếu bạn truyền onNextTrack từ component cha
+  onNextTrack,
 }) => {
   const { isLoggedIn, userId } = useContext(AuthContext);
   const { libraryItems, addToLibrary, removeFromLibrary } = useLibrary();
@@ -33,6 +33,7 @@ const PlaylistDetail = ({
   const [currentTrackId, setCurrentTrackId] = useState(null);
   const [playlistImageUrl, setPlaylistImageUrl] = useState('https://via.placeholder.com/150');
   const [showLogin, setShowLogin] = useState(false);
+  const [ratings, setRatings] = useState({}); // Lưu trạng thái rating của từng bài hát
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -139,89 +140,150 @@ const PlaylistDetail = ({
     return result;
   };
 
-  const handlePlayPauseClick = () => {
-    if (!isLoggedIn) {
-      setShowLogin(true);
-      return;
-    }
+const handlePlayPauseClick = async () => {
+  if (!isLoggedIn) {
+    setShowLogin(true);
+    return;
+  }
 
-    if (tracks.length > 0) {
-      if (!isCurrentPlaylistPlaying()) {
-        setCurrentTrackId(tracks[0].id);
-        onTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
-      } else {
-        setIsPlaying(!isPlaying);
+  if (tracks.length > 0) {
+    if (!isCurrentPlaylistPlaying()) {
+      setCurrentTrackId(tracks[0].id);
+      onTrackSelect(tracks[0], tracks, playlist.id, cardIndex);
+      setIsPlaying(true);
+
+      // Thêm vào lịch sử và tăng listenCount
+      if (userId) {
+        const historyData = {
+          userId: userId,
+          songId: tracks[0].songId,
+          title: tracks[0].title,
+          artist: tracks[0].artist,
+          imageUrl: tracks[0].imageUrl,
+          timestamp: new Date().toISOString(), // Đảm bảo timestamp là chuỗi ISO
+        };
+        try {
+          const addHistoryResponse = await addHistory(historyData);
+          console.log('addHistory response:', addHistoryResponse);
+          const recordListenResponse = await recordListen(historyData);
+          console.log('recordListen response:', recordListenResponse);
+        } catch (err) {
+          console.error('Error in handlePlayPauseClick:', err);
+          setError(err.message);
+        }
       }
+    } else {
+      setIsPlaying(!isPlaying);
     }
-  };
+  }
+};
 
-  const handleTrackPlayPause = async (track) => {
-    if (!isLoggedIn) {
+const handleTrackPlayPause = async (track) => {
+  if (!isLoggedIn) {
       setShowLogin(true);
       return;
-    }
+  }
 
-    try {
+  try {
       if (currentTrackId === track.id && isCurrentPlaylistPlaying()) {
-        setIsPlaying(!isPlaying);
+          setIsPlaying(!isPlaying);
       } else {
-        setCurrentTrackId(track.id);
-        resetCurrentTime();
-        onTrackSelect(track, tracks, playlist.id, cardIndex);
-        setIsPlaying(true);
+          setCurrentTrackId(track.id);
+          resetCurrentTime();
+          onTrackSelect(track, tracks, playlist.id, cardIndex);
+          setIsPlaying(true);
 
-        if (userId) {
-          const historyData = {
-            userId: userId,
-            songId: track.songId,
-            timestamp: new Date().toISOString(),
-          };
-          await addHistory(historyData);
-          console.log(`Added song ${track.songId} to history for user ${userId}`);
-        }
+          // Thêm vào lịch sử và tăng listenCount
+          if (userId) {
+              const historyData = {
+                  userId: userId,
+                  songId: track.songId,
+                  title: track.title,
+                  artist: track.artist,
+                  imageUrl: track.imageUrl,
+                  timestamp: new Date().toISOString(), // Chuỗi ISO với múi giờ Z
+              };
+              const addHistoryResponse = await addHistory(historyData);
+              console.log('addHistory response:', addHistoryResponse);
+              const recordListenResponse = await recordListen(historyData);
+              console.log('recordListen response:', recordListenResponse);
 
-        if (track.artistIds && track.artistIds.length > 0) {
-          const artists = await getArtistsByIds(track.artistIds);
-          onArtistSelect(artists[0]);
-        }
+              if (track.artistIds && track.artistIds.length > 0) {
+                  const artists = await getArtistsByIds(track.artistIds);
+                  onArtistSelect(artists[0]);
+              }
+          }
+      }
+  } catch (err) {
+      console.error('Error in handleTrackPlayPause:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Something went wrong';
+      setError(errorMessage);
+  }
+};
+
+const handleNextTrack = async () => {
+  if (!tracks || tracks.length === 0 || !currentSong) return;
+
+  const currentIndex = tracks.findIndex((track) => track.url === currentSong.url);
+  if (currentIndex === -1) return;
+
+  const nextIndex = currentIndex === tracks.length - 1 ? 0 : currentIndex + 1;
+  const nextTrack = tracks[nextIndex];
+
+  setCurrentTrackId(nextTrack.id);
+  resetCurrentTime();
+  onTrackSelect(nextTrack, tracks, playlist.id, cardIndex);
+  setIsPlaying(true);
+
+  if (userId) {
+    const historyData = {
+      userId: userId,
+      songId: nextTrack.songId,
+      title: nextTrack.title,
+      artist: nextTrack.artist,
+      imageUrl: nextTrack.imageUrl,
+      timestamp: new Date().toISOString(), // Đảm bảo timestamp là chuỗi ISO
+    };
+    try {
+      const addHistoryResponse = await addHistory(historyData);
+      console.log('addHistory response:', addHistoryResponse);
+      const recordListenResponse = await recordListen(historyData);
+      console.log('recordListen response:', recordListenResponse);
+
+      if (nextTrack.artistIds && nextTrack.artistIds.length > 0) {
+        const artists = await getArtistsByIds(nextTrack.artistIds);
+        onArtistSelect(artists[0]);
       }
     } catch (err) {
+      console.error('Error in handleNextTrack:', err);
       setError(err.message);
     }
-  };
+  }
+};
 
-  const handleNextTrack = async () => {
-    if (!tracks || tracks.length === 0 || !currentSong) return;
+const handleRateSong = async (songId, rating) => {
+  if (!isLoggedIn || !userId) {
+    alert('Please log in to rate songs.');
+    return;
+  }
 
-    const currentIndex = tracks.findIndex((track) => track.url === currentSong.url);
-    if (currentIndex === -1) return;
-
-    // Chuyển sang bài tiếp theo, quay lại đầu nếu ở cuối danh sách
-    const nextIndex = currentIndex === tracks.length - 1 ? 0 : currentIndex + 1;
-    const nextTrack = tracks[nextIndex];
-
-    setCurrentTrackId(nextTrack.id);
-    resetCurrentTime();
-    onTrackSelect(nextTrack, tracks, playlist.id, cardIndex);
-    setIsPlaying(true);
-
-    // Nếu có userId, thêm vào lịch sử
-    if (userId) {
-      const historyData = {
-        userId: userId,
-        songId: nextTrack.songId,
-        timestamp: new Date().toISOString(),
-      };
-      await addHistory(historyData);
-      console.log(`Added song ${nextTrack.songId} to history for user ${userId}`);
-    }
-
-    // Cập nhật thông tin nghệ sĩ nếu cần
-    if (nextTrack.artistIds && nextTrack.artistIds.length > 0) {
-      const artists = await getArtistsByIds(nextTrack.artistIds);
-      onArtistSelect(artists[0]);
-    }
-  };
+  try {
+    const historyData = {
+      userId: userId,
+      songId: songId,
+      rating: Number(rating), // Đảm bảo rating là số
+    };
+    const rateSongResponse = await rateSong(historyData);
+    console.log('rateSong response:', rateSongResponse);
+    setRatings((prevRatings) => ({
+      ...prevRatings,
+      [songId]: rating,
+    }));
+  } catch (error) {
+    console.error('Failed to rate song:', error);
+    alert('Failed to rate song. Please try again.');
+  }
+};
 
   const handleLoginRedirect = () => {
     navigate('/auth');
@@ -315,8 +377,9 @@ const PlaylistDetail = ({
           <>
             <div className="grid grid-cols-12 gap-4 border-b border-gray-700 pb-2 mb-3">
               <div className="col-span-1">#</div>
-              <div className="col-span-5">Title</div>
-              <div className="col-span-4">Category</div>
+              <div className="col-span-4">Title</div>
+              <div className="col-span-3">Category</div>
+              <div className="col-span-2">Rate Song</div>
               <div className="col-span-2 text-right">
                 <FiClock className="inline-block w-5 h-5" />
               </div>
@@ -344,7 +407,7 @@ const PlaylistDetail = ({
                       track.id
                     )}
                   </div>
-                  <div className="col-span-5 flex items-center">
+                  <div className="col-span-4 flex items-center">
                     <img
                       src={track.imageUrl}
                       alt={track.title}
@@ -356,8 +419,26 @@ const PlaylistDetail = ({
                       <p className="text-sm text-gray-400">{track.artist}</p>
                     </div>
                   </div>
-                  <div className="col-span-4">{track.category}</div>
-                  <div className="col-span-2 text-right">{track.duration}</div>
+                  <div className="col-span-3 flex items-center">{track.category}</div>
+                  <div className="col-span-2 flex items-center">
+                    {[...Array(5)].map((_, index) => {
+                      const ratingValue = index + 1;
+                      return (
+                        <FaStar
+                          key={index}
+                          size={16}
+                          color={
+                            ratingValue <= (ratings[track.songId] || 0) ? '#ffc107' : '#e4e5e9'
+                          }
+                          onClick={() => handleRateSong(track.songId, ratingValue)}
+                          className="cursor-pointer mx-1"
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="col-span-2 text-right flex items-center justify-end">
+                    {track.duration}
+                  </div>
                 </div>
               ))
             )}

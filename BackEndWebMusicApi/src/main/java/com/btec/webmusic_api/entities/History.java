@@ -1,100 +1,87 @@
 package com.btec.webmusic_api.entities;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "history")
+import java.time.ZonedDateTime;
+
+@Document(collection = "history")
 public class History {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "song_id", nullable = false)
     private String songId;
 
-    @Column(name = "title")
     private String title;
 
-    @Column(name = "artist")
     private String artist;
 
-    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private Integer listenCount;
 
-    // Constructors
+    private Integer rating;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+    private ZonedDateTime timestamp;
+
+    // Constructors, Getters, Setters
     public History() {}
 
-    public History(String userId, String songId, String title, String artist, String imageUrl, LocalDateTime timestamp) {
+    public History(String userId, String songId, String title, String artist, String imageUrl, Integer listenCount, Integer rating, ZonedDateTime timestamp) {
         this.userId = userId;
         this.songId = songId;
         this.title = title;
         this.artist = artist;
         this.imageUrl = imageUrl;
+        this.listenCount = listenCount;
+        this.rating = rating;
         this.timestamp = timestamp;
     }
 
-    // Getters and Setters
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
-    public String getUserId() {
-        return userId;
-    }
+    public String getSongId() { return songId; }
+    public void setSongId(String songId) { this.songId = songId; }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getSongId() {
-        return songId;
-    }
+    public String getArtist() { return artist; }
+    public void setArtist(String artist) { this.artist = artist; }
 
-    public void setSongId(String songId) {
-        this.songId = songId;
-    }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public String getTitle() {
-        return title;
-    }
+    public Integer getListenCount() { return listenCount; }
+    public void setListenCount(Integer listenCount) { this.listenCount = listenCount; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
 
-    public String getArtist() {
-        return artist;
-    }
+    public ZonedDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(ZonedDateTime timestamp) { this.timestamp = timestamp; }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    @Override
+    public String toString() {
+        return "History{" +
+                "id='" + id + '\'' +
+                ", userId='" + userId + '\'' +
+                ", songId='" + songId + '\'' +
+                ", title='" + title + '\'' +
+                ", artist='" + artist + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", listenCount=" + listenCount +
+                ", rating=" + rating +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }
