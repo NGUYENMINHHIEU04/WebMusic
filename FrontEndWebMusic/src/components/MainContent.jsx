@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Playlist from './Playlist';
 import PlaylistDetail from './PlaylistDetail';
 import { getAllPlaylists, getImageUrl } from '../apis/api_playlistcard';
-import { getHistoryByUserId, addHistory, recordListen, rateSong } from '../apis/api_history'; // Thêm addHistory
+import { getHistoryByUserId, addHistory, recordListen, rateSong } from '../apis/api_history';
 import { getSongAudio } from '../apis/api_song';
 import { getImage } from '../apis/api_image';
 import { getRecommendations } from '../apis/api_recommendation';
@@ -31,8 +31,10 @@ const MainContent = ({
   const [recommendedItems, setRecommendedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [hoveredItem, setHoveredItem] = useState(null); // Theo dõi bài hát đang được hover
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [historyUpdated, setHistoryUpdated] = useState(0); // Sử dụng số để trigger cập nhật
 
+  // Lấy danh sách playlists
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
@@ -65,6 +67,7 @@ const MainContent = ({
     fetchPlaylists();
   }, []);
 
+  // Lấy lịch sử nghe
   useEffect(() => {
     const fetchHistory = async () => {
       if (!isLoggedIn || !userId) {
@@ -73,6 +76,7 @@ const MainContent = ({
       }
 
       try {
+        console.log(`Fetching history for user ${userId}...`);
         const historyData = await getHistoryByUserId(userId);
         console.log('History data:', historyData);
 
@@ -115,23 +119,24 @@ const MainContent = ({
     };
 
     fetchHistory();
-  }, [isLoggedIn, userId]);
+  }, [isLoggedIn, userId, historyUpdated]);
 
+  // Lấy gợi ý
   useEffect(() => {
     const fetchRecommendations = async () => {
       if (!isLoggedIn || !userId) {
         setRecommendedItems([]);
         return;
       }
-  
+
       try {
-        const recommendations = await getRecommendations(userId);
+        console.log(`Fetching recommendations for user ${userId} at timestamp ${new Date().toISOString()}...`);
+        const recommendations = await getRecommendations(userId, { cache: false, timestamp: Date.now() }); // Thêm tham số để chống cache
         console.log('Recommendations:', recommendations);
-  
+
         const formattedRecommendations = await Promise.all(
           recommendations.map(async (item, index) => {
             try {
-              // Lấy thông tin bài hát từ songId
               const songData = await getSongAudio(item.songId);
               let imageUrl = item.imageUrl || 'https://via.placeholder.com/150';
               if (songData.idImage) {
@@ -141,7 +146,7 @@ const MainContent = ({
                   console.error(`Failed to fetch image for song ${item.songId}:`, err);
                 }
               }
-  
+
               return {
                 id: `recommend-${index}`,
                 songId: item.songId,
@@ -157,16 +162,16 @@ const MainContent = ({
             }
           })
         );
-  
+
         setRecommendedItems(formattedRecommendations.filter((item) => item !== null));
       } catch (err) {
         console.error('Error fetching recommendations:', err);
         setRecommendedItems([]);
       }
     };
-  
+
     fetchRecommendations();
-  }, [isLoggedIn, userId]);
+  }, [isLoggedIn, userId, historyUpdated]);
 
   useEffect(() => {
     if (selectedPlaylistFromLibrary) {
@@ -188,7 +193,7 @@ const MainContent = ({
 
   const handleTrackSelectWithTracks = (track, tracks, playlistId, cardIndex, shouldResetTime = true) => {
     if (shouldResetTime) {
-      resetCurrentTime(); // Chỉ reset thời gian nếu cần
+      resetCurrentTime();
     }
     onTrackSelect(track, tracks, playlistId, cardIndex);
   };
@@ -226,49 +231,43 @@ const MainContent = ({
   const handleRecommendationPlayPause = (index) => {
     const playlist = createRecommendationPlaylist(index);
     const selectedTrack = playlist.tracks[index];
-  
-    // Kiểm tra xem bài hát đang phát có phải là bài vừa chọn không
+
     const isSameTrack =
       currentPlayingCard === index &&
       currentPlaylistId === 'recommendation-playlist';
-  
+
     if (isSameTrack && isPlaying) {
-      // Nếu bài hát đang phát và là bài vừa chọn, tạm dừng
       setIsPlaying(false);
     } else {
-      // Nếu không phải bài đang phát hoặc đang tạm dừng, phát bài hát
       handleTrackSelectWithTracks(
         selectedTrack,
         playlist.tracks,
         playlist.id,
         index,
-        !isSameTrack // Chỉ reset thời gian nếu là bài khác
+        !isSameTrack
       );
       setIsPlaying(true);
       playSong(selectedTrack);
     }
   };
-  
+
   const handleHistoryPlayPause = (index) => {
     const playlist = createHistoryPlaylist(index);
     const selectedTrack = playlist.tracks[index];
-  
-    // Kiểm tra xem bài hát đang phát có phải là bài vừa chọn không
+
     const isSameTrack =
       currentPlayingCard === index &&
       currentPlaylistId === 'history-playlist';
-  
+
     if (isSameTrack && isPlaying) {
-      // Nếu bài hát đang phát và là bài vừa chọn, tạm dừng
       setIsPlaying(false);
     } else {
-      // Nếu không phải bài đang phát hoặc đang tạm dừng, phát bài hát
       handleTrackSelectWithTracks(
         selectedTrack,
         playlist.tracks,
         playlist.id,
         index,
-        !isSameTrack // Chỉ reset thời gian nếu là bài khác
+        !isSameTrack
       );
       setIsPlaying(true);
       playSong(selectedTrack);
@@ -286,9 +285,10 @@ const MainContent = ({
           imageUrl: song.imageUrl,
           timestamp: new Date().toISOString(),
         };
-        await addHistory(historyData); // Thêm lịch sử
-        await recordListen(historyData); // Tăng listenCount
+        await addHistory(historyData);
+        await recordListen(historyData);
         console.log(`Added song ${song.songId} to history and recorded listen for user ${userId}`);
+        setHistoryUpdated(prev => prev + 1); // Tăng giá trị để trigger cập nhật
       } catch (error) {
         console.error('Failed to record listen:', error);
       }
@@ -395,124 +395,122 @@ const MainContent = ({
         ) : (
           <div>
             {isLoggedIn && recommendedItems.length > 0 && (
-  <div className="mb-8">
-    <div className="flex justify-between items-center mb-5">
-      <h2 className="text-2xl font-bold">Recommended for You</h2>
-      <button className="text-gray-400 hover:text-white text-sm">SHOW ALL</button>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-      {recommendedItems.slice(0, 5).map((item, index) => {
-        const isItemPlaying =
-          isPlaying &&
-          currentPlayingCard === index &&
-          currentPlaylistId === 'recommendation-playlist';
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-5">
+                  <h2 className="text-2xl font-bold">Recommended for You</h2>
+                  <button className="text-gray-400 hover:text-white text-sm">SHOW ALL</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                  {recommendedItems.slice(0, 5).map((item, index) => {
+                    const isItemPlaying =
+                      isPlaying &&
+                      currentPlayingCard === index &&
+                      currentPlaylistId === 'recommendation-playlist';
 
-        return (
-          <div
-            key={item.songId}
-            className="relative bg-gray-900 p-4 rounded-lg flex flex-col items-start cursor-pointer hover:bg-gray-700"
-            onMouseEnter={() => setHoveredItem(item.id)} // Khi hover, lưu id của bài hát
-            onMouseLeave={() => setHoveredItem(null)} // Khi rời chuột, reset
-            onClick={() => handleRecommendationPlayPause(index)} // Giữ nguyên logic phát nhạc khi bấm vào card
-          >
-            <img
-              src={item.imageUrl}
-              alt={item.title}
-              className="w-full h-40 object-cover rounded-md mb-3"
-              onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
-            />
-            {/* Nút Play/Pause */}
-            <div
-              className={`absolute right-3 top-[140px] transform transition-opacity duration-300 ${
-                hoveredItem === item.id ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <button
-                className="bg-[#1DB954] rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-[#1ED760] transition-colors duration-200"
-                onClick={(e) => {
-                  e.stopPropagation(); // Ngăn sự kiện click trên card
-                  handleRecommendationPlayPause(index); // Gọi hàm phát nhạc
-                }}
-              >
-                {isItemPlaying ? (
-                  <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
-                  </svg>
-                ) : (
-                  <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-            <h3 className="text-lg font-semibold">{item.title}</h3>
-            <p className="text-gray-400 text-sm">{item.artist}</p>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-)}
+                    return (
+                      <div
+                        key={item.songId}
+                        className="relative bg-gray-900 p-4 rounded-lg flex flex-col items-start cursor-pointer hover:bg-gray-700"
+                        onMouseEnter={() => setHoveredItem(item.id)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        onClick={() => handleRecommendationPlayPause(index)}
+                      >
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-full h-40 object-cover rounded-md mb-3"
+                          onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
+                        />
+                        <div
+                          className={`absolute right-3 top-[140px] transform transition-opacity duration-300 ${
+                            hoveredItem === item.id ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        >
+                          <button
+                            className="bg-[#1DB954] rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-[#1ED760] transition-colors duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRecommendationPlayPause(index);
+                            }}
+                          >
+                            {isItemPlaying ? (
+                              <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                        <h3 className="text-lg font-semibold">{item.title}</h3>
+                        <p className="text-gray-400 text-sm">{item.artist}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
-{isLoggedIn && historyItems.length > 0 && (
-  <div className="mb-8">
-    <div className="flex justify-between items-center mb-5">
-      <h2 className="text-2xl font-bold">Your Listening History</h2>
-      <button className="text-gray-400 hover:text-white text-sm">SHOW ALL</button>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
-      {historyItems.slice(0, 5).map((item, index) => {
-        const isItemPlaying =
-          isPlaying &&
-          currentPlayingCard === index &&
-          currentPlaylistId === 'history-playlist';
+            {isLoggedIn && historyItems.length > 0 && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-5">
+                  <h2 className="text-2xl font-bold">Your Listening History</h2>
+                  <button className="text-gray-400 hover:text-white text-sm">Show All</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                  {historyItems.slice(0, 5).map((item, index) => {
+                    const isItemPlaying =
+                      isPlaying &&
+                      currentPlayingCard === index &&
+                      currentPlaylistId === 'history-playlist';
 
-        return (
-          <div
-            key={item.id}
-            className="relative bg-gray-900 p-4 rounded-lg flex flex-col items-start cursor-pointer hover:bg-gray-700"
-            onMouseEnter={() => setHoveredItem(item.id)} // Khi hover, lưu id của bài hát
-            onMouseLeave={() => setHoveredItem(null)} // Khi rời chuột, reset
-            onClick={() => handleHistoryPlayPause(index)} // Giữ nguyên logic phát nhạc khi bấm vào card
-          >
-            <img
-              src={item.imageUrl}
-              alt={item.title}
-              className="w-full h-40 object-cover rounded-md mb-3"
-              onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
-            />
-            {/* Nút Play/Pause */}
-            <div
-              className={`absolute right-3 top-[140px] transform transition-opacity duration-300 ${
-                hoveredItem === item.id ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <button
-                className="bg-[#1DB954] rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-[#1ED760] transition-colors duration-200"
-                onClick={(e) => {
-                  e.stopPropagation(); // Ngăn sự kiện click trên card
-                  handleHistoryPlayPause(index); // Gọi hàm phát nhạc
-                }}
-              >
-                {isItemPlaying ? (
-                  <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                )}
-              </button>
-            </div>
-            <h3 className="text-lg font-semibold">{item.title}</h3>
-            <p className="text-gray-400 text-sm">{item.artist}</p>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-)}
+                    return (
+                      <div
+                        key={item.id}
+                        className="relative bg-gray-900 p-4 rounded-lg flex flex-col items-start cursor-pointer hover:bg-gray-700"
+                        onMouseEnter={() => setHoveredItem(item.id)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        onClick={() => handleHistoryPlayPause(index)}
+                      >
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="w-full h-40 object-cover rounded-md mb-3"
+                          onError={(e) => (e.target.src = 'https://via.placeholder.com/150')}
+                        />
+                        <div
+                          className={`absolute right-3 top-[140px] transform transition-opacity duration-300 ${
+                            hoveredItem === item.id ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        >
+                          <button
+                            className="bg-[#1DB954] rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-[#1ED760] transition-colors duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleHistoryPlayPause(index);
+                            }}
+                          >
+                            {isItemPlaying ? (
+                              <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
+                              </svg>
+                            ) : (
+                              <svg className="w-6 h-6 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                        <h3 className="text-lg font-semibold">{item.title}</h3>
+                        <p className="text-gray-400 text-sm">{item.artist}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <Playlist
               playlists={playlists}

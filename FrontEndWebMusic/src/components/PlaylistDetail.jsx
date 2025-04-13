@@ -263,25 +263,35 @@ const handleNextTrack = async () => {
 
 const handleRateSong = async (songId, rating) => {
   if (!isLoggedIn || !userId) {
-    alert('Please log in to rate songs.');
-    return;
+      alert('Please log in to rate songs.');
+      return;
   }
 
   try {
-    const historyData = {
-      userId: userId,
-      songId: songId,
-      rating: Number(rating), // Đảm bảo rating là số
-    };
-    const rateSongResponse = await rateSong(historyData);
-    console.log('rateSong response:', rateSongResponse);
-    setRatings((prevRatings) => ({
-      ...prevRatings,
-      [songId]: rating,
-    }));
+      // Tìm track tương ứng để lấy thông tin đầy đủ
+      const track = tracks.find((t) => t.songId === songId);
+      if (!track) {
+          throw new Error('Song not found');
+      }
+
+      const historyData = {
+          userId: userId,
+          songId: songId,
+          rating: Number(rating),
+          title: track.title || 'Unknown Title',
+          artist: track.artist || 'Unknown Artist',
+          imageUrl: track.imageUrl || 'https://via.placeholder.com/150',
+          timestamp: new Date().toISOString(),
+      };
+      const rateSongResponse = await rateSong(historyData);
+      console.log('rateSong response:', rateSongResponse);
+      setRatings((prevRatings) => ({
+          ...prevRatings,
+          [songId]: rating,
+      }));
   } catch (error) {
-    console.error('Failed to rate song:', error);
-    alert('Failed to rate song. Please try again.');
+      console.error('Failed to rate song:', error);
+      alert('Failed to rate song. Please try again.');
   }
 };
 
