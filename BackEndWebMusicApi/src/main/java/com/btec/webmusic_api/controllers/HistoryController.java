@@ -113,6 +113,39 @@ public class HistoryController {
         }
     }
 
+    // Thêm endpoint mới để hỗ trợ GET /api/history
+    @GetMapping
+    public ResponseEntity<ResponseObject<List<Map<String, Object>>>> getAllHistory() {
+        try {
+            List<History> historyList = historyService.getAllHistory();
+            if (historyList.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ResponseObject<>(404, null, "No history found"));
+            }
+            List<Map<String, Object>> historyResponse = historyList.stream()
+                    .map(history -> {
+                        Map<String, Object> response = new HashMap<>();
+                        response.put("songId", history.getSongId());
+                        response.put("userId", history.getUserId());
+                        response.put("title", history.getTitle() != null ? history.getTitle() : "Unknown Song");
+                        response.put("artist", history.getArtist() != null ? history.getArtist() : "Unknown Artist");
+                        response.put("imageUrl", history.getImageUrl() != null ? history.getImageUrl() : "https://via.placeholder.com/150");
+                        response.put("listenCount", history.getListenCount() != null ? history.getListenCount() : 0);
+                        response.put("rating", history.getRating());
+                        response.put("timestamp", history.getTimestamp());
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ResponseObject<>(200, historyResponse, "Retrieved all history entries"));
+        } catch (Exception e) {
+            System.out.println("Unexpected error in getAllHistory: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ResponseObject<>(500, null, "Unexpected error: " + e.getMessage()));
+        }
+    }
+
 
 
 }
